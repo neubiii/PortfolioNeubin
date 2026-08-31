@@ -10,7 +10,7 @@ import ArrowLink from '@/components/ui/ArrowLink.vue'
       The link is broken or the page has moved. The work is all still where it should be.
     </p>
     <div class="nf__actions">
-      <ArrowLink to="/work" size="lg">View the work</ArrowLink>
+      <ArrowLink to="/#work" size="lg">View the work</ArrowLink>
       <ArrowLink to="/">Back home</ArrowLink>
     </div>
   </div>

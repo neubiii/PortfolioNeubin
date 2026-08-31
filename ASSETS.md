@@ -1,34 +1,30 @@
 # Assets — Figma export manifest
 
-Every image on the site currently renders a **ratio-accurate placeholder** that
-names the Figma node it is waiting for. The site is complete apart from these.
+**Status: fulfilled.** Every image below is now a real PNG export in
+`src/assets/`, and each entry's `ratio` in `projects.ts` matches the file's
+measured intrinsic dimensions.
 
-## Why they aren't already here
+Keep this table as the record of which Figma node each file came from, so a
+re-export later lands in the right place.
 
-The Figma asset CDN is blocked by this environment's network policy, so the
-real bitmaps could not be downloaded automatically. Everything else — all the
-copy, statistics, quotes and structure — came straight out of the Figma file.
-
-## How to swap one in
+## How to replace one
 
 1. In Figma, select the node listed below.
 2. Export as **PNG, 2x**.
-3. Save it into `src/assets/<folder>/` under the **exact filename** in the table.
-4. Delete the `.svg` placeholder sitting next to it.
+3. Overwrite the file of that name in `src/assets/<folder>/`.
+4. Update that item's `ratio` in `projects.ts` to the new pixel dimensions.
 
-Nothing else changes. `src/data/assets.ts` resolves images by name, prefers a
-real `.png` over a placeholder automatically, and the "Placeholder" badge on the
-frame disappears on its own.
+`src/data/assets.ts` resolves images by name, so nothing else changes. The
+`ratio` is only used to reserve space before load — it is released once the
+browser knows the real size, so a wrong value costs a small layout shift and
+never a distorted image.
 
 File key: `xbNlhyfWuoGdGYpjusY0eD`
 
 ---
 
-## `src/assets/profile/`
-
-| File          | Source                                                      |
-| ------------- | ----------------------------------------------------------- |
-| `portrait.png` | Your photo. Portrait crop, roughly 3:4, at least 900px wide. |
+> The portrait is no longer used — the hero is typography-led — so
+> `src/assets/profile/` has been removed.
 
 ## `src/assets/meet-in-room/` — page `CasestudyMeetingroom`
 

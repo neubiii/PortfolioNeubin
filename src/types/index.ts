@@ -14,8 +14,29 @@ export interface MediaItem {
   src: string
   /** Empty string marks the image decorative; it is then hidden from AT. */
   alt: string
+  /**
+   * The asset's true intrinsic aspect, e.g. `786/1704`. Used only to reserve
+   * space before the image loads — it is dropped once the real dimensions are
+   * known, so a stale value can never crop or letterbox the final image.
+   */
   ratio?: string
-  fit?: 'cover' | 'contain'
+  /**
+   * How the image is presented.
+   *
+   * `natural`  (default) — the screenshot is the visual. Intrinsic aspect, no
+   *            frame, no background, never cropped. Every case-study image.
+   * `longform` — a full-page capture too tall to sit inline (evergrove/page is
+   *            2882×8958). Collapsed with an explicit expand control.
+   * `crop`     — a deliberately cropped tile at a ratio the component supplies.
+   *            Index covers only, so the work list keeps one rhythm.
+   */
+  display?: 'natural' | 'longform' | 'crop'
+  /**
+   * `object-position` for the cropped preview stage, e.g. `'center top'`.
+   * Only consulted when the image is cropped; defaults to centred. Set it on a
+   * cover whose subject sits off-centre and would otherwise be trimmed.
+   */
+  previewPosition?: string
   caption?: string
 }
 

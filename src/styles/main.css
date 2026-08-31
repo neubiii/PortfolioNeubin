@@ -49,8 +49,8 @@
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
-    /* Sticky header + a little air, so anchored sections don't hide under the nav. */
-    scroll-padding-top: 7rem;
+    /* Sticky header (4.5rem) + air, so anchored sections don't hide under it. */
+    scroll-padding-top: 6.5rem;
   }
 
   body {

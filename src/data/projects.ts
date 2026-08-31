@@ -1,4 +1,4 @@
-import type { Project } from '@/types'
+import type { Discipline, Project } from '@/types'
 
 /**
  * PROJECT CONTENT
@@ -178,37 +178,37 @@ export const projects: Project[] = [
           {
             src: 'ai-expense-agent/flow-upload',
             alt: 'Upload step — receipt attached, extraction in progress',
-            ratio: '393/852',
+            ratio: '786/1704',
             caption: 'Upload',
           },
           {
             src: 'ai-expense-agent/flow-review',
             alt: 'Review step — fields marked "Suggested by AI", low-confidence fields flagged amber',
-            ratio: '393/852',
+            ratio: '786/1704',
             caption: 'Review — confidence surfaced per field',
           },
           {
             src: 'ai-expense-agent/flow-justify',
             alt: 'Justification step — a policy violation asking for a written justification',
-            ratio: '393/852',
+            ratio: '786/1704',
             caption: 'Justify — a violation invites an explanation',
           },
           {
             src: 'ai-expense-agent/flow-messages',
             alt: 'Messages panel grouping errors, warnings and information',
-            ratio: '393/852',
+            ratio: '786/1768',
             caption: 'Messages — errors, warnings, information',
           },
           {
             src: 'ai-expense-agent/flow-confirm',
             alt: 'Confirm step — the completed report before submission',
-            ratio: '393/852',
+            ratio: '786/1704',
             caption: 'Confirm',
           },
           {
             src: 'ai-expense-agent/flow-submitted',
             alt: 'Submitted confirmation screen',
-            ratio: '393/852',
+            ratio: '786/1704',
             caption: 'Submitted',
           },
         ],
@@ -311,7 +311,7 @@ export const projects: Project[] = [
     cover: {
       src: 'meet-in-room/cover',
       alt: 'Meet-in-Room — the room booking app shown on two phones',
-      ratio: '1220/450',
+      ratio: '2440/900',
     },
     presentation: 'case-study',
     featured: true,
@@ -327,7 +327,7 @@ export const projects: Project[] = [
           {
             src: 'meet-in-room/hero',
             alt: 'Meet-in-Room booking flow shown across several phone screens',
-            ratio: '1680/614',
+            ratio: '3360/1228',
           },
         ],
       },
@@ -416,13 +416,13 @@ export const projects: Project[] = [
           {
             src: 'meet-in-room/wireframes',
             alt: 'Paper wireframes exploring structure and flow',
-            ratio: '812/640',
+            ratio: '1624/1280',
             caption: 'Paper wireframes — structure and flow before any styling.',
           },
           {
             src: 'meet-in-room/ia-sitemap',
             alt: 'Sitemap showing three task branches off the home page',
-            ratio: '812/851',
+            ratio: '1624/1702',
             caption: 'Sitemap — three task branches, nothing deeper than three levels.',
           },
         ],
@@ -445,13 +445,13 @@ export const projects: Project[] = [
           {
             src: 'meet-in-room/user-flow',
             alt: 'User flow diagram including failure paths for taken slots and login errors',
-            ratio: '1680/997',
+            ratio: '3360/1994',
             caption: 'The booking flow with its failure paths drawn in.',
           },
           {
             src: 'meet-in-room/style-guide',
             alt: 'Style guide showing the type ramp, colour palette and component library',
-            ratio: '1680/685',
+            ratio: '3360/1370',
             caption:
               'Style guide and component library — IBM Plex Sans type ramp, the five-colour palette, and the seven reusable components every screen is composed from.',
           },
@@ -488,19 +488,19 @@ export const projects: Project[] = [
           {
             src: 'meet-in-room/solution-availability',
             alt: 'Home screen showing rooms that are free right now',
-            ratio: '528/1143',
+            ratio: '1056/2286',
             caption: 'Availability first',
           },
           {
             src: 'meet-in-room/solution-request',
             alt: 'A taken slot offering a Request action',
-            ratio: '528/1143',
+            ratio: '1056/2286',
             caption: "Request, don't walk",
           },
           {
             src: 'meet-in-room/solution-inbox',
             alt: 'Attendees added, with invites routed through college email',
-            ratio: '528/1143',
+            ratio: '1056/2286',
             caption: 'Familiar inbox',
           },
         ],
@@ -553,19 +553,19 @@ export const projects: Project[] = [
           {
             src: 'meet-in-room/test-round-1',
             alt: 'Round one testing findings annotated on wireframes',
-            ratio: '812/539',
+            ratio: '1624/1078',
             caption: 'Round 1 — at wireframe stage',
           },
           {
             src: 'meet-in-room/test-round-2',
             alt: 'Round two testing findings annotated on high-fidelity screens',
-            ratio: '812/678',
+            ratio: '1624/1356',
             caption: 'Round 2 — in high fidelity',
           },
           {
             src: 'meet-in-room/ab-test',
             alt: 'A/B test comparing two booking entry treatments',
-            ratio: '812/678',
+            ratio: '1624/1356',
             caption: 'A/B test — booking entry',
           },
         ],
@@ -605,7 +605,7 @@ export const projects: Project[] = [
     cover: {
       src: 'busstop/cover',
       alt: 'BusStop — the transit app shown on two phones',
-      ratio: '1232/440',
+      ratio: '7112/5334',
     },
     presentation: 'case-study',
     featured: false,
@@ -642,14 +642,14 @@ export const projects: Project[] = [
           {
             src: 'busstop/competitive-analysis',
             alt: 'Competitive analysis matrix comparing Bus Times, Google Maps, Moovit and Where is my Train',
-            ratio: '1805/1322',
+            ratio: '1806/1417',
             caption:
               'Competitive analysis — guest account, local schedules, live tracking, alarm setter.',
           },
           {
             src: 'busstop/persona',
             alt: 'User persona for Dhakshayani C, 22, designer in Bangalore',
-            ratio: '1479/1446',
+            ratio: '1173/1135',
             caption: 'Primary persona — a daily commuter, not an occasional traveller.',
           },
         ],
@@ -695,13 +695,13 @@ export const projects: Project[] = [
           {
             src: 'busstop/ia',
             alt: 'Information architecture showing home, bus and bus stop branches',
-            ratio: '1365/1798',
+            ratio: '924/668',
             caption: 'Information architecture — guest-first, three ways in.',
           },
           {
             src: 'busstop/user-flow',
             alt: 'User flow from search through bus details to live tracking',
-            ratio: '3112/2666',
+            ratio: '1104/1469',
             caption: 'Search → bus details → live track: one component, three inputs.',
           },
         ],
@@ -745,37 +745,37 @@ export const projects: Project[] = [
           {
             src: 'busstop/screen-home',
             alt: 'Home screen with From and To inputs',
-            ratio: '393/852',
+            ratio: '786/1704',
             caption: 'From and To only. One job per screen.',
           },
           {
             src: 'busstop/screen-find-bus',
             alt: 'Bus results list with fares and on-time status',
-            ratio: '393/852',
+            ratio: '786/1704',
             caption: 'Results — schedules, fare, delay flags.',
           },
           {
             src: 'busstop/screen-live-track',
             alt: 'Live tracking view for route 507K',
-            ratio: '393/852',
+            ratio: '786/1704',
             caption: 'Redesigned simpler after users stalled on this screen.',
           },
           {
             src: 'busstop/screen-alarm',
             alt: 'Stop alarm configuration screen',
-            ratio: '393/852',
+            ratio: '786/1704',
             caption: 'Stop alarm frees riders from watching the map.',
           },
           {
             src: 'busstop/type-color',
             alt: 'Typography and colour system — Quicksand and Reem Kufi on navy',
-            ratio: '1317/1235',
+            ratio: '2634/2470',
             caption: 'Borrowed from the signage — Quicksand and Reem Kufi.',
           },
           {
             src: 'busstop/wireframes',
             alt: 'Eighteen wireframes laid out as a system',
-            ratio: '3971/2251',
+            ratio: '2978/2912',
             caption: 'Eighteen wireframes, one street plan.',
           },
         ],
@@ -837,7 +837,7 @@ export const projects: Project[] = [
     cover: {
       src: 'evergrove/cover',
       alt: 'EverGrove landing page hero',
-      ratio: '1441/1080',
+      ratio: '2882/2606',
     },
     presentation: 'gallery',
     featured: true,
@@ -860,9 +860,9 @@ export const projects: Project[] = [
         items: [
           {
             src: 'evergrove/page',
+            display: 'longform',
             alt: 'Full EverGrove landing page — hero, clients, features, testimonials, pricing and footer',
-            ratio: '1441/4479',
-            fit: 'contain',
+            ratio: '2882/8958',
             caption: 'Full page at 1440 — hero through footer.',
           },
         ],
@@ -876,8 +876,7 @@ export const projects: Project[] = [
           {
             src: 'evergrove/components',
             alt: 'Component sheet showing primary and secondary buttons and links in default, hover, active and disabled states',
-            ratio: '1926/1513',
-            fit: 'contain',
+            ratio: '4012/3186',
             caption:
               'Primary, secondary and link treatments — default, hover, active and disabled.',
           },
@@ -906,7 +905,7 @@ export const projects: Project[] = [
     cover: {
       src: 'rate-conversion/cover',
       alt: 'Rate conversion tool landing page',
-      ratio: '1443/1254',
+      ratio: '3946/2960',
     },
     presentation: 'gallery',
     featured: false,
@@ -930,8 +929,7 @@ export const projects: Project[] = [
           {
             src: 'rate-conversion/page',
             alt: 'Rate conversion tool landing page at 1440 width',
-            ratio: '1443/1254',
-            fit: 'contain',
+            ratio: '2886/2508',
           },
         ],
       },
@@ -939,21 +937,25 @@ export const projects: Project[] = [
   },
 ]
 
-export const disciplines = [
-  { id: 'ux', label: 'UI/UX', phase: 1 },
-  { id: 'development', label: 'Development', phase: 2 },
-  { id: 'writing', label: 'Writing', phase: 2 },
-] as const
+/**
+ * The portfolio's three content types, in nav order. `Development` and
+ * `Blogs` are intentionally empty — the showcase renders whatever
+ * `projects` contains, so adding entries with the matching `discipline` is
+ * all that Phase 2 requires.
+ */
+export const categories = [
+  { id: 'ux', label: 'UI/UX', empty: 'Development projects will be added next.' },
+  { id: 'development', label: 'Development', empty: 'Development projects will be added next.' },
+  { id: 'writing', label: 'Blogs', empty: 'Writing will be added next.' },
+] as const satisfies readonly { id: Discipline; label: string; empty: string }[]
 
-export type DisciplineId = (typeof disciplines)[number]['id']
+export type CategoryId = (typeof categories)[number]['id']
+
+export const projectsIn = (category: CategoryId): Project[] =>
+  projects.filter((p) => p.discipline === category)
 
 export const findProject = (slug: string): Project | undefined =>
   projects.find((p) => p.slug === slug)
-
-export const featuredProjects = (): Project[] => projects.filter((p) => p.featured)
-
-export const caseStudies = (): Project[] =>
-  projects.filter((p) => p.presentation === 'case-study')
 
 /** Next project in the index, wrapping — powers the end-of-page pager. */
 export const nextProject = (slug: string): Project | undefined => {

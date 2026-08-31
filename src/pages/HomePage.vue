@@ -1,78 +1,68 @@
 <script setup lang="ts">
 import ArrowLink from '@/components/ui/ArrowLink.vue'
 import Annotation from '@/components/ui/Annotation.vue'
+import GridRules from '@/components/ui/GridRules.vue'
+import MotionToggle from '@/components/ui/MotionToggle.vue'
 import Reveal from '@/components/ui/Reveal.vue'
 import SectionHead from '@/components/ui/SectionHead.vue'
-import ProjectRow from '@/components/project/ProjectRow.vue'
-import { featuredProjects, projects } from '@/data/projects'
+import VantaBirds from '@/components/ui/VantaBirds.vue'
+import WorksShowcase from '@/components/project/WorksShowcase.vue'
+import { projects } from '@/data/projects'
 import { profile } from '@/data/profile'
-import { asset, isPlaceholder } from '@/data/assets'
-
-const featured = featuredProjects()
-const portrait = asset('profile/portrait')
-const portraitPending = isPlaceholder('profile/portrait')
 </script>
 
 <template>
   <div>
-    <!-- ── Hero ──────────────────────────────────────────────────────────── -->
-    <section class="hero" aria-labelledby="hero-title">
-      <!-- The column rules are the "live creative background" from the concept,
-           resolved as structure rather than as decoration: they show the grid
-           the whole page is built on. -->
-      <div class="hero__rules" aria-hidden="true">
-        <span v-for="n in 5" :key="n" class="hero__rule" :style="{ '--i': n }" />
-      </div>
+    <!-- ── Hero ──────────────────────────────────────────────────────────────
+         A near-black block in both themes: it is the ground the flock moves
+         across, and fixing it makes the type contrast a constant rather than
+         something that depends on the visitor's theme.
+
+         Layering, back to front: Vanta canvas (inert) → veil → layout ruler →
+         content. Only the content layer takes pointer events.
+    ─────────────────────────────────────────────────────────────────────── -->
+    <section class="hero" data-hero aria-labelledby="hero-title">
+      <VantaBirds class="hero__vanta" />
+      <div class="hero__veil" aria-hidden="true" />
+      <GridRules class="hero__rules" :columns="4" ticks />
 
       <div class="shell hero__inner">
-        <div class="hero__body">
-          <p class="mono hero__eyebrow">
-            {{ profile.role }}
-            <span class="hero__sep" aria-hidden="true">/</span>
-            {{ profile.secondRole }}
-          </p>
+        <p class="mono hero__eyebrow">
+          Product Developer
+          <span class="hero__slash" aria-hidden="true">/</span>
+          UI/UX Developer
+        </p>
 
-          <h1 id="hero-title" class="display hero__title">
-            I design the<br />
-            interface, then<br />
-            I <Annotation>build</Annotation> it.
-          </h1>
+        <h1 id="hero-title" class="display hero__title">
+          I design the interface,<br />
+          then I <Annotation :delay="1100">build</Annotation> it.
+        </h1>
 
-          <p class="lede hero__lede">{{ profile.intro }}</p>
+        <p class="hero__lede">{{ profile.intro }}</p>
 
-          <div class="hero__cta">
-            <ArrowLink to="/work" size="lg">View my work</ArrowLink>
-          </div>
+        <div class="hero__cta">
+          <ArrowLink to="/#work" size="lg">View my work</ArrowLink>
         </div>
+      </div>
 
-        <div class="hero__portrait">
-          <img :src="portrait" alt="" aria-hidden="true" />
-          <p class="mono hero__caption">
-            {{ profile.name }}<span v-if="portraitPending" class="hero__caption-flag"> · photo pending</span>
+      <!-- Ruler foot: a measured bottom edge that also carries the two things
+           worth saying here — how much work there is, and control over the
+           motion behind it. -->
+      <div class="shell hero__foot">
+        <p class="mono hero__foot-item">{{ projects.length }} projects</p>
+
+        <div class="hero__foot-controls">
+          <MotionToggle />
+          <span class="hero__foot-divider" aria-hidden="true" />
+          <p class="mono hero__foot-item">
+            Scroll <span class="hero__foot-arrow" aria-hidden="true">↓</span>
           </p>
         </div>
       </div>
     </section>
 
-    <!-- ── Selected work ─────────────────────────────────────────────────── -->
-    <section class="shell section" aria-labelledby="selected-title">
-      <SectionHead
-        id="selected"
-        marker="Selected"
-        title="Work worth the scroll"
-        :note="`${featured.length} of ${projects.length}`"
-      />
-
-      <div class="stack">
-        <Reveal v-for="(project, i) in featured" :key="project.slug">
-          <ProjectRow :project="project" :flip="i % 2 === 1" :eager="i === 0" />
-        </Reveal>
-      </div>
-
-      <div class="section__more">
-        <ArrowLink to="/work">All work</ArrowLink>
-      </div>
-    </section>
+    <!-- ── Work — the single browsing experience, anchored at #work ────── -->
+    <WorksShowcase />
 
     <!-- ── About ─────────────────────────────────────────────────────────── -->
     <section class="shell section" aria-labelledby="about-title">
@@ -151,110 +141,192 @@ const portraitPending = isPlaceholder('profile/portrait')
 
 .hero {
   position: relative;
-  padding-top: clamp(3rem, 9vw, 7rem);
-  padding-bottom: clamp(4rem, 10vw, 8rem);
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Header is sticky and 4.5rem tall, so hero + header fills exactly one
+     viewport. `svh` keeps that true under mobile browser chrome. */
+  min-height: calc(100svh - 4.5rem);
+  padding-block: clamp(4rem, 12vh, 8rem) 0;
+  background: var(--c-hero-bg);
   overflow: hidden;
+
+  /* Re-point the palette for this block. Every child — the annotation, the
+     arrow link, the rules — reads these, so one declaration inverts the lot. */
+  --c-ink: var(--c-hero-ink);
+  --c-muted: var(--c-hero-muted);
+  --c-accent: var(--c-hero-accent);
+  --c-accent-hover: var(--c-hero-ink);
+  --c-rule: var(--c-hero-rule);
+  --c-rule-strong: var(--c-hero-rule-strong);
+  --c-focus: var(--c-hero-ink);
+  --rules-color: var(--c-hero-rule);
+  --rules-tick: var(--c-hero-rule-strong);
+
+  color: var(--c-hero-ink);
+}
+
+.hero__vanta {
+  z-index: 0;
+}
+
+/* Washes toward the hero's own ground — darkening in dark mode, lightening in
+   light mode — so a bird crossing behind the headline never costs contrast.
+   Not a panel: it has no edge. */
+.hero__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 66% 58% at 50% 47%,
+      rgb(var(--c-hero-veil) / 0.86) 0%,
+      rgb(var(--c-hero-veil) / 0.6) 42%,
+      rgb(var(--c-hero-veil) / 0.22) 68%,
+      transparent 84%
+    ),
+    linear-gradient(to bottom, rgb(var(--c-hero-veil) / 0.55), transparent 22%);
 }
 
 .hero__rules {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: space-evenly;
-  pointer-events: none;
-}
-
-.hero__rule {
-  width: 1px;
-  background: var(--c-rule);
-  transform-origin: top;
-  animation: rule-in 1s var(--ease-out) backwards;
-  animation-delay: calc(var(--i) * 70ms);
-}
-
-@keyframes rule-in {
-  from {
-    transform: scaleY(0);
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero__rule {
-    animation: none;
-  }
+  z-index: 2;
 }
 
 .hero__inner {
   position: relative;
-  display: grid;
-  gap: clamp(2.5rem, 6vw, 4rem);
-}
-
-@media (min-width: 56rem) {
-  .hero__inner {
-    grid-template-columns: minmax(0, 8fr) minmax(0, 3fr);
-    column-gap: clamp(2rem, 6vw, 6rem);
-    align-items: end;
-  }
+  z-index: 3;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-block: clamp(2rem, 6vh, 4rem);
 }
 
 .hero__eyebrow {
-  color: var(--c-muted);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0 0.15rem;
+  max-width: 100%;
+  color: var(--c-hero-muted);
   font-size: var(--t-xs);
-  padding-bottom: 1.5rem;
-  margin-bottom: clamp(1.75rem, 4vw, 2.75rem);
-  border-bottom: 1px solid var(--c-rule);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-bottom: clamp(1.75rem, 5vh, 3rem);
 }
 
-.hero__sep {
-  color: var(--c-accent);
-  padding-inline: 0.4rem;
+/* Wide tracking is the point of this line, but at 390px it runs past the
+   gutter — so it eases off rather than being clipped. */
+@media (max-width: 30rem) {
+  .hero__eyebrow {
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+  }
+}
+
+.hero__slash {
+  color: var(--c-hero-accent);
+  padding-inline: 0.55rem;
 }
 
 .hero__title {
   font-size: var(--t-4xl);
-  margin-bottom: clamp(1.75rem, 4vw, 2.5rem);
+  /* Optical size wound right up: at this scale Fraunces gets the fine
+     hairlines and high contrast that carry the editorial voice. */
+  font-variation-settings:
+    'opsz' 144,
+    'SOFT' 0,
+    'WONK' 1;
+  line-height: 0.98;
+  letter-spacing: -0.028em;
+  max-width: 18ch;
+  text-wrap: balance;
 }
 
 .hero__lede {
-  color: var(--c-muted);
+  margin-top: clamp(1.5rem, 4vh, 2.5rem);
+  max-width: 48ch;
+  font-size: var(--t-lg);
+  line-height: 1.5;
+  color: var(--c-hero-muted);
+  text-wrap: balance;
 }
 
 .hero__cta {
-  margin-top: clamp(2rem, 4vw, 3rem);
+  margin-top: clamp(2rem, 5vh, 3.25rem);
 }
 
-.hero__portrait {
-  max-width: 22rem;
+/* ── Hero foot ─────────────────────────────────────────────────────────── */
+
+.hero__foot {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.35rem;
+  border-top: 1px solid var(--c-hero-rule);
 }
 
-.hero__portrait img {
-  width: 100%;
-  border: 1px solid var(--c-rule);
-  background: var(--c-surface);
-  /* Duotone toward the accent, released on hover — the image commits to the
-     palette at rest and shows its true colour when you engage with it. */
-  filter: grayscale(1) contrast(1.05);
-  transition: filter var(--dur-slow) var(--ease-out);
+.hero__foot-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
 }
 
-.hero__portrait:hover img {
-  filter: none;
+.hero__foot-divider {
+  width: 1px;
+  height: 1.05rem;
+  flex: none;
+  background: var(--c-hero-rule-strong);
 }
 
-.hero__caption-flag {
-  color: var(--c-accent);
+/* On a phone the ruler row keeps the control and drops the count, which the
+   work section states again a screen later. */
+@media (max-width: 34rem) {
+  .hero__foot > .hero__foot-item {
+    display: none;
+  }
+
+  .hero__foot {
+    justify-content: center;
+  }
 }
 
-.hero__caption {
-  margin-top: 0.85rem;
-  color: var(--c-muted);
+.hero__foot-item {
+  color: var(--c-hero-muted);
   font-size: var(--t-xs);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.hero__foot-arrow {
+  display: inline-block;
+  margin-left: 0.35rem;
+  animation: nudge 2.4s var(--ease-in-out) infinite;
+}
+
+@keyframes nudge {
+  0%,
+  72%,
+  100% {
+    transform: translateY(0);
+  }
+  84% {
+    transform: translateY(0.28rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__foot-arrow {
+    animation: none;
+  }
 }
 
 /* ── Shared section rhythm ─────────────────────────────────────────────── */
@@ -263,14 +335,7 @@ const portraitPending = isPlaceholder('profile/portrait')
   padding-block: var(--section-y);
 }
 
-.section__more {
-  margin-top: clamp(2.5rem, 5vw, 4rem);
-}
 
-.stack {
-  display: grid;
-  gap: clamp(3.5rem, 8vw, 6rem);
-}
 
 /* ── About ─────────────────────────────────────────────────────────────── */
 
@@ -393,5 +458,4 @@ const portraitPending = isPlaceholder('profile/portrait')
   color: var(--c-muted);
   max-width: 46ch;
 }
-
 </style>

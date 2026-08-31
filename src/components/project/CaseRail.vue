@@ -88,11 +88,14 @@ const { active } = useScrollSpy(() => titled.value.map((s) => s.id))
 
 @media (min-width: 64rem) {
   .rail {
-    position: sticky;
-    top: 6.5rem;
-    max-height: calc(100vh - 8.5rem);
+    /* Sticky lives on the grid item in ProjectPage. The rail only needs to fit
+       inside it and scroll when the contents list is genuinely taller than the
+       viewport. No `overscroll-behavior: contain` — the wheel must still reach
+       the page once this reaches its end. */
+    min-height: 0;
     overflow-y: auto;
     padding-right: 0.5rem;
+    scrollbar-width: thin;
   }
 }
 

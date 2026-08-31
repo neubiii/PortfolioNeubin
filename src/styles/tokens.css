@@ -38,6 +38,28 @@
   /* Focus */
   --c-focus: #7a1226;
 
+  /* ── Hero ────────────────────────────────────────────────────────────────
+     The landing hero is its own block — a shade deeper than the page ground so
+     it reads as a distinct surface — and it is the canvas the Vanta flock moves
+     across. `--vanta-*` are the flock's own colours, read straight out of CSS
+     by `VantaBirds.vue` so this file stays the single source of palette truth.
+
+     Light hero contrast: ink 15.6:1 · muted 6.2:1 · accent 9.0:1
+     ──────────────────────────────────────────────────────────────────────── */
+  --c-hero-bg: #efe9e2;
+  --c-hero-ink: #16110f;
+  --c-hero-muted: #5b504a;
+  --c-hero-accent: #7a1226;
+  --c-hero-rule: rgb(22 17 15 / 0.11);
+  --c-hero-rule-strong: rgb(22 17 15 / 0.24);
+  /* Raw channels for the readability veil, which washes toward the ground
+     colour in both themes rather than always darkening. */
+  --c-hero-veil: 239 233 226;
+
+  --vanta-bg: #efe9e2;
+  --vanta-c1: #a03a48;
+  --vanta-c2: #cfa4a8;
+
   /* Grain intensity — dialled down in dark, where noise reads much louder */
   --grain-opacity: 0.055;
 
@@ -88,4 +110,18 @@
   --c-focus: #e36b80;
 
   --grain-opacity: 0.03;
+
+  /* Hero — dark. Same system, inverted ground. Contrast: ink 16.4:1 ·
+     muted 8.1:1 · accent 7.3:1 */
+  --c-hero-bg: #0e0b0b;
+  --c-hero-ink: #f5efea;
+  --c-hero-muted: #b8aaa3;
+  --c-hero-accent: #e4808f;
+  --c-hero-rule: rgb(245 239 234 / 0.12);
+  --c-hero-rule-strong: rgb(245 239 234 / 0.26);
+  --c-hero-veil: 14 11 11;
+
+  --vanta-bg: #0e0b0b;
+  --vanta-c1: #5e0e1d;
+  --vanta-c2: #a85c68;
 }

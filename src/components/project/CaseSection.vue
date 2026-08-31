@@ -87,6 +87,8 @@ defineProps<{ section: CaseSection }>()
 </template>
 
 <style scoped>
+/* Anchor clearance is owned by `scroll-padding-top` on <html> in main.css —
+   a scroll-margin here as well would stack, doubling the offset. */
 .cs + .cs {
   margin-top: clamp(3.5rem, 7vw, 6rem);
 }

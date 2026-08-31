@@ -14,9 +14,9 @@ export const profile = {
   secondRole: 'UI/UX Developer',
   email: 'neubinsebastian01@gmail.com',
 
-  /** Short positioning statement. Rewrite in your own voice — this is scaffolding. */
+  /** Supporting line under the hero headline. Rewrite in your own voice. */
   intro:
-    'I work across the seam between product design and front-end engineering — shaping the interface, then building it.',
+    'Product design and front-end engineering in one pair of hands, so the thing that ships is the thing that was designed.',
 
   links: [
     { label: 'GitHub', href: 'https://github.com/', external: true },

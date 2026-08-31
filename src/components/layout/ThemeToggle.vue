@@ -45,6 +45,7 @@ const label = computed(() =>
 
 .theme-toggle__track {
   position: relative;
+  flex: none;
   width: 2.1rem;
   height: 0.7rem;
   border: 1px solid var(--c-rule-strong);
@@ -67,6 +68,7 @@ const label = computed(() =>
 
 .theme-toggle__text {
   width: 3.1ch;
+  line-height: 1;
   text-align: left;
 }
 

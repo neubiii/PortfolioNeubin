@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import { onKeyStroke, useScrollLock, useWindowScroll } from '@vueuse/core'
+import { onKeyStroke, useEventListener, useScrollLock, useWindowScroll } from '@vueuse/core'
 import ThemeToggle from './ThemeToggle.vue'
 import { profile } from '@/data/profile'
 
@@ -10,20 +10,20 @@ const { y } = useWindowScroll()
 const scrolled = computed(() => y.value > 24)
 
 /**
- * Phase 1 nav.
+ * Every destination is a section of the home page, so every item is a hash
+ * link — including Work, which no longer has a route of its own. From a
+ * project page these resolve to `/#…`, and the router's `scrollBehavior` waits
+ * for the section to mount before scrolling to it.
  *
- * About / Skillset / Contact are sections of the home page, so they are hash
- * links; Work is a real route. Experience only appears once there is real
- * experience data — a nav item pointing at an empty section is a dead link.
+ * Experience appears only once there is real experience data; a nav item
+ * pointing at an empty section is a dead link.
  */
 const links = computed(() => [
-  { label: 'Work', to: '/work', kind: 'route' as const },
-  { label: 'About', to: '/#about', kind: 'hash' as const, hash: '#about' },
-  { label: 'Skillset', to: '/#skillset', kind: 'hash' as const, hash: '#skillset' },
-  ...(profile.experience.length
-    ? [{ label: 'Experience', to: '/#experience', kind: 'hash' as const, hash: '#experience' }]
-    : []),
-  { label: 'Contact', to: '/#contact', kind: 'hash' as const, hash: '#contact' },
+  { label: 'Work', to: '/#work' },
+  { label: 'About', to: '/#about' },
+  { label: 'Skillset', to: '/#skillset' },
+  ...(profile.experience.length ? [{ label: 'Experience', to: '/#experience' }] : []),
+  { label: 'Contact', to: '/#contact' },
 ])
 
 const github = profile.links.find((l) => l.label === 'GitHub')
@@ -31,15 +31,39 @@ const github = profile.links.find((l) => l.label === 'GitHub')
 const open = ref(false)
 const locked = useScrollLock(document.body)
 watch(open, (v) => (locked.value = v))
-watch(() => route.fullPath, () => (open.value = false))
+watch(
+  () => route.fullPath,
+  () => (open.value = false),
+)
 onKeyStroke('Escape', () => (open.value = false))
 
-const isActive = (to: string) =>
-  to === '/work' ? route.path.startsWith('/work') : route.path === '/' && route.hash === to.slice(1)
+/**
+ * The home hero is a near-black block, so the header inverts while it is over
+ * it and returns to the paper treatment once the page scrolls past.
+ */
+const heroHeight = ref(0)
+const measureHero = () => {
+  const el = document.querySelector<HTMLElement>('[data-hero]')
+  heroHeight.value = el?.offsetHeight ?? 0
+}
+onMounted(measureHero)
+useEventListener(window, 'resize', measureHero)
+watch(
+  () => route.fullPath,
+  () => nextTick(measureHero),
+)
+const overHero = computed(() => !open.value && heroHeight.value > 0 && y.value < heroHeight.value - 96)
+
+/** Every nav item is now a section of the home page, so match path AND hash. */
+const isActive = (to: string) => {
+  const [path, hash] = to.split('#')
+  if (route.path !== (path || '/')) return false
+  return hash ? route.hash === `#${hash}` : !route.hash
+}
 </script>
 
 <template>
-  <header class="header" :data-scrolled="scrolled">
+  <header class="header" :data-scrolled="scrolled" :data-over-hero="overHero">
     <a class="skip" href="#main">Skip to content</a>
 
     <div class="shell header__bar">
@@ -62,6 +86,8 @@ const isActive = (to: string) =>
         </ul>
       </nav>
 
+      <!-- One aligned control group: every child is a 2.75rem-tall inline-flex
+           box centred on the same axis, with the divider centred between them. -->
       <div class="header__meta">
         <a
           v-if="github"
@@ -93,7 +119,7 @@ const isActive = (to: string) =>
       <div v-if="open" id="mobile-nav" class="panel">
         <nav class="shell panel__inner" aria-label="Primary (mobile)">
           <ul>
-            <li v-for="(link, i) in links" :key="link.label" :style="{ '--i': i }">
+            <li v-for="link in links" :key="link.label">
               <RouterLink :to="link.to" class="display panel__link">{{ link.label }}</RouterLink>
             </li>
           </ul>
@@ -119,11 +145,30 @@ const isActive = (to: string) =>
   background: color-mix(in srgb, var(--c-paper) 88%, transparent);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid transparent;
-  transition: border-color var(--dur) var(--ease-out);
+  transition:
+    border-color var(--dur) var(--ease-out),
+    background-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out);
 }
 
 .header[data-scrolled='true'] {
   border-bottom-color: var(--c-rule);
+}
+
+/* Over the dark hero the bar carries the hero's ink instead of the page's.
+   Re-pointing the tokens means every child — links, divider, toggle — inverts
+   together without a single per-element override. */
+.header[data-over-hero='true'] {
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom-color: transparent;
+  --c-ink: var(--c-hero-ink);
+  --c-muted: var(--c-hero-muted);
+  --c-accent: var(--c-hero-accent);
+  --c-rule: var(--c-hero-rule);
+  --c-rule-strong: var(--c-hero-rule-strong);
+  --c-focus: var(--c-hero-ink);
+  color: var(--c-hero-ink);
 }
 
 .skip {
@@ -153,28 +198,43 @@ const isActive = (to: string) =>
 }
 
 .header__mark {
+  /* `baseline`, not `center`: an empty inline-flex item takes its baseline
+     from its bottom margin edge, so the dot sits ON the wordmark's baseline
+     the way a full stop does. Centring it and then nudging with a margin —
+     which is what this used to do — left the dot floating below the type. */
   display: inline-flex;
   align-items: baseline;
-  gap: 0.25rem;
-  /* 44px target without moving the baseline the wordmark sits on. */
-  padding-block: 0.7rem;
+  gap: 0.22rem;
+  /* Padding, not min-height: the target grows around the baseline instead of
+     stretching the flex line and pushing the dot out of alignment again. */
+  padding-block: 0.72rem;
+  color: var(--c-ink);
 }
 
 .header__mark-text {
   font-size: 1.5rem;
+  line-height: 1;
   letter-spacing: -0.03em;
 }
 
 .header__mark-dot {
   width: 0.3rem;
   height: 0.3rem;
+  flex: none;
   background: var(--c-accent);
   transition: transform var(--dur) var(--ease-out);
 }
 
+/* A transform, so the hop never reflows the wordmark or the nav beside it. */
 .header__mark:hover .header__mark-dot,
 .header__mark:focus-visible .header__mark-dot {
-  transform: translateY(-0.35rem);
+  transform: translateY(-0.32rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header__mark-dot {
+    transition: none;
+  }
 }
 
 .header__nav {
@@ -189,6 +249,7 @@ const isActive = (to: string) =>
 
 .header__list {
   display: flex;
+  align-items: center;
   gap: clamp(1.25rem, 2.4vw, 2.5rem);
 }
 
@@ -196,11 +257,14 @@ const isActive = (to: string) =>
   font-size: var(--t-sm);
   font-weight: 500;
   letter-spacing: 0.01em;
+  color: var(--c-ink);
 }
 
 .header__link[data-active='true'] {
   color: var(--c-accent);
 }
+
+/* ── Right-hand control group ──────────────────────────────────────────── */
 
 .header__meta {
   display: flex;
@@ -208,42 +272,57 @@ const isActive = (to: string) =>
   gap: 1rem;
 }
 
+/* Hidden below 42rem by `visibility`-free removal from flow, but when shown it
+   MUST stay inline-flex: `display: block` here was overriding `.link-grow`'s
+   own inline-flex centring, which is what pushed GitHub off the shared axis. */
 .header__github {
   display: none;
   font-family: var(--font-mono);
   font-size: var(--t-xs);
+  line-height: 1;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: var(--c-muted);
+}
+
+.header__github:hover,
+.header__github:focus-visible {
+  color: var(--c-ink);
 }
 
 .header__divider {
   display: none;
+  flex: none;
+  align-self: center;
   width: 1px;
-  height: 1.1rem;
-  background: var(--c-rule);
+  height: 1.15rem;
+  background: var(--c-rule-strong);
 }
 
 @media (min-width: 42rem) {
-  .header__github,
+  .header__github {
+    display: inline-flex;
+  }
+
   .header__divider {
     display: block;
   }
 }
 
 .header__burger {
-  display: grid;
+  display: none;
   align-content: center;
+  justify-items: end;
   gap: 0.32rem;
   min-height: 2.75rem;
   min-width: 2.75rem;
-  justify-items: end;
   padding: 0.5rem;
   margin-right: -0.5rem;
 }
 
-@media (min-width: 60rem) {
+@media (max-width: 59.999rem) {
   .header__burger {
-    display: none;
+    display: grid;
   }
 }
 
@@ -262,6 +341,8 @@ const isActive = (to: string) =>
 .header__burger-line[data-open='true']:last-child {
   transform: translateY(-0.165rem) rotate(-45deg);
 }
+
+/* ── Mobile panel ──────────────────────────────────────────────────────── */
 
 .panel {
   position: fixed;
@@ -310,5 +391,4 @@ const isActive = (to: string) =>
 .panel-leave-to {
   opacity: 0;
 }
-
 </style>

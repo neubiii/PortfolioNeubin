@@ -43,7 +43,7 @@ const isCaseStudy = computed(() => project.value?.presentation === 'case-study')
     <!-- ── Title ─────────────────────────────────────────────────────────── -->
     <header class="shell project__head">
       <nav class="project__crumb" aria-label="Breadcrumb">
-        <RouterLink to="/work" class="mono project__back">
+        <RouterLink to="/#work" class="mono project__back">
           <span aria-hidden="true">←</span> Work
         </RouterLink>
         <span class="mono project__crumb-sep" aria-hidden="true">/</span>
@@ -95,7 +95,7 @@ const isCaseStudy = computed(() => project.value?.presentation === 'case-study')
       </RouterLink>
 
       <div class="project__all">
-        <ArrowLink to="/work">All work</ArrowLink>
+        <ArrowLink to="/#work">All work</ArrowLink>
       </div>
     </nav>
   </article>
@@ -192,9 +192,13 @@ const isCaseStudy = computed(() => project.value?.presentation === 'case-study')
 @media (min-width: 64rem) {
   .project__body[data-rail='true'] {
     display: grid;
-    grid-template-columns: 15rem minmax(0, 1fr);
+    grid-template-columns: 16rem minmax(0, 1fr);
     column-gap: clamp(2.5rem, 6vw, 6rem);
-    align-items: start;
+    /* `stretch`, not `start`: the aside spans the full row so its sticky
+       position has somewhere to travel. With `start` the item collapsed to its
+       own content height and sticky had zero range — which is why the rail
+       scrolled away with the page. */
+    align-items: stretch;
   }
 }
 
@@ -207,6 +211,13 @@ const isCaseStudy = computed(() => project.value?.presentation === 'case-study')
 @media (min-width: 64rem) {
   .project__rail {
     margin-bottom: 0;
+    position: sticky;
+    /* Header is 4.5rem tall; 1.25rem of air under it. */
+    top: 5.75rem;
+    align-self: start;
+    max-height: calc(100vh - 7.5rem);
+    display: flex;
+    flex-direction: column;
   }
 }
 
