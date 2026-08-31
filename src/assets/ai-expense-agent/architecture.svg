@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 800" width="1600" height="800" role="img">
+<rect width="1600" height="800" fill="#F6F3EF"/>
+<text x="60" y="70" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="29" fill="#7A1226" letter-spacing="4">BACKEND PIPELINE</text>
+<text x="60" y="112" font-family="Georgia,'Iowan Old Style','Times New Roman',serif" font-size="48" fill="#16110F">Receipt in, cited policy issues out — the model never decides alone</text>
+<line x1="60" y1="146" x2="1540" y2="146" stroke="#D6CCC1" stroke-width="2"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7A1226"/></marker></defs>
+
+<rect x="60" y="250" width="340" height="100" fill="none" stroke="#16110F" stroke-width="1.6"/>
+<text x="76" y="280" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="24" fill="#16110F" letter-spacing="1">React 19 + TS</text>
+<text x="76" y="304" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">upload · review · summary</text>
+<line x1="400" y1="300" x2="520" y2="300" stroke="#7A1226" stroke-width="2"  marker-end="url(#a)"/>
+<text x="460" y="282" text-anchor="middle" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="18" fill="#5E534D">multipart</text>
+
+<rect x="520" y="230" width="340" height="190" fill="none" stroke="#7A1226" stroke-width="2.5"/>
+<text x="536" y="260" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="24" fill="#7A1226" letter-spacing="1">FastAPI</text>
+<text x="536" y="284" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">4 routers</text>
+<text x="536" y="330" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">/extract   /policy</text>
+<text x="536" y="360" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">/submission   /explain</text>
+
+<rect x="960" y="180" width="560" height="100" fill="none" stroke="#16110F" stroke-width="1.6"/>
+<text x="976" y="210" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="24" fill="#16110F" letter-spacing="1">ocr_tesseract</text>
+<text x="976" y="234" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">pytesseract + OpenCV</text>
+
+<rect x="960" y="300" width="560" height="100" fill="none" stroke="#16110F" stroke-width="1.6"/>
+<text x="976" y="330" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="24" fill="#16110F" letter-spacing="1">receipt_parser</text>
+<text x="976" y="354" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">regex + keywords → 5 fields</text>
+
+<rect x="960" y="420" width="560" height="110" fill="none" stroke="#7A1226" stroke-width="2.5"/>
+<text x="976" y="450" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="24" fill="#7A1226" letter-spacing="1">policy_engine</text>
+<text x="976" y="474" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">deterministic rules, no model</text>
+
+<rect x="960" y="556" width="560" height="100" fill="none" stroke="#16110F" stroke-width="1.6"/>
+<text x="976" y="586" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="24" fill="#16110F" letter-spacing="1">mock_explainer</text>
+<text x="976" y="610" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">the JSON shape a model would return</text>
+<line x1="860" y1="300" x2="960" y2="228" stroke="#7A1226" stroke-width="2"  marker-end="url(#a)"/>
+<line x1="860" y1="300" x2="960" y2="348" stroke="#7A1226" stroke-width="2"  marker-end="url(#a)"/>
+<line x1="860" y1="300" x2="960" y2="478" stroke="#7A1226" stroke-width="2"  marker-end="url(#a)"/>
+<line x1="860" y1="300" x2="960" y2="606" stroke="#7A1226" stroke-width="2"  marker-end="url(#a)"/>
+
+
+<rect x="60" y="480" width="300" height="100" fill="none" stroke="#16110F" stroke-width="1.6"/>
+<text x="76" y="510" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="24" fill="#16110F" letter-spacing="1">SQLite</text>
+<text x="76" y="534" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">sqlalchemy</text>
+<line x1="700" y1="420" x2="215" y2="480" stroke="#7A1226" stroke-width="2" stroke-dasharray="7 7" marker-end="url(#a)"/>
+
+<text x="60" y="648" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="21" fill="#7A1226" letter-spacing="1">RULES THAT FIRE</text>
+<line x1="60" y1="666" x2="820" y2="666" stroke="#D6CCC1" stroke-width="1.5"/>
+<text x="60" y="702" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">POL-REQ-001   required field missing</text>
+<text x="60" y="732" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">POL-CONF-100  field confidence &lt; 0.75 → ask</text>
+<text x="60" y="762" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">POL-LIM-010   meals &gt; 20 EUR unless justified</text>
+</svg>

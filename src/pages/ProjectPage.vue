@@ -5,7 +5,8 @@ import CaseRail from '@/components/project/CaseRail.vue'
 import CaseSection from '@/components/project/CaseSection.vue'
 import MediaFrame from '@/components/ui/MediaFrame.vue'
 import ArrowLink from '@/components/ui/ArrowLink.vue'
-import { findProject, nextProject } from '@/data/projects'
+import ProjectLinks from '@/components/project/ProjectLinks.vue'
+import { findProject, nextProject, presentationLabel } from '@/data/projects'
 
 const props = defineProps<{ slug: string }>()
 const router = useRouter()
@@ -35,7 +36,16 @@ const body = computed(() =>
   (project.value?.sections ?? []).filter((s) => !(s.kind === 'media' && s.id === 'hero')),
 )
 
-const isCaseStudy = computed(() => project.value?.presentation === 'case-study')
+/**
+ * Case studies and development deep dives both earn the rail — meta, contents
+ * and calls to action. A gallery has neither the metadata nor the section count
+ * to fill one, so its links move under the standfirst instead.
+ */
+const hasRail = computed(() => project.value?.presentation !== 'gallery')
+
+const kind = computed(() =>
+  project.value ? presentationLabel[project.value.presentation] : '',
+)
 </script>
 
 <template>
@@ -58,10 +68,10 @@ const isCaseStudy = computed(() => project.value?.presentation === 'case-study')
 
       <ul class="project__tags">
         <li v-for="tag in project.tags" :key="tag" class="mono project__tag">{{ tag }}</li>
-        <li class="mono project__tag project__tag--accent">
-          {{ isCaseStudy ? 'Case study' : 'Visual study' }}
-        </li>
+        <li class="mono project__tag project__tag--accent">{{ kind }}</li>
       </ul>
+
+      <ProjectLinks v-if="!hasRail" :links="project.links" layout="inline" class="project__cta" />
     </header>
 
     <div v-if="hero" class="shell project__hero">
@@ -69,8 +79,8 @@ const isCaseStudy = computed(() => project.value?.presentation === 'case-study')
     </div>
 
     <!-- ── Body ──────────────────────────────────────────────────────────── -->
-    <div class="shell project__body" :data-rail="isCaseStudy">
-      <aside v-if="isCaseStudy" class="project__rail">
+    <div class="shell project__body" :data-rail="hasRail">
+      <aside v-if="hasRail" class="project__rail">
         <CaseRail :project="project" />
       </aside>
 
@@ -177,6 +187,10 @@ const isCaseStudy = computed(() => project.value?.presentation === 'case-study')
 
 .project__tag--accent {
   color: var(--c-accent);
+}
+
+.project__cta {
+  margin-top: 2rem;
 }
 
 .project__hero {

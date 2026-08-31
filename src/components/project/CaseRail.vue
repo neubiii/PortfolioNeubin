@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import ProjectLinks from '@/components/project/ProjectLinks.vue'
 import { useScrollSpy } from '@/composables/useScrollSpy'
 import type { CaseSection, Project } from '@/types'
 
@@ -67,15 +68,7 @@ const { active } = useScrollSpy(() => titled.value.map((s) => s.id))
       </ul>
     </nav>
 
-    <ul v-if="project.links.length" class="rail__cta">
-      <li v-for="link in project.links" :key="link.href">
-        <a :href="link.href" target="_blank" rel="noopener noreferrer" class="rail__cta-link">
-          <span>{{ link.label }}</span>
-          <span aria-hidden="true">↗</span>
-          <span class="sr-only">(opens in a new tab)</span>
-        </a>
-      </li>
-    </ul>
+    <ProjectLinks :links="project.links" />
   </div>
 </template>
 
@@ -178,31 +171,6 @@ const { active } = useScrollSpy(() => titled.value.map((s) => s.id))
 .rail__link[data-active='true'] .rail__tick {
   width: 1.5rem;
   background: var(--c-accent);
-}
-
-/* ── CTA ───────────────────────────────────────────────────────────────── */
-
-.rail__cta {
-  display: grid;
-  gap: 0.5rem;
-}
-
-.rail__cta-link {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.85rem 1.1rem;
-  background: var(--c-accent);
-  color: var(--c-on-deep);
-  font-weight: 500;
-  font-size: var(--t-sm);
-  transition: background-color var(--dur) var(--ease-out);
-}
-
-.rail__cta-link:hover,
-.rail__cta-link:focus-visible {
-  background: var(--c-accent-hover);
 }
 
 </style>

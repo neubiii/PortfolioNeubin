@@ -12,6 +12,19 @@ import type { Discipline, Project } from '@/types'
  *   Designwork-Webdesign        → evergrove   (gallery — no documented process)
  *   Designwork-landingpage      → rate-conversion (gallery)
  *
+ * Three of those pages carry real prototype wiring, and their `links` point at
+ * the flow's own starting frame. EverGrove and the landing page have none, so
+ * they carry no link.
+ *
+ * The development entries are transcribed the same way, from the repositories
+ * rather than from Figma: source files, Docker and CI configuration, and
+ * `git log`. Ports, rule IDs, thresholds and library names are quoted from the
+ * code.
+ *
+ * `ai-expense-agent` and `expense-ai` are the same product told twice on
+ * purpose — the designed concept and the thing that was built. They are
+ * separate entries because they answer different questions.
+ *
  * Nothing here is invented. Where the source is silent — a role title, a
  * prototype link — the field is absent rather than filled in.
  *
@@ -21,14 +34,13 @@ export const projects: Project[] = [
   // ───────────────────────────────────────────────────────────────────────────
   {
     slug: 'ai-expense-agent',
-    index: '01',
     title: 'AI Expense Agent',
     eyebrow: 'Agentic UX · SAP Fiori for iOS',
     headline: 'An AI expense agent that shows its work.',
     hook: 'Why 96% of users picked an AI that asks over one that guesses. A human-in-the-loop agent that cites the policy rule behind every flag.',
     summary:
       'Enterprise expense tools optimise for speed, then reject you for a policy you never saw. I designed a human-in-the-loop AI agent for SAP Fiori for iOS that cites the exact policy rule behind every flag and stops to ask the moment its confidence drops, validated with 30 users and a moderated usability study scoring 74.4 SUS.',
-    discipline: 'ux',
+    disciplines: ['ux'],
     year: '2026',
     tags: ['Agentic UX', 'Enterprise', 'iOS'],
     meta: {
@@ -44,7 +56,13 @@ export const projects: Project[] = [
     },
     presentation: 'case-study',
     featured: true,
-    links: [],
+    links: [
+      {
+        label: 'View Figma prototype',
+        href: 'https://www.figma.com/proto/xbNlhyfWuoGdGYpjusY0eD/Portfolio?node-id=9-24980&starting-point-node-id=9%3A24980',
+        kind: 'prototype',
+      },
+    ],
     sections: [
       {
         kind: 'stats',
@@ -291,14 +309,13 @@ export const projects: Project[] = [
   // ───────────────────────────────────────────────────────────────────────────
   {
     slug: 'meet-in-room',
-    index: '02',
     title: 'Meet-in-Room',
     eyebrow: 'Meet-in-Room · 8-week solo UX case study',
     headline: 'Turning a 300-metre walk into a three-tap booking.',
     hook: 'No system existed for booking a campus meeting room, so students walked 300 metres to find out if one was free. Availability you can see before you walk.',
     summary:
       'SRH Heidelberg had no system for booking meeting rooms: students and faculty walked between buildings just to find out whether one was free. I designed a mobile app that makes live room availability visible and bookable in seconds, refined across two rounds of usability testing and an A/B test on the booking entry point.',
-    discipline: 'ux',
+    disciplines: ['ux'],
     year: '2024',
     tags: ['Mobile app', 'Design thinking', 'Usability testing'],
     meta: {
@@ -315,7 +332,13 @@ export const projects: Project[] = [
     },
     presentation: 'case-study',
     featured: true,
-    links: [],
+    links: [
+      {
+        label: 'View Figma prototype',
+        href: 'https://www.figma.com/proto/xbNlhyfWuoGdGYpjusY0eD/Portfolio?node-id=9-10560&starting-point-node-id=9%3A10560',
+        kind: 'prototype',
+      },
+    ],
     scopeNote:
       'Scope note — a self-directed academic case study. The app was not deployed, so the figures above are process outcomes, not production metrics. Research findings (300m, 60%, zero existing systems) come from 1:1 interviews conducted during the project.',
     sections: [
@@ -586,14 +609,13 @@ export const projects: Project[] = [
   // ───────────────────────────────────────────────────────────────────────────
   {
     slug: 'busstop',
-    index: '03',
     title: 'BusStop',
     eyebrow: 'Route 01 · Consumer transit app · 2024',
     headline: 'Find the bus. Track the bus.',
     hook: '80% of the riders I surveyed had already missed a bus to a schedule that lied. A guest-first transit app that turns an unreliable timetable into a live, trackable route in three taps.',
     summary:
       'Riders had no trusted source for local bus timings and no way to see where the bus actually was. I designed both — schedule truth and live tracking — behind a guest login.',
-    discipline: 'ux',
+    disciplines: ['ux'],
     year: '2024',
     tags: ['Consumer app', 'Transit', 'UX research'],
     meta: {
@@ -609,7 +631,13 @@ export const projects: Project[] = [
     },
     presentation: 'case-study',
     featured: false,
-    links: [],
+    links: [
+      {
+        label: 'View Figma prototype',
+        href: 'https://www.figma.com/proto/xbNlhyfWuoGdGYpjusY0eD/Portfolio?node-id=9-4291&starting-point-node-id=9%3A4291',
+        kind: 'prototype',
+      },
+    ],
     sections: [
       {
         kind: 'text',
@@ -819,14 +847,13 @@ export const projects: Project[] = [
   // ───────────────────────────────────────────────────────────────────────────
   {
     slug: 'evergrove',
-    index: '04',
     title: 'EverGrove',
     eyebrow: 'Interface design · SaaS marketing site',
     headline: 'A productivity platform, dressed for launch.',
     hook: 'A full marketing site for a collaboration platform — hero through pricing and testimonials — designed alongside the button and link system that holds it together.',
     summary:
       'An end-to-end landing page for EverGrove, an all-in-one collaboration and productivity platform: hero, feature story, testimonials, two-tier pricing and footer, built on a small component set with every interaction state drawn.',
-    discipline: 'ux',
+    disciplines: ['ux'],
     year: '2024',
     tags: ['Web design', 'Design system', 'Marketing site'],
     meta: {
@@ -888,14 +915,13 @@ export const projects: Project[] = [
   // ───────────────────────────────────────────────────────────────────────────
   {
     slug: 'rate-conversion',
-    index: '05',
     title: 'Rate Conversion Tool',
     eyebrow: 'Interface design · Product landing page',
     headline: 'One claim, one action, one screen.',
     hook: 'A single-screen product landing page for an AI rate-conversion tool — the whole argument made above the fold and closed with one call to action.',
     summary:
       'A responsive landing page for an AI-generated rate conversion tool, built as an exercise in getting a product’s entire pitch — claim, proof and action — to land inside one screen.',
-    discipline: 'ux',
+    disciplines: ['ux'],
     year: '2024',
     tags: ['Web design', 'Landing page'],
     meta: {
@@ -935,31 +961,598 @@ export const projects: Project[] = [
       },
     ],
   },
+
+  // ── Development ───────────────────────────────────────────────────────────
+  // Everything below is transcribed from the repositories themselves — source,
+  // Docker and CI files, and `git log`. History is used to check what is true,
+  // never quoted: where it cannot support a claim about my own part, the entry
+  // simply carries no contribution section.
+  {
+    slug: 'expense-ai',
+    title: 'Expense AI',
+    eyebrow: 'Human-in-the-loop · FastAPI + React',
+    headline: 'A policy engine that never guesses.',
+    hook: 'The working prototype behind the expense agent. A receipt goes in, cited policy issues come out, and any field the OCR is unsure of stops the flow rather than being filled in.',
+    summary:
+      'The coded prototype of the AI Expense Agent concept: FastAPI, Tesseract and SQLite behind a React and TypeScript front end. The whole idea rests on one claim — that an agent should be able to show its work — so the build is arranged to make that claim true. Every flag traces to a rule ID, and no model sits anywhere near the decision.',
+    disciplines: ['development'],
+    year: '2026',
+    tags: ['FastAPI', 'React 19', 'TypeScript', 'OCR'],
+    meta: {
+      context: 'Solo project',
+      platform: 'FastAPI · React · SQLite',
+      output: 'Working local prototype',
+    },
+    cover: {
+      src: 'expense-ai/cover',
+      alt: 'Expense AI — a confidence gate on every field',
+      ratio: '1600/1000',
+    },
+    presentation: 'deep-dive',
+    featured: false,
+    links: [
+      {
+        label: 'View GitHub repository',
+        href: 'https://github.com/neubiii/Expense-AI',
+        kind: 'repo',
+      },
+    ],
+    sections: [
+      {
+        kind: 'text',
+        id: 'overview',
+        marker: '01 — The system',
+        title: 'What it does',
+        body: [
+          'Photograph a receipt and the service reads it, checks it against an expense policy, and hands back a verdict with the rule behind it. Nothing is filed until the person submitting says so.',
+          'It runs a sense–plan–act loop: OCR lifts the fields and their confidences, a rule engine decides, and the interface explains and asks. The interaction design it implements is the AI Expense Agent case study; this page is about how the thing is put together.',
+        ],
+      },
+      {
+        kind: 'media',
+        id: 'architecture',
+        title: 'How a receipt becomes a decision',
+        layout: 'full',
+        items: [
+          {
+            src: 'expense-ai/architecture',
+            alt: 'Backend pipeline: a React client posts a receipt to FastAPI, which runs OCR, a field parser, the policy engine and an explanation step, writing submissions to SQLite',
+            caption: 'Drawn from the routers and services in the repository, including the three rule IDs the engine can raise.',
+          },
+        ],
+      },
+      {
+        kind: 'steps',
+        id: 'decisions',
+        marker: '02 — Decisions',
+        title: 'Three worth defending',
+        items: [
+          {
+            label: 'One',
+            heading: 'The policy engine is deterministic on purpose.',
+            body: 'validate_policy walks the extracted fields and returns issues, each carrying a severity, a rule ID and a plain-language summary. Missing required fields raise POL-REQ-001; anything the OCR read with less than 0.75 confidence raises POL-CONF-100; a meal over 20 EUR raises POL-LIM-010. No model is consulted, so the same receipt always produces the same verdict and the interface can cite the exact rule instead of a probability.',
+          },
+          {
+            label: 'Two',
+            heading: 'A justification downgrades a failure rather than bypassing it.',
+            body: 'When a meal breaks the limit the engine looks for a justification filed against that rule ID. If one is there the issue becomes a WARN with its own message — allowed, but flagged for a reviewer. The escape hatch is a rule, not a special case buried in the interface.',
+          },
+          {
+            label: 'Three',
+            heading: 'The explanation is mocked against a real contract.',
+            body: 'The explain route builds its answer only from the issues and rule summaries the engine produced, and returns the same JSON shape a model endpoint would. The front end is already written against that contract, so swapping the mock for a hosted model is a change to one file — and the explanation still cannot invent a reason the engine did not raise.',
+          },
+        ],
+      },
+      {
+        kind: 'list',
+        id: 'build',
+        marker: '03 — The build',
+        title: 'How the rest of it is put together',
+        items: [
+          {
+            term: 'Extraction',
+            detail: 'PNG or JPEG only. pytesseract returns per-word confidences, and a regex and keyword parser turns the text into merchant, date, total, currency and category — each with its own confidence, which is what the review screen colours green, amber or red.',
+          },
+          {
+            term: 'Submission gate',
+            detail: 'POST /submission/create returns BLOCKED unless user_confirmed is true. The human-in-the-loop rule is enforced by the API, not only by the button.',
+          },
+          {
+            term: 'Audit trail',
+            detail: 'Each submission writes a record plus an audit event holding the issues raised, the edits the person made, their justifications and the final review state — so the trail shows what the machine proposed and what the human changed.',
+          },
+          {
+            term: 'Front end',
+            detail: 'React 19 and TypeScript over three screens — upload, review, summary — with no component library, so the confidence states are styled rather than fought with.',
+          },
+          {
+            term: 'Voice input',
+            detail: 'The description field accepts speech through the browser SpeechRecognition API behind a capability check, and falls back to typing where the API is missing.',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    slug: 'live-market-dashboard',
+    title: 'Live Market Dashboard',
+    eyebrow: 'Real-time systems · Python microservices',
+    headline: 'One Redis stream, read two different ways.',
+    hook: 'Eight FastAPI services around a single Redis stream. One reader fans every tick out to the browser; the other joins a consumer group so an alert is evaluated once, however many instances are running.',
+    summary:
+      'A live market dashboard fed by Finnhub’s trade websocket and split into eight FastAPI services on one Docker Compose file. Built as a team project, with my work focused on the real-time gateway, the anomaly detection and watchlist flows, the stock relationship graph, and parts of the dashboard they report into.',
+    disciplines: ['development'],
+    year: '2025',
+    tags: ['FastAPI', 'Redis Streams', 'WebSockets', 'Neo4j'],
+    meta: {
+      role: 'Real-time services, alerts, graph service, dashboard',
+      context: 'Group project · 5 contributors',
+      platform: 'Docker Compose · 8 services',
+    },
+    cover: {
+      src: 'live-market-dashboard/cover',
+      alt: 'Live Market Dashboard — eight services around one Redis stream',
+      ratio: '1600/1000',
+    },
+    presentation: 'deep-dive',
+    featured: false,
+    links: [
+      {
+        label: 'View GitHub repository',
+        href: 'https://github.com/neubiii/Conversational_LiveMarket_Dashboard-Group-Project-',
+        kind: 'repo',
+      },
+    ],
+    sections: [
+      {
+        kind: 'text',
+        id: 'overview',
+        marker: '01 — The system',
+        title: 'What it does',
+        body: [
+          'Finnhub publishes trades over a websocket. One service holds that socket open on a background thread, hands each trade to the asyncio loop through a queue, and appends it to a Redis stream called market:stream. Everything downstream reads that one stream.',
+          'The dashboard shows live prices, a per-user watchlist, alerts on the symbols that user follows, and a force-directed graph of how companies relate to each other. A conversational assistant answers questions over the same data.',
+        ],
+      },
+      {
+        kind: 'media',
+        id: 'architecture',
+        title: 'How the data moves',
+        layout: 'full',
+        items: [
+          {
+            src: 'live-market-dashboard/architecture',
+            alt: 'Finnhub feeds the market data service, which writes to a Redis stream; a realtime gateway and an anomaly detector read it differently and each hold a websocket open to the React dashboard',
+            caption: 'Service names, ports and read commands are taken from the compose file and the service sources.',
+          },
+        ],
+      },
+      {
+        kind: 'steps',
+        id: 'decisions',
+        marker: '02 — Decisions',
+        title: 'Three that shaped the build',
+        items: [
+          {
+            label: 'One',
+            heading: 'Two readers on one stream, deliberately different.',
+            body: 'The gateway does a plain blocking XREAD from the end of the stream and forwards everything to every browser on /ws/market-data, because a price chart is only correct if each client sees each tick. The detector joins the consumer group anomaly_group and acknowledges what it reads, because an alert must fire once no matter how many copies of the service are running. Same stream, opposite requirements — and the two commands are the whole difference.',
+          },
+          {
+            label: 'Two',
+            heading: 'Alerts are gated on the watchlist before detection runs.',
+            body: 'The feed carries far more symbols than anyone is following. The detector refreshes each connected user’s watchlist from the watchlist service every ten seconds and discards ticks that are not on one, so the detection window only ever fills with symbols someone asked about. It also keeps the work proportional to users rather than to the market.',
+          },
+          {
+            label: 'Three',
+            heading: 'Detection is a five-tick window, not a model.',
+            body: 'Every watched symbol keeps a deque of its last five trades. The newest price is compared against the oldest in that window and the newest volume against the mean of the rest; crossing either threshold pushes an alert down a second websocket. The thresholds are constants at the top of the file rather than something learned, which is what makes the alert explainable when it fires.',
+          },
+        ],
+      },
+      {
+        kind: 'text',
+        id: 'graph',
+        title: 'Why the relationships live in a graph',
+        body: [
+          'The question the graph page answers — what is connected to this company, and how — is a traversal, not a join. So the relationship service keeps companies as Neo4j nodes and their links as typed edges: SUPPLIES_CHIPS_TO, COMPETES_WITH, OWNED_BY, DISTRIBUTES_THROUGH and a dozen more.',
+          'The seed data is written with MERGE rather than CREATE, so restarting the container re-runs it without duplicating anything. The service returns a plain nodes-and-links payload, which the frontend draws with react-force-graph.',
+        ],
+      },
+      {
+        kind: 'text',
+        id: 'contribution',
+        marker: '03 — My part',
+        title: 'What I worked on',
+        body: [
+          'My work focused mainly on the real-time gateway, the anomaly detection service, the watchlist and its alerts, and the stock relationship graph — along with the dashboard pages those services feed.',
+          'The two read patterns above are the part I would most want to talk through.',
+        ],
+      },
+      {
+        kind: 'list',
+        id: 'stack',
+        title: 'Stack',
+        items: [
+          { term: 'Services', detail: 'FastAPI, redis.asyncio, motor for MongoDB, the async Neo4j driver, httpx between services.' },
+          { term: 'Frontend', detail: 'React 19, Redux Toolkit, MUI, Chart.js and Recharts, react-force-graph, native WebSocket.' },
+          { term: 'Infrastructure', detail: 'Docker Compose brings up Redis, MongoDB, Neo4j and Qdrant alongside the eight services on one network.' },
+        ],
+      },
+    ],
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    slug: 'cooking-assistant',
+    title: 'Cooking Assistant',
+    eyebrow: 'Microservices · Observability',
+    headline: 'Four services behind one gateway.',
+    hook: 'A recipe manager split into four Express services, with a correlation ID that survives every hop and turns four separate logs into one traceable request in Kibana.',
+    summary:
+      'A team project built for a software architecture course: a recipe manager deliberately split into four Express services behind an API gateway, sharing one MongoDB cluster, containerised with Docker Compose and shipped to Heroku by GitHub Actions.',
+    disciplines: ['development'],
+    year: '2025',
+    tags: ['Node', 'Express', 'MongoDB', 'Docker'],
+    meta: {
+      context: 'Team project',
+      platform: 'Microservices · Vue 3 client',
+    },
+    cover: {
+      src: 'cooking-assistant/cover',
+      alt: 'Cooking Assistant — four services behind one gateway',
+      ratio: '1600/1000',
+    },
+    presentation: 'deep-dive',
+    featured: false,
+    links: [
+      {
+        label: 'View GitHub repository',
+        href: 'https://github.com/neubiii/CookingAssistant',
+        kind: 'repo',
+      },
+    ],
+    sections: [
+      {
+        kind: 'text',
+        id: 'overview',
+        marker: '01 — The system',
+        title: 'What it does',
+        body: [
+          'Users create and manage recipes; admins manage accounts and pull usage reports. The interesting part is not the feature list — it is that a small application was split four ways on purpose, so the seams had to be designed rather than assumed.',
+          'A Vue 3 client talks only to an api-gateway on port 5005. The gateway proxies /api/auth, /api/recipes, /api/user-management and /api/analytics to four Express services with http-proxy-middleware, applies a CORS origin allowlist and a 100-request-per-15-minute rate limit, and publishes a Swagger UI describing the routes it fronts.',
+        ],
+      },
+      {
+        kind: 'media',
+        id: 'architecture',
+        title: 'The topology',
+        layout: 'full',
+        items: [
+          {
+            src: 'cooking-assistant/architecture',
+            alt: 'A Vue client calls an API gateway on port 5005, which proxies to four Express services sharing one MongoDB cluster, with correlation IDs and Winston logging alongside',
+            caption: 'Ports and middleware taken from the gateway source and the compose file.',
+          },
+        ],
+      },
+      {
+        kind: 'steps',
+        id: 'decisions',
+        marker: '02 — Decisions',
+        title: 'What the split forced us to solve',
+        items: [
+          {
+            label: 'One',
+            heading: 'A request that crosses four services needs one identifier.',
+            body: 'The gateway takes the incoming x-correlation-id header or mints a UUID, stores it in a cls-hooked namespace, and echoes it on the response. Because the namespace is bound to the async context, any code further down can read the ID without it being threaded through every function signature — which is what usually kills this pattern halfway through.',
+          },
+          {
+            label: 'Two',
+            heading: 'Logs are only useful once they are in one place.',
+            body: 'Each service logs through Winston to Elasticsearch with its own index, so a single correlation ID reconstructs the whole path of a request in Kibana instead of leaving four partial stories in four terminals. Distributed tracing at its smallest useful size.',
+          },
+          {
+            label: 'Three',
+            heading: 'Authorisation is one middleware, not a check per route.',
+            body: 'Auth issues a JWT carrying a role; a five-line authorize(role) middleware guards the admin routes. Small, but it is the reason the analytics service can expose report and log-deletion endpoints without every handler repeating the same conditional.',
+          },
+        ],
+      },
+      {
+        kind: 'list',
+        id: 'delivery',
+        title: 'Delivery',
+        items: [
+          { term: 'Local', detail: 'One docker-compose file builds six images — the four services, the gateway and the client — and wires them with environment variables rather than hardcoded hosts.' },
+          { term: 'Deploy', detail: 'A GitHub Actions workflow logs into the Heroku container registry and pushes and releases each of the six apps on every merge to main.' },
+          { term: 'Docs', detail: 'Every service carries swagger-jsdoc annotations, and the gateway serves a combined Swagger UI at /api-docs.' },
+        ],
+      },
+    ],
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    slug: 'fraud-detection',
+    title: 'Fraud Detection: AutoML vs Custom',
+    eyebrow: 'Cloud ML · Model comparison',
+    headline: 'Two prediction backends, one response shape.',
+    hook: 'The same transaction form answered by a Vertex AI AutoML endpoint and by a custom ensemble on Cloud Run — with the server normalising both into one shape so the interface never learns which model replied.',
+    summary:
+      'A group project comparing a Vertex AI AutoML classifier against a hand-built ensemble on the same fraud dataset. A React form posts a transaction to an Express API on App Engine, which routes it to one backend or the other and returns a single response shape.',
+    disciplines: ['development'],
+    year: '2025',
+    tags: ['Google Cloud', 'Vertex AI', 'React', 'Express'],
+    meta: {
+      role: 'Prediction form, results view, integration',
+      context: 'Group project · 3 contributors',
+      platform: 'App Engine · Cloud Run · Vertex AI',
+    },
+    cover: {
+      src: 'fraud-detection/cover',
+      alt: 'Fraud detection — two model backends, one response shape',
+      ratio: '1600/1000',
+    },
+    presentation: 'deep-dive',
+    featured: false,
+    links: [
+      {
+        label: 'View GitHub repository',
+        href: 'https://github.com/neubiii/fraud-detection-automl-vs-custom-model-GroupProject',
+        kind: 'repo',
+      },
+    ],
+    sections: [
+      {
+        kind: 'text',
+        id: 'overview',
+        marker: '01 — The system',
+        title: 'What it does',
+        body: [
+          'You fill in a transaction — type, amount, both balances before and after — and get a fraud probability back. The point of the project is that the same form can be answered by two very different backends, so the two can be compared on identical input rather than on published metrics.',
+          'The client posts features plus a modelType to a single /predict route on an Express server. What happens next depends entirely on that one field.',
+        ],
+      },
+      {
+        kind: 'media',
+        id: 'architecture',
+        title: 'The two paths',
+        layout: 'full',
+        items: [
+          {
+            src: 'fraud-detection/architecture',
+            alt: 'A React client posts to an Express server on App Engine, which either calls a Vertex AI AutoML endpoint or a two-step Cloud Run service that preprocesses then predicts with a custom ensemble',
+            caption: 'Both routes are in server.js and predict.js; the normalisation happens before the response leaves the API.',
+          },
+        ],
+      },
+      {
+        kind: 'steps',
+        id: 'decisions',
+        marker: '02 — Decisions',
+        title: 'Where the engineering actually was',
+        items: [
+          {
+            label: 'One',
+            heading: 'The two backends disagree about their own output.',
+            body: 'AutoML answers with classes and scores. The custom service answers with three separate probabilities — a random forest, a deep network, and a meta-learner over both. The server rebuilds the custom response into the same classes-and-scores pairs before returning it, so the results component renders either one without knowing which model produced it. Without that step the comparison would have leaked into the UI.',
+          },
+          {
+            label: 'Two',
+            heading: 'The custom model needs two calls, not one.',
+            body: 'Encoding lives with the model rather than with the caller: the Cloud Run service exposes /preprocess and /predict separately, and the server chains them, failing loudly if the first does not return an array. The client also derives three ratio features of its own — amount against the opening balance, and the change in each side’s balance — which is the kind of duplication worth naming rather than hiding.',
+          },
+          {
+            label: 'Three',
+            heading: 'Which model is live is an environment change, not a code change.',
+            body: 'Two npm scripts, start:automl and start:custom, copy a different .env into place before starting the server. Endpoint IDs and the project stay out of the source, and switching the demo between models takes a restart.',
+          },
+        ],
+      },
+      {
+        kind: 'text',
+        id: 'contribution',
+        marker: '03 — My part',
+        title: 'What I worked on',
+        body: [
+          'My work focused on the prediction form and the results view, and on the server-side integration that made both model paths come back to the interface in the same shape. The models themselves were trained and deployed outside this repository.',
+        ],
+      },
+      {
+        kind: 'list',
+        id: 'delivery',
+        title: 'Delivery',
+        items: [
+          { term: 'Hosting', detail: 'Express on App Engine, runtime nodejs20, instance class F2, serving the built React client as static files from the same service.' },
+          { term: 'Auth', detail: 'google-auth-library mints an access token per request for the Vertex endpoint; the Cloud Run service is called directly.' },
+          { term: 'CI', detail: 'A GitHub Actions workflow builds the client, installs the server and deploys both with gcloud app deploy on every push to main.' },
+        ],
+      },
+    ],
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    slug: 'event-scheduler',
+    title: 'Event Scheduler',
+    eyebrow: 'Testing · Continuous integration',
+    headline: 'A calendar app where the testing was the assignment.',
+    hook: 'Built for a verification course, so the interesting half is the test suite: ten Jest suites, seven Cypress specs and a pipeline that runs them on every push.',
+    summary:
+      'A React and Redux Toolkit calendar for creating, editing and sharing events, built for a usability-testing and verification course. A team project, with my work focused on the event editing and invitation features and on most of the unit tests around them.',
+    disciplines: ['development'],
+    year: '2025',
+    tags: ['React', 'Redux Toolkit', 'Jest', 'Cypress'],
+    meta: {
+      role: 'Event editing, invitations, unit tests',
+      context: 'Group project · 3 contributors',
+      platform: 'Responsive web',
+    },
+    cover: {
+      src: 'event-scheduler/cover',
+      alt: 'Event Scheduler — a calendar app where the tests were the point',
+      ratio: '1600/1000',
+    },
+    presentation: 'deep-dive',
+    featured: false,
+    links: [
+      {
+        label: 'View GitHub repository',
+        href: 'https://github.com/neubiii/React-Event-Scheduler-Application',
+        kind: 'repo',
+      },
+    ],
+    sections: [
+      {
+        kind: 'text',
+        id: 'overview',
+        marker: '01 — The system',
+        title: 'What it does',
+        body: [
+          'Sign in, open a calendar, click a slot, and fill in an event. FullCalendar supplies the day, week and month views; Redux Toolkit holds the events; json-server stands in for a backend, which keeps the project honest about being coursework rather than dressing a fixture file up as an API.',
+          'Submitting the form also sends invitations: the attendee addresses go straight to EmailJS from the browser. The My Events page lists what you created, with search, filtering and infinite scroll once the list gets long.',
+        ],
+      },
+      {
+        kind: 'text',
+        id: 'testing',
+        marker: '02 — Verification',
+        title: 'The half that was the point',
+        body: [
+          'The brief was a verification course, so the suite is not an afterthought. Ten Jest suites cover the components, an integration suite covers the API layer, and seven Cypress specs drive the real flows — auth, the calendar, navigation, my events, infinite scroll.',
+          'A GitHub Actions workflow runs the tests and the production build on every push to main and dev, so a red suite blocks the branch rather than being discovered at a demo.',
+        ],
+      },
+      {
+        kind: 'list',
+        id: 'contribution',
+        marker: '03 — My part',
+        title: 'What I worked on',
+        items: [
+          {
+            term: 'Features',
+            detail: 'The navbar, the Redux state and API calls behind event creation, edit and delete with the event-details popup, and the EmailJS invitation that goes out when an event is created.',
+          },
+          {
+            term: 'Tests',
+            detail: 'Unit suites for My Events, search and filter, infinite scrolling, edit and delete, the navbar and the login screen, plus the Jest setup the suite bootstraps from.',
+          },
+          {
+            term: 'Written work',
+            detail: 'The test plan and a usability test of the edit-and-delete flow — the course wanted both the automated and the observed kind of verification, and both are in the repository.',
+          },
+        ],
+      },
+    ],
+  },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    slug: 'lost-and-found',
+    title: 'Lost and Found',
+    eyebrow: 'Vue 3 · Campus utility',
+    headline: 'Matching a lost report to a found item.',
+    hook: 'A Vue 3 app for reporting lost and found things on campus, where the whole product is one join: does this found item look like anyone’s lost report?',
+    summary:
+      'A Vue 3 project: report something lost, report something found, and let the app score the two lists against each other. Built as a team project, with my work focused on the edit and delete flows, the lost items, item detail and profile pages, and a share of the design and prototype.',
+    disciplines: ['development'],
+    year: '2024',
+    tags: ['Vue 3', 'Vuex', 'json-server'],
+    meta: {
+      role: 'Edit and delete, lost items, item detail, profile',
+      context: 'Group project · 4 developers',
+      platform: 'Responsive web',
+    },
+    cover: {
+      src: 'lost-and-found/cover',
+      alt: 'Lost and Found — matching a lost report to a found item',
+      ratio: '1600/1000',
+    },
+    presentation: 'deep-dive',
+    featured: false,
+    links: [
+      {
+        label: 'View GitHub repository',
+        href: 'https://github.com/neubiii/LostandFound',
+        kind: 'repo',
+      },
+    ],
+    sections: [
+      {
+        kind: 'text',
+        id: 'overview',
+        marker: '01 — The system',
+        title: 'What it does',
+        body: [
+          'Two report forms, two lists, and a matched-items view that scores how well a found item fits a lost report. Everything else — search, filtering by location or category, a profile page of your own posts — exists to get people to that comparison.',
+          'Vuex holds the session and the item lists; a thin util module wraps fetch for each resource, so the components never build a URL themselves. json-server on port 5001 is the data layer.',
+        ],
+      },
+      {
+        kind: 'text',
+        id: 'honest',
+        marker: '02 — What I would change',
+        title: 'The part that has not aged well',
+        body: [
+          'Authentication is entirely client-side: passwords are hashed with bcryptjs in the browser and the signed-in email is base64-encoded into sessionStorage. That is encoding, not security, and with a real backend none of it stays in the client.',
+          'The same goes for the data layer. json-server was the right call for a two-week project — it made the API shape real without anyone standing up a server — but every write is unauthenticated, so it is a prototype boundary rather than a design.',
+        ],
+      },
+      {
+        kind: 'text',
+        id: 'contribution',
+        marker: '03 — My part',
+        title: 'What I worked on',
+        body: [
+          'Edit and delete for both lost and found posts, the lost items, item detail and profile pages, and the store actions and fetch helpers behind them. The design and the prototype were a shared effort.',
+        ],
+      },
+    ],
+  },
 ]
 
 /**
- * The portfolio's three content types, in nav order. `Development` and
- * `Blogs` are intentionally empty — the showcase renders whatever
- * `projects` contains, so adding entries with the matching `discipline` is
- * all that Phase 2 requires.
+ * The portfolio's three content types, in nav order. `Blogs` is intentionally
+ * empty and says so in one line — the showcase renders whatever `projects`
+ * contains, so writing arrives as data with no layout change.
  */
 export const categories = [
-  { id: 'ux', label: 'UI/UX', empty: 'Development projects will be added next.' },
+  { id: 'ux', label: 'UI/UX', empty: 'UI/UX work will be added next.' },
   { id: 'development', label: 'Development', empty: 'Development projects will be added next.' },
   { id: 'writing', label: 'Blogs', empty: 'Writing will be added next.' },
 ] as const satisfies readonly { id: Discipline; label: string; empty: string }[]
 
 export type CategoryId = (typeof categories)[number]['id']
 
+/** How a project's shape is named to a reader, in the index and on the page. */
+export const presentationLabel: Record<Project['presentation'], string> = {
+  'case-study': 'Case study',
+  'deep-dive': 'Deep dive',
+  gallery: 'Visual study',
+}
+
+/** A project appears under every discipline it claims. */
 export const projectsIn = (category: CategoryId): Project[] =>
-  projects.filter((p) => p.discipline === category)
+  projects.filter((p) => p.disciplines.includes(category))
 
 export const findProject = (slug: string): Project | undefined =>
   projects.find((p) => p.slug === slug)
 
-/** Next project in the index, wrapping — powers the end-of-page pager. */
+/**
+ * Next project for the end-of-page pager. It wraps within the current project's
+ * first discipline, so finishing a case study offers another case study rather
+ * than dropping the reader into a service topology — and a project that claims
+ * both categories still has exactly one successor.
+ */
 export const nextProject = (slug: string): Project | undefined => {
-  const i = projects.findIndex((p) => p.slug === slug)
-  if (i === -1 || projects.length < 2) return undefined
-  return projects[(i + 1) % projects.length]
+  const current = findProject(slug)
+  if (!current) return undefined
+  const siblings = projectsIn(current.disciplines[0])
+  if (siblings.length < 2) return undefined
+  const i = siblings.findIndex((p) => p.slug === slug)
+  return siblings[(i + 1) % siblings.length]
 }

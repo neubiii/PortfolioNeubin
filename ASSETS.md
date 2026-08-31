@@ -21,6 +21,20 @@ never a distorted image.
 
 File key: `xbNlhyfWuoGdGYpjusY0eD`
 
+## Not from Figma
+
+The development projects' images are generated SVGs, not exports, and have no
+Figma node behind them:
+
+| File | What it is |
+| --- | --- |
+| `<project>/cover.svg` | Editorial cover — 1600×1000 (16:10, the preview stage's ratio). Dark ground, mono kicker, serif hook, structural motif, stack line. |
+| `expense-ai/cover.svg` | The development Expense AI entry's cover. The UI/UX entry (`ai-expense-agent`) keeps its Figma export. |
+| `<project>/architecture.svg` | Architecture figure on paper ground. Every node, port, protocol and rule ID is quoted from that repository. |
+
+Edit them as text, or regenerate. If a real screenshot arrives later, drop the
+`.png` in beside the `.svg` and `assets.ts` prefers it automatically.
+
 ---
 
 > The portrait is no longer used — the hero is typography-led — so

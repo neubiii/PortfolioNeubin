@@ -31,6 +31,13 @@
   --c-accent-hover: #5e0e1d;
   --c-accent-soft: rgb(122 18 38 / 0.08);
 
+  /* Solid maroon block behind light text. Kept separate from `--c-accent`
+     because the accent has to lighten in the dark theme to stay legible AS
+     text, and a light accent cannot then carry light text as a background.
+     Light: 12.4:1 against --c-on-deep. Dark: 8.4:1. */
+  --c-cta: #7a1226;
+  --c-cta-hover: #5e0e1d;
+
   /* Structure */
   --c-rule: #ded5cb; /* hairline — the primary visual device */
   --c-rule-strong: #c3b7ab;
@@ -103,6 +110,9 @@
   --c-accent: #e36b80;
   --c-accent-hover: #ef8497;
   --c-accent-soft: rgb(227 107 128 / 0.12);
+
+  --c-cta: #8f1b30;
+  --c-cta-hover: #a82239;
 
   --c-rule: #2c2523;
   --c-rule-strong: #453b38;

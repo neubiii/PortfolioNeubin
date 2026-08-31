@@ -10,18 +10,25 @@ npm run build      # typecheck + production build
 npm run preview
 ```
 
-## Phase 1 scope
+## Scope
 
 Two routes: the home page and a project page per project. `WorksShowcase.vue`
 on the home page (anchored at `#work`) is the one place work is browsed —
 there is no separate work index. `/work` survives only as a redirect to
 `/#work` so older links still land somewhere sensible.
 
-The showcase carries all three content types the portfolio will hold —
-UI/UX, Development and Blogs — as a tablist filtering one list on each entry's
-`discipline`. Development and Blogs are deliberately empty and say so in one
-line; adding Phase 2's work is a data change to `src/data/projects.ts`, with no
-layout change here.
+The showcase is a tablist over one list. An entry appears under every category
+in its `disciplines` array, so Expense AI — designed *and* built — is in both
+UI/UX and Development while still resolving to a single page and a single URL.
+Blogs is deliberately empty and says so in one line.
+
+Phase 1 was the five UI/UX projects. Phase 2 added the six development ones,
+written from the repositories rather than from Figma.
+
+Expense AI appears twice on purpose — `ai-expense-agent` is the designed
+concept and the research behind it, `expense-ai` is the thing that was built.
+Two entries rather than one, because they answer different questions and a
+recruiter arrives looking for one or the other.
 
 ## Where things live
 
@@ -47,16 +54,26 @@ src/
 
 ## Adding a project
 
-Add an entry to `src/data/projects.ts`. Two shapes:
+Add an entry to `src/data/projects.ts`. Three shapes, all rendered by the same
+page component from the section kinds in `src/types` (`text`, `split`, `stats`,
+`quote`, `steps`, `list`, `media`):
 
 - `presentation: 'case-study'` — the narrative page with the sticky meta rail
-  and scroll-spy contents. Build it from the section kinds in `src/types`:
-  `text`, `split`, `stats`, `quote`, `steps`, `list`, `media`.
+  and scroll-spy contents.
+- `presentation: 'deep-dive'` — the development shape. Same rail; the sections
+  are what it does, an architecture figure, the decisions, and who built what.
+  It is a label plus a different choice of sections, not a second component.
 - `presentation: 'gallery'` — the visual-first page, for work with real craft
-  behind it but no documented process to narrate.
+  behind it but no documented process to narrate. No rail; its calls to action
+  sit under the standfirst instead.
 
-Set `discipline: 'development'` for Phase 2 work; the Work page filter already
-counts and routes it.
+`disciplines` is an array, so a project that genuinely belongs in two tabs
+needs no duplicate entry. Index numbers are computed per category rather than
+stored, since the same project holds a different position in each list.
+
+A development entry earns a contribution section only when the work can be
+attributed. Where it cannot, the section is simply absent — the page never
+explains what the evidence did not show.
 
 ## Design notes
 
@@ -117,10 +134,38 @@ keyboard parity for every hover behaviour, no information carried by colour
 alone, and alt text on meaningful images with decorative ones hidden from
 assistive technology.
 
+## Calls to action
+
+`ProjectLinks.vue` renders a project's `links` array — used by the rail on a
+case study or deep dive, and under the standfirst on a gallery page. Nothing is
+hardcoded per project.
+
+UI/UX entries carry `View Figma prototype`, development entries carry
+`View GitHub repository`, and a project with no real destination carries no
+link at all. There are no placeholders waiting for a URL.
+
+The three prototype links point at the entry frame of that page's own flow in
+Figma. EverGrove and the rate-conversion landing page have no prototype wiring
+— no starting point, no frame-to-frame navigation — so neither has a link.
+
+## Development covers and figures
+
+No screenshots exist for most of the development work, so each one leads with a
+generated editorial cover instead — dark ground, a short hook, a structural
+motif drawn from what the system actually is, and the stack set in mono. They
+are SVGs in `src/assets/<project>/cover.svg`, at 16:10 so they fill the index
+preview stage exactly. No fake interfaces, no stock imagery.
+
+Four projects also carry an architecture figure at
+`src/assets/<project>/architecture.svg`. Every node, port, protocol and rule ID
+in them is quoted from the repository — the compose file, the service sources,
+the CI workflow — not sketched from memory.
+
 ## Still needed
 
 - **`profile.ts`** — verify `facts` (the "Based" row is inferred), fill in
   `experience` (the section stays hidden while it's empty), and set the real
   GitHub and LinkedIn URLs.
-- **Prototype links.** Each project's `links` array is empty; add Figma
-  prototype URLs and the rail renders the call to action.
+- **Figma sharing** — the three prototype links only open for people who can
+  view the file. Set link sharing on `xbNlhyfWuoGdGYpjusY0eD` to "anyone with
+  the link" before sending the portfolio out.

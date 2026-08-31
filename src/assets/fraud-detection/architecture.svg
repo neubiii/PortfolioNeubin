@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 700" width="1600" height="700" role="img">
+<rect width="1600" height="700" fill="#F6F3EF"/>
+<text x="60" y="70" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="29" fill="#7A1226" letter-spacing="4">PREDICTION PATHS</text>
+<text x="60" y="112" font-family="Georgia,'Iowan Old Style','Times New Roman',serif" font-size="48" fill="#16110F">Two model backends normalised behind one endpoint</text>
+<line x1="60" y1="146" x2="1540" y2="146" stroke="#D6CCC1" stroke-width="2"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7A1226"/></marker></defs>
+
+<rect x="60" y="290" width="280" height="100" fill="none" stroke="#16110F" stroke-width="1.6"/>
+<text x="76" y="320" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="24" fill="#16110F" letter-spacing="1">React client</text>
+<text x="76" y="344" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">Vite · predict form</text>
+<line x1="340" y1="340" x2="520" y2="340" stroke="#7A1226" stroke-width="2"  marker-end="url(#a)"/>
+<text x="430" y="322" text-anchor="middle" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="18" fill="#5E534D">POST /predict</text>
+
+<rect x="520" y="270" width="300" height="140" fill="none" stroke="#7A1226" stroke-width="2.5"/>
+<text x="536" y="300" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="24" fill="#7A1226" letter-spacing="1">Express server</text>
+<text x="536" y="324" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">App Engine nodejs20</text>
+<text x="532" y="446" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="18" fill="#5E534D">modelType switches the path;</text>
+<text x="532" y="468" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="18" fill="#5E534D">both return {classes, scores}</text>
+<line x1="820" y1="315" x2="1020" y2="240" stroke="#7A1226" stroke-width="2"  marker-end="url(#a)"/>
+
+<text x="850" y="240" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="18" fill="#5E534D">REST + OAuth</text>
+<line x1="820" y1="365" x2="1020" y2="470" stroke="#7A1226" stroke-width="2"  marker-end="url(#a)"/>
+<text x="920" y="399.5" text-anchor="middle" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="18" fill="#5E534D">fetch</text>
+
+<rect x="1020" y="196" width="500" height="92" fill="none" stroke="#16110F" stroke-width="1.6"/>
+<text x="1036" y="226" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="24" fill="#16110F" letter-spacing="1">Vertex AI AutoML endpoint</text>
+<text x="1036" y="250" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">:predict via aiplatform REST</text>
+
+<rect x="1020" y="420" width="500" height="100" fill="none" stroke="#16110F" stroke-width="1.6"/>
+<text x="1036" y="450" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="24" fill="#16110F" letter-spacing="1">Cloud Run service</text>
+<text x="1036" y="474" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">/preprocess → /predict</text>
+
+<rect x="1020" y="560" width="500" height="100" fill="none" stroke="#16110F" stroke-width="1.6"/>
+<text x="1036" y="590" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="24" fill="#16110F" letter-spacing="1">custom ensemble</text>
+<text x="1036" y="614" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">random forest · DNN · meta</text>
+<line x1="1270" y1="520" x2="1270" y2="560" stroke="#7A1226" stroke-width="2"  marker-end="url(#a)"/>
+
+
+<rect x="520" y="540" width="380" height="100" fill="none" stroke="#16110F" stroke-width="1.6"/>
+<text x="536" y="570" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="24" fill="#16110F" letter-spacing="1">env swap</text>
+<text x="536" y="594" font-family="'DejaVu Sans Mono','Liberation Mono',Menlo,monospace" font-size="20" fill="#5E534D">start:automl / start:custom</text>
+</svg>

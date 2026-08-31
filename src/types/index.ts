@@ -49,6 +49,10 @@ export interface ProjectMeta {
   context?: string
 }
 
+/**
+ * A call to action on a project page. A project that has no real destination
+ * carries no link — there are no placeholders waiting for a URL.
+ */
 export interface ProjectLink {
   label: string
   href: string
@@ -132,7 +136,6 @@ export type TitledSection = Extract<CaseSection, { title?: string }>
 
 export interface Project {
   slug: string
-  index: string
   title: string
   /** Kicker from the case study — e.g. "AGENTIC UX · SAP FIORI FOR iOS". */
   eyebrow: string
@@ -142,7 +145,12 @@ export interface Project {
   hook: string
   /** Longer standfirst opening the project page. */
   summary: string
-  discipline: Discipline
+  /**
+   * The categories a project appears under. An array rather than a single
+   * value because the filter reads the same either way, and a piece of work
+   * that genuinely belongs in two tabs should not need a duplicate entry.
+   */
+  disciplines: Discipline[]
   year: string
   tags: string[]
   cover: MediaItem
@@ -151,8 +159,12 @@ export interface Project {
    * `case-study` renders the narrative page with the sticky rail.
    * `gallery`    renders the visual-first presentation, for work with real
    *              craft behind it but no documented process to narrate.
+   * `deep-dive`  is the development shape: same rail, but the sections are
+   *              architecture, decisions and contribution rather than
+   *              research and testing. It is a label and a set of sections,
+   *              not a second page component.
    */
-  presentation: 'case-study' | 'gallery'
+  presentation: 'case-study' | 'gallery' | 'deep-dive'
   sections: CaseSection[]
   links: ProjectLink[]
   featured: boolean

@@ -2,14 +2,14 @@
 import { computed, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import MediaFrame from '@/components/ui/MediaFrame.vue'
-import { categories, projectsIn, type CategoryId } from '@/data/projects'
+import { categories, presentationLabel, projectsIn, type CategoryId } from '@/data/projects'
 
 /**
  * The one place work is browsed.
  *
- * Categories are a filter over the same list, not three components: an entry's
- * `discipline` decides which tab it appears under, so Phase 2 adds development
- * work and writing by adding data, with no layout change here.
+ * Categories are a filter over the same list, not three components: an entry
+ * appears under every discipline it claims. Adding work is a data change;
+ * nothing here needs to know about it.
  *
  * Above 75rem the composition is three columns — half the index, the preview,
  * the other half — so the last project sits at the same eye level as the first
@@ -20,7 +20,17 @@ import { categories, projectsIn, type CategoryId } from '@/data/projects'
 const active = ref<CategoryId>('ux')
 const tabs = ref<(HTMLButtonElement | null)[]>([])
 
-const visible = computed(() => projectsIn(active.value))
+/**
+ * Numbering is per category, not global: the first project in this tab is 01
+ * whichever tab it is. A stored index on the project could not do that, because
+ * the same project holds a different position in each list it appears in.
+ */
+const visible = computed(() =>
+  projectsIn(active.value).map((project, i) => ({
+    project,
+    index: String(i + 1).padStart(2, '0'),
+  })),
+)
 const activeCategory = computed(
   () => categories.find((c) => c.id === active.value) ?? categories[0],
 )
@@ -35,7 +45,9 @@ const groups = computed(() => [
 
 const previewSlug = ref<string | null>(null)
 const preview = computed(
-  () => visible.value.find((p) => p.slug === previewSlug.value) ?? visible.value[0],
+  () =>
+    (visible.value.find((e) => e.project.slug === previewSlug.value) ?? visible.value[0])
+      ?.project,
 )
 
 // A selection from the previous category is meaningless in this one.
@@ -104,7 +116,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
               :start="side === 0 ? 1 : half + 1"
               :data-side="side === 0 ? 'left' : 'right'"
             >
-              <li v-for="project in group" :key="project.slug">
+              <li v-for="{ project, index } in group" :key="project.slug">
                 <RouterLink
                   :to="`/work/${project.slug}`"
                   class="entry"
@@ -113,7 +125,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
                   @focus="previewSlug = project.slug"
                 >
                   <p class="mono entry__meta">
-                    <span class="entry__index">{{ project.index }}</span>
+                    <span class="entry__index">{{ index }}</span>
                     <span class="entry__rule" aria-hidden="true" />
                     <span>{{ project.year }}</span>
                   </p>
@@ -125,7 +137,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
                   </ul>
 
                   <p class="mono entry__kind">
-                    {{ project.presentation === 'case-study' ? 'Case study' : 'Visual study' }}
+                    {{ presentationLabel[project.presentation] }}
                     <span class="entry__arrow" aria-hidden="true">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                         <path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="square" />
