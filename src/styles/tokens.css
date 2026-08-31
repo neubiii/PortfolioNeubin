@@ -1,0 +1,91 @@
+/*
+ * Design tokens.
+ *
+ * Raw values live here as `--c-*` / `--t-*` custom properties so the theme can be
+ * swapped at runtime. `main.css` maps them into Tailwind's `@theme` layer, which is
+ * what generates the `bg-paper` / `text-ink` style utilities used across components.
+ *
+ * Contrast (WCAG 2.1, verified both themes):
+ *   ink on paper      16.9 : 1     accent on paper   9.8 : 1  (light)  6.2 : 1 (dark)
+ *   muted on paper     6.7 : 1     paper on deep    15.2 : 1
+ *   faint on paper     3.6 : 1  -> large text (>=24px) or decorative numerals only
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --c-paper: #f6f3ef; /* page ground — warm off-white, not clinical white */
+  --c-surface: #fffdfa; /* raised: images, sticky rails */
+  --c-deep: #3d0a15; /* full-bleed maroon block */
+
+  /* Ink */
+  --c-ink: #16110f;
+  --c-muted: #5e534d;
+  --c-faint: #8a7d75; /* 3.6:1 — large text (>=24px) or non-text only */
+  --c-on-deep: #f6f3ef;
+  --c-on-deep-muted: #c9b7b2;
+
+  /* Accent */
+  --c-accent: #7a1226;
+  --c-accent-hover: #5e0e1d;
+  --c-accent-soft: rgb(122 18 38 / 0.08);
+
+  /* Structure */
+  --c-rule: #ded5cb; /* hairline — the primary visual device */
+  --c-rule-strong: #c3b7ab;
+
+  /* Focus */
+  --c-focus: #7a1226;
+
+  /* Grain intensity — dialled down in dark, where noise reads much louder */
+  --grain-opacity: 0.055;
+
+  /* Type scale — fluid, clamped. Ratio ~1.28 at base, widening toward display. */
+  --t-xs: 0.75rem;
+  --t-sm: 0.8125rem;
+  --t-base: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+  --t-lg: clamp(1.125rem, 1.05rem + 0.36vw, 1.3125rem);
+  --t-xl: clamp(1.375rem, 1.2rem + 0.75vw, 1.75rem);
+  --t-2xl: clamp(1.75rem, 1.42rem + 1.45vw, 2.75rem);
+  --t-3xl: clamp(2.25rem, 1.6rem + 2.9vw, 4.25rem);
+  --t-4xl: clamp(2.75rem, 1.5rem + 5.6vw, 7rem);
+  --t-5xl: clamp(3.25rem, 1.1rem + 9.6vw, 10rem);
+
+  /* Rhythm */
+  --section-y: clamp(4.5rem, 9vw, 9rem);
+  --gutter: clamp(1.25rem, 4vw, 4.5rem);
+  --measure: 68ch;
+
+  /* Motion — short, mechanical, never floaty */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 140ms;
+  --dur: 260ms;
+  --dur-slow: 620ms;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --c-paper: #100d0c;
+  --c-surface: #191413;
+  --c-deep: #59101f;
+
+  --c-ink: #f3eee8;
+  --c-muted: #a2958c;
+  --c-faint: #7a6e67; /* dark: 3.9:1 — same rule */
+  --c-on-deep: #fbf6f2;
+  --c-on-deep-muted: #dcbfc4;
+
+  --c-accent: #e36b80;
+  --c-accent-hover: #ef8497;
+  --c-accent-soft: rgb(227 107 128 / 0.12);
+
+  --c-rule: #2c2523;
+  --c-rule-strong: #453b38;
+
+  --c-focus: #e36b80;
+
+  --grain-opacity: 0.03;
+}

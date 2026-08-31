@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neubin Sebastian — Product Developer &amp; UI/UX Developer</title>
+    <meta
+      name="description"
+      content="Neubin Sebastian — product developer and UI/UX developer. Product thinking, interface design, and the code that ships it."
+    />
+    <meta name="theme-color" content="#F6F3EF" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#100D0C" media="(prefers-color-scheme: dark)" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!--
+      Theme is resolved before first paint so the page never flashes the wrong
+      surface. Kept inline and tiny on purpose.
+    -->
+    <script>
+      (() => {
+        try {
+          const stored = localStorage.getItem('theme')
+          const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+          document.documentElement.dataset.theme = stored || system
+        } catch {
+          document.documentElement.dataset.theme = 'light'
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

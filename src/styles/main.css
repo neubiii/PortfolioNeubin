@@ -1,0 +1,308 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+/* Theme is explicit (data attribute) so the toggle can override the OS. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@theme inline {
+  --color-paper: var(--c-paper);
+  --color-surface: var(--c-surface);
+  --color-deep: var(--c-deep);
+
+  --color-ink: var(--c-ink);
+  --color-muted: var(--c-muted);
+  --color-faint: var(--c-faint);
+  --color-on-deep: var(--c-on-deep);
+  --color-on-deep-muted: var(--c-on-deep-muted);
+
+  --color-accent: var(--c-accent);
+  --color-accent-hover: var(--c-accent-hover);
+  --color-accent-soft: var(--c-accent-soft);
+
+  --color-rule: var(--c-rule);
+  --color-rule-strong: var(--c-rule-strong);
+
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+
+  --text-xs: var(--t-xs);
+  --text-sm: var(--t-sm);
+  --text-base: var(--t-base);
+  --text-lg: var(--t-lg);
+  --text-xl: var(--t-xl);
+  --text-2xl: var(--t-2xl);
+  --text-3xl: var(--t-3xl);
+  --text-4xl: var(--t-4xl);
+  --text-5xl: var(--t-5xl);
+
+  --ease-out-expo: var(--ease-out);
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    /* Sticky header + a little air, so anchored sections don't hide under the nav. */
+    scroll-padding-top: 7rem;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--c-paper);
+    color: var(--c-ink);
+    font-family: var(--font-sans);
+    font-size: var(--t-base);
+    line-height: 1.6;
+    font-synthesis-weight: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0;
+    font-weight: 400;
+    text-wrap: balance;
+  }
+
+  p {
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  ul,
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  /* One focus treatment everywhere. Offset so it never clips the glyphs. */
+  :focus-visible {
+    outline: 2px solid var(--c-focus);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  ::selection {
+    background: var(--c-accent);
+    color: var(--c-on-deep);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* ---- Layout primitives ------------------------------------------------ */
+
+  /* The page grid. Everything aligns to these 12 columns; the asymmetry in the
+     layouts comes from where content starts, not from ad-hoc margins. */
+  .shell {
+    width: 100%;
+    max-width: 96rem;
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .grid12 {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: clamp(1rem, 2vw, 2rem);
+  }
+
+  .rule-t {
+    border-top: 1px solid var(--c-rule);
+  }
+
+  .rule-b {
+    border-bottom: 1px solid var(--c-rule);
+  }
+
+  /* ---- Type roles ------------------------------------------------------- */
+
+  /* Display: Fraunces, high optical size, tight. The editorial voice. */
+  .display {
+    font-family: var(--font-display);
+    font-variation-settings:
+      'opsz' 128,
+      'SOFT' 0,
+      'WONK' 1;
+    font-weight: 400;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+  }
+
+  .display-soft {
+    font-family: var(--font-display);
+    font-variation-settings:
+      'opsz' 48,
+      'SOFT' 40,
+      'WONK' 1;
+    font-weight: 400;
+    line-height: 1.06;
+    letter-spacing: -0.015em;
+  }
+
+  /* Label: the mono voice. Metadata, eyebrows, indices, column headers. */
+  .label {
+    font-family: var(--font-mono);
+    font-size: var(--t-xs);
+    font-weight: 500;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+    font-size: var(--t-sm);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+
+  .lede {
+    font-size: var(--t-lg);
+    line-height: 1.55;
+    max-width: var(--measure);
+  }
+
+  .prose-measure {
+    max-width: var(--measure);
+  }
+
+  /* ---- Interaction ------------------------------------------------------ */
+
+  /* Underline that grows from the leading edge. Used on every inline text link
+     so link affordance never depends on colour alone. */
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 1px;
+    transition: background-size var(--dur) var(--ease-out);
+    padding-bottom: 0.06em;
+  }
+
+  @media (hover: hover) {
+    .link-underline:hover {
+      background-size: 0% 1px;
+      background-position: 100% 100%;
+    }
+  }
+
+  .link-underline:focus-visible {
+    background-size: 0% 1px;
+  }
+
+  /* Grows in on hover/focus instead — for nav items, which start bare.
+     Built on a pseudo-element rather than a background, so the link can carry
+     a 44px tall hit area (WCAG 2.5.8) while the rule still sits tight under
+     the text rather than 44px below it. */
+  .link-grow {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  .link-grow::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(50% + 0.62em);
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .link-grow:hover::after,
+  .link-grow:focus-visible::after,
+  .link-grow[data-active='true']::after {
+    transform: scaleX(1);
+  }
+
+  /* Standalone links that need a real target without changing their look. */
+  .tap-target {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+}
+
+@layer utilities {
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Bleeds an element out of the grid to the viewport edge. */
+  .bleed {
+    margin-inline: calc(var(--gutter) * -1);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+}
