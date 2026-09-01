@@ -1516,14 +1516,18 @@ export const projects: Project[] = [
 ]
 
 /**
- * The portfolio's three content types, in nav order. `Blogs` is intentionally
- * empty and says so in one line — the showcase renders whatever `projects`
- * contains, so writing arrives as data with no layout change.
+ * The portfolio's three content types, in nav order. `Writing` is not drawn
+ * from `projects` — it is external content and lives in `writing.ts` — but it
+ * is a category here so the showcase's tablist stays one list.
+ *
+ * `empty` is the line a category shows when it holds nothing. All three are
+ * populated now; the fallback stays because an empty tab should still say
+ * something honest rather than collapse.
  */
 export const categories = [
   { id: 'ux', label: 'UI/UX', empty: 'UI/UX work will be added next.' },
   { id: 'development', label: 'Development', empty: 'Development projects will be added next.' },
-  { id: 'writing', label: 'Blogs', empty: 'Writing will be added next.' },
+  { id: 'writing', label: 'Writing', empty: 'Writing will be added next.' },
 ] as const satisfies readonly { id: Discipline; label: string; empty: string }[]
 
 export type CategoryId = (typeof categories)[number]['id']

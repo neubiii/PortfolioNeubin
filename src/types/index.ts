@@ -131,6 +131,31 @@ export type CaseSection =
   | StepsSection
   | ListSection
 
+/**
+ * A piece of writing published somewhere else.
+ *
+ * Deliberately not a `Project`: there is no page to route to and no case study
+ * to render, so modelling it as one would mean five empty project pages. The
+ * showcase treats it as an index entry whose only destination is the original
+ * post.
+ */
+export interface WritingEntry {
+  /** Selection key for the preview. Not a route — writing has none. */
+  id: string
+  title: string
+  /** Set when the piece belongs to a run; parts then share a treatment. */
+  series?: string
+  /** The line that earns the click. */
+  hook: string
+  /** What the post is actually about, in one or two sentences. */
+  summary: string
+  topics: string[]
+  /** Where it was published — shown as the source indicator. */
+  source: string
+  /** The original post. Always external, always a new tab. */
+  href: string
+}
+
 /** Sections that carry a heading are the ones the contents rail lists. */
 export type TitledSection = Extract<CaseSection, { title?: string }>
 

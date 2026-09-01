@@ -2,7 +2,9 @@
 import { computed, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import MediaFrame from '@/components/ui/MediaFrame.vue'
+import WritingPreview from '@/components/project/WritingPreview.vue'
 import { categories, presentationLabel, projectsIn, type CategoryId } from '@/data/projects'
+import { writing } from '@/data/writing'
 
 /**
  * The one place work is browsed.
@@ -14,8 +16,13 @@ import { categories, presentationLabel, projectsIn, type CategoryId } from '@/da
  * Above 75rem the composition is three columns — half the index, the preview,
  * the other half — so the last project sits at the same eye level as the first
  * instead of trailing a long single list. Below that the preview column is
- * dropped and each row carries its own image, because a touch visitor has no
- * hover to discover imagery with.
+ * dropped and each row carries what the preview would have shown, because a
+ * touch visitor has no hover to discover anything with.
+ *
+ * Writing runs through the same composition with two differences: a row is an
+ * external link rather than a route, and the centre panel is typographic
+ * because a LinkedIn post has no screenshot to show. Everything else — the
+ * split, the hover, the dimming, the sticky column — is shared.
  */
 const active = ref<CategoryId>('ux')
 const tabs = ref<(HTMLButtonElement | null)[]>([])
@@ -25,33 +32,47 @@ const tabs = ref<(HTMLButtonElement | null)[]>([])
  * whichever tab it is. A stored index on the project could not do that, because
  * the same project holds a different position in each list it appears in.
  */
-const visible = computed(() =>
-  projectsIn(active.value).map((project, i) => ({
-    project,
-    index: String(i + 1).padStart(2, '0'),
-  })),
+const ordinal = (i: number) => String(i + 1).padStart(2, '0')
+
+const isWriting = computed(() => active.value === 'writing')
+
+const projectRows = computed(() =>
+  projectsIn(active.value).map((project, i) => ({ project, index: ordinal(i) })),
 )
+const writingRows = computed(() => writing.map((entry, i) => ({ entry, index: ordinal(i) })))
+
+const count = computed(() => (isWriting.value ? writing.length : projectRows.value.length))
+
+/** The tab counter has to know that writing is not in the project list. */
+const countIn = (category: CategoryId) =>
+  category === 'writing' ? writing.length : projectsIn(category).length
+
 const activeCategory = computed(
   () => categories.find((c) => c.id === active.value) ?? categories[0],
 )
 
-const half = computed(() => Math.ceil(visible.value.length / 2))
+const half = computed(() => Math.ceil(count.value / 2))
 
 /** Two groups so the grid can place them in columns 1 and 3. 5 → 3 / 2. */
-const groups = computed(() => [
-  visible.value.slice(0, half.value),
-  visible.value.slice(half.value),
-])
+const split = <T,>(rows: T[]) => [rows.slice(0, half.value), rows.slice(half.value)]
+const groups = computed(() => split(projectRows.value))
+const writingGroups = computed(() => split(writingRows.value))
 
-const previewSlug = ref<string | null>(null)
+/** Whatever the pointer or focus is on: a project slug or a writing id. */
+const previewKey = ref<string | null>(null)
+
 const preview = computed(
   () =>
-    (visible.value.find((e) => e.project.slug === previewSlug.value) ?? visible.value[0])
+    (projectRows.value.find((e) => e.project.slug === previewKey.value) ?? projectRows.value[0])
       ?.project,
+)
+const writingPreview = computed(
+  () =>
+    (writingRows.value.find((e) => e.entry.id === previewKey.value) ?? writingRows.value[0])?.entry,
 )
 
 // A selection from the previous category is meaningless in this one.
-watch(active, () => (previewSlug.value = null))
+watch(active, () => (previewKey.value = null))
 
 const tabId = (id: string) => `works-tab-${id}`
 
@@ -76,9 +97,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
       <!-- A ruler row, not an introduction. The projects are the content. -->
       <div class="works__head">
         <h2 id="works-title" class="label works__title">Work</h2>
-        <p class="mono works__count">
-          {{ visible.length }} {{ active === 'writing' ? 'posts' : 'projects' }}
-        </p>
+        <p class="mono works__count">{{ count }} {{ isWriting ? 'posts' : 'projects' }}</p>
       </div>
 
       <!-- Category nav: type on a rule, with the active item carrying the
@@ -101,14 +120,76 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
           @keydown="onTabKey($event, i)"
         >
           <span>{{ category.label }}</span>
-          <span class="mono tab__count">{{ projectsIn(category.id).length }}</span>
+          <span class="mono tab__count">{{ countIn(category.id) }}</span>
         </button>
       </div>
 
       <div id="works-panel" role="tabpanel" :aria-labelledby="tabId(active)">
         <Transition name="fade" mode="out-in">
           <!-- Populated category -->
-          <div v-if="visible.length" :key="active" class="works__grid" @mouseleave="previewSlug = null">
+          <div v-if="count" :key="active" class="works__grid" @mouseleave="previewKey = null">
+            <!-- ── Writing: external entries, typographic preview ─────────── -->
+            <template v-if="isWriting">
+              <ol
+                v-for="(group, side) in writingGroups"
+                :key="side"
+                class="works__col"
+                :start="side === 0 ? 1 : half + 1"
+                :data-side="side === 0 ? 'left' : 'right'"
+              >
+                <li v-for="{ entry, index } in group" :key="entry.id">
+                  <a
+                    :href="entry.href"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="entry entry--writing"
+                    :data-dim="previewKey !== null && previewKey !== entry.id"
+                    :data-current="writingPreview?.id === entry.id"
+                    @mouseenter="previewKey = entry.id"
+                    @focus="previewKey = entry.id"
+                  >
+                    <p class="mono entry__meta">
+                      <span class="entry__index">{{ index }}</span>
+                      <span class="entry__rule" aria-hidden="true" />
+                      <span :data-series="Boolean(entry.series)">
+                        {{ entry.series ?? entry.source }}
+                      </span>
+                    </p>
+
+                    <h3 class="display entry__title">{{ entry.title }}</h3>
+
+                    <ul class="entry__tags">
+                      <li v-for="topic in entry.topics" :key="topic" class="mono entry__tag">
+                        {{ topic }}
+                      </li>
+                    </ul>
+
+                    <!-- Below the preview breakpoint the row has to say what
+                         the panel would have said. -->
+                    <p class="entry__lede">{{ entry.hook }}</p>
+
+                    <p class="mono entry__go">
+                      <span>View {{ entry.source }} post</span>
+                      <span class="entry__go-mark" aria-hidden="true">↗</span>
+                    </p>
+                    <span class="sr-only">(opens in a new tab)</span>
+                  </a>
+                </li>
+              </ol>
+
+              <div class="works__preview">
+                <Transition name="fade" mode="out-in">
+                  <WritingPreview
+                    v-if="writingPreview"
+                    :key="writingPreview.id"
+                    :entry="writingPreview"
+                  />
+                </Transition>
+              </div>
+            </template>
+
+            <!-- ── Projects ───────────────────────────────────────────────── -->
+            <template v-else>
             <ol
               v-for="(group, side) in groups"
               :key="side"
@@ -120,9 +201,9 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
                 <RouterLink
                   :to="`/work/${project.slug}`"
                   class="entry"
-                  :data-dim="previewSlug !== null && previewSlug !== project.slug"
-                  @mouseenter="previewSlug = project.slug"
-                  @focus="previewSlug = project.slug"
+                  :data-dim="previewKey !== null && previewKey !== project.slug"
+                  @mouseenter="previewKey = project.slug"
+                  @focus="previewKey = project.slug"
                 >
                   <p class="mono entry__meta">
                     <span class="entry__index">{{ index }}</span>
@@ -184,6 +265,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
                 </Transition>
               </RouterLink>
             </div>
+            </template>
           </div>
 
           <!-- Empty category. One honest line on a rule — no skeletons, no
@@ -447,6 +529,79 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
   font-size: var(--t-sm);
   line-height: 1.55;
   max-width: 52ch;
+}
+
+/* ── Writing rows ──────────────────────────────────────────────────────── */
+
+/* The meta line is a system label everywhere else in this component — a bare
+   year — so the source and the series name are set the same way rather than
+   dropped in as running text. */
+.entry--writing .entry__meta span:last-child {
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* The series name takes the source's place, so a run of parts is visible while
+   scanning the list and not only inside the panel. */
+.entry__meta [data-series='true'] {
+  color: var(--c-accent);
+}
+
+/* Selecting a post changes the panel instead of navigating, so the row it
+   belongs to has to say so — otherwise nothing connects the two. */
+@media (min-width: 75rem) {
+  .entry--writing[data-current='true'] .entry__title {
+    color: var(--c-accent);
+  }
+}
+
+/* Below the preview breakpoint the hook stands in for the panel. */
+.entry__lede {
+  display: none;
+  margin-top: 1rem;
+  color: var(--c-muted);
+  font-size: var(--t-sm);
+  line-height: 1.55;
+  max-width: 52ch;
+}
+
+@media (max-width: 74.99rem) {
+  .entry__lede {
+    display: block;
+  }
+}
+
+/* Always visible, unlike the project rows' arrow: on a touch screen this is
+   the only thing telling the visitor where the row goes. */
+.entry__go {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+  color: var(--c-accent);
+  font-size: var(--t-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.entry__go-mark {
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.entry:hover .entry__go-mark,
+.entry:focus-visible .entry__go-mark {
+  transform: translate(0.15rem, -0.15rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entry__go-mark {
+    transition: none;
+  }
+
+  .entry:hover .entry__go-mark,
+  .entry:focus-visible .entry__go-mark {
+    transform: none;
+  }
 }
 
 /* ── Preview ───────────────────────────────────────────────────────────── */

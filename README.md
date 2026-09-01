@@ -20,10 +20,9 @@ there is no separate work index. `/work` survives only as a redirect to
 The showcase is a tablist over one list. An entry appears under every category
 in its `disciplines` array, so Expense AI — designed *and* built — is in both
 UI/UX and Development while still resolving to a single page and a single URL.
-Blogs is deliberately empty and says so in one line.
 
 Phase 1 was the five UI/UX projects. Phase 2 added the six development ones,
-written from the repositories rather than from Figma.
+written from the repositories rather than from Figma. Phase 3 added Writing.
 
 Expense AI appears twice on purpose — `ai-expense-agent` is the designed
 concept and the research behind it, `expense-ai` is the thing that was built.
@@ -51,6 +50,31 @@ src/
     main.css            Tailwind theme mapping, base layer, shared classes
   types/                the content model
 ```
+
+## Writing
+
+Writing is published on LinkedIn, so the third tab is an index to it rather
+than a copy of it. `src/data/writing.ts` holds five `WritingEntry` records —
+title, hook, summary, topics, an optional series name and the post URL — and
+that is the whole model. Deliberately not `Project`: there is no page to route
+to, and forcing it into that shape would mean five empty project pages.
+
+The tab reuses the showcase's composition exactly — the same split index, the
+same hover-and-focus preview, the same sticky column. Two things differ. A row
+is an external link rather than a route, so selecting a post never navigates
+inside the site. And the centre panel is `WritingPreview.vue`, which is
+typographic because a LinkedIn post has no screenshot: the hook is set large
+and does the work a cover image does elsewhere.
+
+The three parts of the AI UX Patterns series share a flat accent tint and a
+tick row — one rule per part, the current one longer, the same signal the
+case-study contents rail uses — so they read as one run without being merged
+into a single article that does not exist. `seriesPosition()` counts the parts
+from the data, so a fourth would number itself.
+
+Below 75rem there is no hover to discover anything with, so each row carries
+its own hook and its own `View LinkedIn post ↗` line. No engagement figures are
+stored or shown anywhere.
 
 ## Adding a project
 
