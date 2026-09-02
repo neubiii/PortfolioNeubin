@@ -196,3 +196,39 @@ export interface Project {
   /** Rendered at the foot of a case study when the source material carries one. */
   scopeNote?: string
 }
+
+/* ── Skillset ──────────────────────────────────────────────────────────────
+   Kept deliberately small. Everything the Skillset section shows is derived
+   from these four fields, so changing what a thing is called, how well it is
+   known, or which side of the practice it belongs to is a one-line edit in
+   `@/data/skills` and nothing else. */
+
+/**
+ * Self-assessed depth. Ordered from strongest to lightest; the display order
+ * and any labelling come from `LEVELS` in the data file, not from a component.
+ */
+export type SkillLevel = 'advanced' | 'above-average' | 'working-knowledge' | 'familiar'
+
+/** Which side of the practice an item belongs to. Both is allowed. */
+export type SkillDomain = 'ux' | 'development'
+
+/**
+ * `skill` is a capability, language, framework or practice — something done.
+ * `tool` is a named application that is operated. The line matters because the
+ * two are worth presenting differently, and it is drawn here rather than being
+ * inferred from a name later.
+ */
+export type SkillKind = 'skill' | 'tool'
+
+export interface SkillItem {
+  /** Stable slug. Used as a key, and later as an anchor for interactions. */
+  id: string
+  name: string
+  kind: SkillKind
+  /**
+   * One entry per item, never two. Something practised on both sides of the
+   * work carries both domains rather than appearing twice.
+   */
+  domains: SkillDomain[]
+  level: SkillLevel
+}

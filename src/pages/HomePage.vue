@@ -3,9 +3,9 @@ import ArrowLink from '@/components/ui/ArrowLink.vue'
 import Annotation from '@/components/ui/Annotation.vue'
 import GridRules from '@/components/ui/GridRules.vue'
 import MotionToggle from '@/components/ui/MotionToggle.vue'
-import Reveal from '@/components/ui/Reveal.vue'
 import SectionHead from '@/components/ui/SectionHead.vue'
 import AboutSection from '@/components/layout/AboutSection.vue'
+import SkillsetSection from '@/components/layout/SkillsetSection.vue'
 import VantaBirds from '@/components/ui/VantaBirds.vue'
 import WorksShowcase from '@/components/project/WorksShowcase.vue'
 import { projects } from '@/data/projects'
@@ -69,18 +69,7 @@ import { profile } from '@/data/profile'
     <AboutSection />
 
     <!-- ── Skillset ──────────────────────────────────────────────────────── -->
-    <section class="shell section" aria-labelledby="skillset-title">
-      <SectionHead id="skillset" marker="Skillset" title="What I actually do" />
-
-      <Reveal class="caps">
-        <div v-for="group in profile.capabilities" :key="group.group" class="caps__group">
-          <h3 class="label caps__heading">{{ group.group }}</h3>
-          <ul>
-            <li v-for="item in group.items" :key="item" class="caps__item">{{ item }}</li>
-          </ul>
-        </div>
-      </Reveal>
-    </section>
+    <SkillsetSection />
 
     <!-- ── Experience — renders only when there is real data to show ─────── -->
     <section
@@ -304,38 +293,6 @@ import { profile } from '@/data/profile'
 }
 
 
-
-/* ── Capabilities ──────────────────────────────────────────────────────── */
-
-.caps {
-  display: grid;
-  gap: clamp(2rem, 4vw, 3rem);
-}
-
-@media (min-width: 40rem) {
-  .caps {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 64rem) {
-  .caps {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.caps__heading {
-  color: var(--c-accent);
-  padding-bottom: 0.9rem;
-  margin-bottom: 0.25rem;
-  border-bottom: 1px solid var(--c-rule-strong);
-}
-
-.caps__item {
-  padding-block: 0.8rem;
-  border-bottom: 1px solid var(--c-rule);
-  font-size: var(--t-base);
-}
 
 /* ── Experience ────────────────────────────────────────────────────────── */
 

@@ -37,37 +37,6 @@ export const profile = {
   ],
 
   /**
-   * Capabilities. Grouped, not scored — no progress bars, no percentages,
-   * because neither would mean anything.
-   */
-  capabilities: [
-    {
-      group: 'Design',
-      items: [
-        'Product & interaction design',
-        'Information architecture',
-        'Interface systems & design tokens',
-        'Prototyping',
-        'Usability review',
-      ],
-    },
-    {
-      group: 'Development',
-      items: [
-        'Vue 3 · TypeScript',
-        'Tailwind CSS · design-system CSS',
-        'Component architecture',
-        'Accessibility & responsive engineering',
-        'Design-to-code translation',
-      ],
-    },
-    {
-      group: 'Tools',
-      items: ['Figma', 'Git', 'Vite', 'Motion'],
-    },
-  ],
-
-  /**
    * TODO — supply real roles. Each entry needs: period, title, org, and one line
    * of what you actually did. Left empty on purpose; the Experience section does
    * not render while this array is empty.
