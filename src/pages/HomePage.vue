@@ -5,6 +5,7 @@ import GridRules from '@/components/ui/GridRules.vue'
 import MotionToggle from '@/components/ui/MotionToggle.vue'
 import Reveal from '@/components/ui/Reveal.vue'
 import SectionHead from '@/components/ui/SectionHead.vue'
+import AboutSection from '@/components/layout/AboutSection.vue'
 import VantaBirds from '@/components/ui/VantaBirds.vue'
 import WorksShowcase from '@/components/project/WorksShowcase.vue'
 import { projects } from '@/data/projects'
@@ -65,40 +66,7 @@ import { profile } from '@/data/profile'
     <WorksShowcase />
 
     <!-- ── About ─────────────────────────────────────────────────────────── -->
-    <section class="shell section" aria-labelledby="about-title">
-      <SectionHead id="about" marker="About" title="Design and build, not design then hand off" />
-
-      <Reveal class="about">
-        <div class="about__prose">
-          <p class="about__para">
-            Most interface problems only show themselves once the thing is running — when the
-            content is the wrong length, the state you forgot appears, or an interaction that
-            looked fine in a static frame turns out to be a chore. Working across both sides
-            means those get caught while they are still cheap to change.
-          </p>
-          <p class="about__para about__para--muted">
-            So the design work is done with the constraints of the build in mind, and the build
-            is done with the intent of the design intact. Fewer things get lost in translation,
-            because there is no translation step.
-          </p>
-        </div>
-
-        <!-- Facts only, straight from `profile.facts`. A row you delete there
-             disappears here — nothing is filled in to keep the table even. -->
-        <dl class="about__facts">
-          <div v-for="fact in profile.facts" :key="fact.term" class="about__fact">
-            <dt class="label">{{ fact.term }}</dt>
-            <dd class="mono">{{ fact.detail }}</dd>
-          </div>
-          <div class="about__fact">
-            <dt class="label">Contact</dt>
-            <dd class="mono">
-              <a :href="`mailto:${profile.email}`" class="link-underline tap-target">Email</a>
-            </dd>
-          </div>
-        </dl>
-      </Reveal>
-    </section>
+    <AboutSection />
 
     <!-- ── Skillset ──────────────────────────────────────────────────────── -->
     <section class="shell section" aria-labelledby="skillset-title">
@@ -336,58 +304,6 @@ import { profile } from '@/data/profile'
 }
 
 
-
-/* ── About ─────────────────────────────────────────────────────────────── */
-
-.about {
-  display: grid;
-  gap: clamp(2.5rem, 5vw, 4rem);
-}
-
-@media (min-width: 56rem) {
-  .about {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
-    column-gap: clamp(3rem, 8vw, 7rem);
-  }
-}
-
-.about__para {
-  font-size: var(--t-lg);
-  line-height: 1.55;
-  max-width: 56ch;
-}
-
-.about__para + .about__para {
-  margin-top: 1.5rem;
-}
-
-.about__para--muted {
-  color: var(--c-muted);
-}
-
-.about__facts {
-  margin: 0;
-  border-top: 1px solid var(--c-rule);
-}
-
-.about__fact {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 1.5rem;
-  padding-block: 0.9rem;
-  border-bottom: 1px solid var(--c-rule);
-}
-
-.about__fact dt {
-  color: var(--c-muted);
-  flex: none;
-}
-
-.about__fact dd {
-  margin: 0;
-  text-align: right;
-}
 
 /* ── Capabilities ──────────────────────────────────────────────────────── */
 

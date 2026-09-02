@@ -40,6 +40,18 @@ Edit them as text, or regenerate. If a real screenshot arrives later, drop the
 > The portrait is no longer used — the hero is typography-led — so
 > `src/assets/profile/` has been removed.
 
+## `src/assets/about/` — section `AboutSection`
+
+Supplied images, not Figma exports. All four are processed for the web rather
+than dropped in at source size.
+
+| File | What it is |
+| --- | --- |
+| `portrait-cut.png` | Supplied already cut out of its backdrop (`NeubinImagenew.png`), then bounding-box cropped, padded on the empty side to bring the **face close to the file's horizontal centre**, and resized to 593×820 RGBA. The identity panel's arched window takes this file's aspect ratio and the image fills it, so the head lands under the apex of the arch with no offset in CSS. Replacing the portrait means redoing that crop-and-pad and updating `aspect-ratio: 593 / 820` in `AboutSection.vue` to match — otherwise the face drifts out from under the arch. |
+| `mountains.png` | Flat vector landscape, resized to 1200×1200 and quantised to 128 colours. |
+| `snow.png` | Flat vector landscape, resized to 1200×759 and quantised to 128 colours. |
+| `music-mask.png` | Headphones drawn out of musical notes, 760×630. Used as a CSS `mask-image`, not as an `<img>`: the RGB is discarded and only the alpha is kept, so the artwork takes the panel's own ink instead of arriving with a ground of its own. |
+
 ## `src/assets/meet-in-room/` — page `CasestudyMeetingroom`
 
 | File                        | Figma node | Layer name                              |
