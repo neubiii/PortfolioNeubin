@@ -1,23 +1,10 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { useIntersectionObserver } from '@vueuse/core'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { motion, useInView } from 'motion-v'
 import { useMotion } from '@/composables/useMotion'
 import { asset } from '@/data/assets'
 
-/**
- * About, built as a bento composition.
- *
- * The rest of the site is paper, hairlines and maroon. This one block turns the
- * volume up: a local plum-to-magenta palette, colour-blocked panels and a
- * cut-out portrait on a hard magenta spot. It is the only place on the site
- * where the person outranks the work, so it is the only place that gets to look
- * different — but the type, the grid and the paper it sits on are the site's,
- * which is what keeps it from reading as a foreign object.
- *
- * The layout is one twelve-column grid, not a stack of independent cards: the
- * identity panel runs the full height of the right-hand column, so the two
- * halves are locked together rather than merely adjacent.
- */
+
 const media = {
   portrait: asset('about/portrait-cut'),
   mountains: asset('about/mountains'),
@@ -25,14 +12,10 @@ const media = {
   music: asset('about/music-mask'),
 }
 
-/**
- * The vanity slug is the one in the author's own post URLs
- * (`linkedin.com/posts/neubii_…`), not a guess.
- */
+
 const linkedin = 'https://www.linkedin.com/in/neubii/'
 
-/* The headline is set word by word so each full stop can take the accent —
-   three claims, three beats, rather than one long string. */
+
 const claims = ['Learner', 'Problem Solver', 'Storyteller']
 
 /**
@@ -58,10 +41,21 @@ const stats = [
   },
 ]
 
-/* ── Entrance ─────────────────────────────────────────────────────────────
-   One observer for the whole composition, fired once. Each block carries its
-   own direction and a small delay in CSS, so the section assembles itself in
-   the order it reads rather than fading in as one slab. */
+/* ── Entrance and counters ────────────────────────────────────────────────
+   Both run on Motion for Vue rather than on a hand-rolled observer. Two
+   previous attempts drove CSS transitions from custom IntersectionObserver
+   state and both measured correct while looking wrong in a real browser — the
+   first fired while the grid was still a strip at the bottom edge of the
+   screen, the second could apply its hidden state and its revealed state in the
+   same render when a block was already in view at mount, so the browser never
+   painted a start frame to transition from. `whileInView` owns that lifecycle,
+   which removes the class of bug entirely.
+
+   `amount: 'some'` with the root's bottom pulled up a quarter gives the
+   asymmetry this needs: a block arrives once it crosses into the upper
+   three-quarters of the screen, and only leaves once it is completely above the
+   viewport. So nothing animates at the very edge of vision, nothing visibly
+   fades out while you are still looking at it, and coming back re-runs it. */
 const { preference, reducedMotion } = useMotion()
 
 /**
@@ -73,48 +67,70 @@ const motionOk = computed(
   () => preference.value === 'on' || (preference.value === 'system' && !reducedMotion.value),
 )
 
-const bento = ref<HTMLElement | null>(null)
-const shown = ref(false)
-const { stop } = useIntersectionObserver(
-  bento,
-  ([entry]) => {
-    if (!entry?.isIntersecting) return
-    shown.value = true
-    stop()
-  },
-  { threshold: 0.12, rootMargin: '0px 0px -6% 0px' },
-)
+const viewport = { amount: 'some', margin: '0px 0px -25% 0px', once: false } as const
+const ease = [0.16, 1, 0.3, 1]
+
+type From = 'left' | 'top' | 'right' | 'bottom'
+const offset = { left: { x: -24 }, right: { x: 24 }, top: { y: -20 }, bottom: { y: 20 } }
+
+/** Spread onto a block: `v-bind="from('left')"`. Empty when motion is off. */
+const from = (dir: From, delay = 0) =>
+  motionOk.value
+    ? {
+        initial: { opacity: 0, ...offset[dir] },
+        whileInView: { opacity: 1, x: 0, y: 0 },
+        inViewOptions: viewport,
+        transition: { duration: 0.58, delay, ease },
+      }
+    : {}
 
 /* ── Counting up ──────────────────────────────────────────────────────────
-   One rAF loop drives both figures, so they finish together. It lands on the
-   exact values rather than on whatever the last frame computed, and under
-   reduced motion the final values are simply there. */
+   Tied to the counts block's own in-view state, so the numbers are on screen
+   while they move, and re-armed by the same signal: it goes false only once the
+   block is fully out of the trigger zone, which is why scrolling around inside
+   the section does not restart it. */
 const tallies = ref(stats.map(() => 0))
 const counted = ref(false)
 
+const settleCounts = () => {
+  tallies.value = stats.map((s) => s.value)
+  counted.value = true
+}
+
+let raf = 0
+
 const runCount = () => {
+  cancelAnimationFrame(raf)
   if (!motionOk.value) {
-    tallies.value = stats.map((s) => s.value)
-    counted.value = true
+    settleCounts()
     return
   }
+  counted.value = false
+  tallies.value = stats.map(() => 0)
   const started = performance.now()
   const span = 1000
   const frame = (now: number) => {
     const t = Math.min(1, (now - started) / span)
     const eased = 1 - Math.pow(1 - t, 3)
     tallies.value = stats.map((s) => s.value * eased)
-    if (t < 1) {
-      requestAnimationFrame(frame)
-    } else {
-      tallies.value = stats.map((s) => s.value)
-      counted.value = true
-    }
+    if (t < 1) raf = requestAnimationFrame(frame)
+    else settleCounts()
   }
-  requestAnimationFrame(frame)
+  raf = requestAnimationFrame(frame)
 }
 
-watch(shown, (on) => on && runCount(), { immediate: false })
+const counts = ref<HTMLElement | null>(null)
+const countsInView = useInView(counts, viewport)
+
+watch(countsInView, (visible) => {
+  if (visible) runCount()
+})
+
+onMounted(() => {
+  if (!motionOk.value) settleCounts()
+})
+
+onBeforeUnmount(() => cancelAnimationFrame(raf))
 
 /** Fixed width while it climbs, so `10+` does not shove the label sideways. */
 const written = (i: number) => tallies.value[i].toFixed(stats[i].decimals)
@@ -137,19 +153,19 @@ const loves = [
         <h2 id="about-title" class="label about__marker">About</h2>
       </div>
 
-      <div ref="bento" class="bento" :data-in="shown">
+      <div class="bento">
         <!-- ── Statement ────────────────────────────────────────────────── -->
-        <p class="display about__title">
+        <motion.p class="display about__title" v-bind="from('top')">
           <template v-for="(claim, i) in claims" :key="claim"
             ><template v-if="i">{{ ' ' }}</template
             ><span class="about__claim"
               >{{ claim }}<span class="about__stop">.</span></span
             ></template
           >
-        </p>
+        </motion.p>
 
         <!-- ── Identity ─────────────────────────────────────────────────── -->
-        <article class="panel id">
+        <motion.article class="panel id" v-bind="from('left')">
           <!-- An arched window cut into the panel. The cut-out stands on its
                floor and is trimmed by its sides, so the flat bottom edge of the
                source image reads as the frame's own baseline rather than as a
@@ -183,10 +199,10 @@ const loves = [
               <span class="id__ext" aria-hidden="true">↗</span>
             </a>
           </div>
-        </article>
+        </motion.article>
 
         <!-- ── The short version ────────────────────────────────────────── -->
-        <article class="panel story">
+        <motion.article class="panel story" v-bind="from('top', 0.09)">
           <p class="label story__kicker">The short version</p>
 
           <p class="story__copy">
@@ -199,12 +215,12 @@ const loves = [
           <p class="story__open">
             <span class="mono">Open to</span>
             <span class="story__dots" aria-hidden="true" />
-            <span class="mono story__roles">UI/UX Design · Front-end</span>
+            <span class="mono story__roles">Design Engineer · UI/UX Design · Front-end</span>
           </p>
-        </article>
+        </motion.article>
 
         <!-- ── Two counts ───────────────────────────────────────────────── -->
-        <div class="stats">
+        <motion.div ref="counts" class="stats" v-bind="from('right', 0.15)">
           <article
             v-for="(stat, i) in stats"
             :key="stat.label"
@@ -220,12 +236,14 @@ const loves = [
                  the settled fact rather than whatever frame is on screen. -->
             <span class="sr-only">{{ stat.read }}</span>
           </article>
-        </div>
+        </motion.div>
 
         <!-- ── Off the clock ────────────────────────────────────────────── -->
-        <h3 class="display-soft loves__head">Things I love most…</h3>
+        <motion.h3 class="display-soft loves__head" v-bind="from('bottom')">
+          Things I love most…
+        </motion.h3>
 
-        <ul class="loves">
+        <motion.ul class="loves" v-bind="from('bottom', 0.1)">
           <li
             v-for="love in loves"
             :key="love.id"
@@ -253,7 +271,7 @@ const loves = [
               <span class="mono love__note">{{ love.note }}</span>
             </p>
           </li>
-        </ul>
+        </motion.ul>
       </div>
     </div>
   </section>
@@ -292,8 +310,6 @@ const loves = [
      6.3:1 light / 8.3:1 dark. */
   --a-on-dark: var(--a-blush);
   --a-on-dark-quiet: rgb(241 207 224 / 0.76);
-
-  --a-radius: 0.875rem;
 
   padding-block: var(--section-y);
 }
@@ -402,9 +418,12 @@ const loves = [
 
 /* ── Panels ───────────────────────────────────────────────────────────── */
 
+/* Square. The composition is sharper for it, and the one curve left in the
+   section — the arched window — now reads as a deliberate shape rather than as
+   the largest of several radii. */
 .panel {
   position: relative;
-  border-radius: var(--a-radius);
+  border-radius: 0;
   overflow: hidden;
 }
 
@@ -431,32 +450,37 @@ const loves = [
    it reads as cut into it rather than laid on top. */
 .id__frame {
   position: relative;
-  /* The window takes the cut-out's own proportion, and the file is padded so
-     the face sits at its exact centre — which is what puts the head under the
-     apex of the arch without a magic offset in here. */
-  height: min(100%, 29rem);
-  aspect-ratio: 593 / 820;
+  /* The window has its own proportion now. It used to inherit the photograph's,
+     which is why the figure filled it edge to edge with nowhere to breathe. */
+  height: min(100%, 27rem);
+  aspect-ratio: 41 / 52;
   width: auto;
   max-width: 100%;
   overflow: hidden;
   background: var(--a-navy-lit);
   border: 1px solid var(--a-navy-edge);
-  border-radius: 50% 50% var(--a-radius) var(--a-radius) / 42% 42% var(--a-radius)
-    var(--a-radius);
+  /* border-radius: 50% 50% 0 0 / 42% 42% 0 0; */
   transition: transform var(--dur-slow) var(--ease-out);
 }
 
-/* Fills the window and stands on its floor, so the flat lower edge of the
-   cut-out is the frame's baseline rather than a crop. */
+/* Placed inside the window rather than filling it, and standing on its floor.
+   The source file is cropped tight to the visible subject, so `bottom: 0` puts
+   the body on the frame's baseline rather than on the edge of a transparent
+   box, and `translateX(-50%)` centres the person rather than that box. Height
+   is what is set — width follows from the aspect — so the side margins are a
+   consequence of the size and stay put; the 18% left over goes above the head. */
 .id__portrait {
   position: absolute;
-  inset: 0;
+  left: 50%;
+  bottom: 0;
   z-index: 1;
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: 82%;
+  width: auto;
+  max-width: 84%;
+  object-fit: contain;
   object-position: bottom center;
+  transform: translateX(-50%);
 }
 
 .id:hover .id__frame {
@@ -752,7 +776,7 @@ const loves = [
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.6rem 0.75rem;
-  border-radius: calc(var(--a-radius) - 0.4rem);
+  border-radius: 0;
   background: rgb(17 13 30 / 0.66);
 }
 
@@ -807,64 +831,9 @@ const loves = [
   }
 }
 
-/* ── Entrance ─────────────────────────────────────────────────────────────
-   Each block arrives from the side of the composition it belongs to — the
-   identity panel from the left, the statement and the story from above, the
-   counts from the right, the interests from below — on one short stagger, once.
-   The distances are small on purpose: this should read as the section settling
-   into place, not as six things flying in. */
-.bento > *,
-.bento .loves {
-  opacity: 0;
-  transition:
-    opacity 520ms var(--ease-out) var(--in-delay, 0ms),
-    transform 520ms var(--ease-out) var(--in-delay, 0ms);
-}
-
-.bento > .id {
-  transform: translateX(-1.25rem);
-}
-
-.bento > .about__title {
-  --in-delay: 60ms;
-  transform: translateY(-1rem);
-}
-
-.bento > .story {
-  --in-delay: 120ms;
-  transform: translateY(-1rem);
-}
-
-.bento > .stats {
-  --in-delay: 180ms;
-  transform: translateX(1.25rem);
-}
-
-.bento > .loves__head {
-  --in-delay: 230ms;
-  transform: translateY(1rem);
-}
-
-.bento > .loves {
-  --in-delay: 280ms;
-  transform: translateY(1.25rem);
-}
-
-.bento[data-in='true'] > * {
-  opacity: 1;
-  transform: none;
-}
-
 /* ── Reduced motion ───────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
-  /* Everything simply present, wherever the observer happens to be. */
-  .bento > * {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-
   .stat__suffix {
     opacity: 1;
     transition: none;

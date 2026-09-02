@@ -47,7 +47,7 @@ than dropped in at source size.
 
 | File | What it is |
 | --- | --- |
-| `portrait-cut.png` | Supplied already cut out of its backdrop (`NeubinImagenew.png`), then bounding-box cropped, padded on the empty side to bring the **face close to the file's horizontal centre**, and resized to 593×820 RGBA. The identity panel's arched window takes this file's aspect ratio and the image fills it, so the head lands under the apex of the arch with no offset in CSS. Replacing the portrait means redoing that crop-and-pad and updating `aspect-ratio: 593 / 820` in `AboutSection.vue` to match — otherwise the face drifts out from under the arch. |
+| `portrait-cut.png` | Supplied already cut out of its backdrop (`NeubinImagenew.png`), then cropped **tight to the visible subject** and resized to 517×900 RGBA. Tight is the point: the arched window has its own proportion and the portrait is placed inside it at 82% of its height, so `translateX(-50%)` centres the person rather than a bounding box with slack on one side. A replacement portrait only needs the same tight crop — no padding, and no CSS change. |
 | `mountains.png` | Flat vector landscape, resized to 1200×1200 and quantised to 128 colours. |
 | `snow.png` | Flat vector landscape, resized to 1200×759 and quantised to 128 colours. |
 | `music-mask.png` | Headphones drawn out of musical notes, 760×630. Used as a CSS `mask-image`, not as an `<img>`: the RGB is discarded and only the alpha is kept, so the artwork takes the panel's own ink instead of arriving with a ground of its own. |
