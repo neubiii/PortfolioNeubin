@@ -18,9 +18,14 @@ export const profile = {
   intro:
     'Product design and front-end engineering in one pair of hands, so the thing that ships is the thing that was designed.',
 
+  /**
+   * Both taken from the author's own URLs already in this repo — the project
+   * links under `github.com/neubiii/…` and the post links under
+   * `linkedin.com/posts/neubii_…` — not guessed from the name.
+   */
   links: [
-    { label: 'GitHub', href: 'https://github.com/', external: true },
-    { label: 'LinkedIn', href: 'https://www.linkedin.com/', external: true },
+    { label: 'GitHub', href: 'https://github.com/neubiii', external: true },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/neubii/', external: true },
   ],
 
   /**

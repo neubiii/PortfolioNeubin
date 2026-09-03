@@ -9,14 +9,14 @@
  *
  * See ASSETS.md for the Figma node each key maps to.
  */
-const files = import.meta.glob('../assets/**/*.{png,jpg,jpeg,webp,svg}', {
+const files = import.meta.glob('../assets/**/*.{png,jpg,jpeg,webp,gif,svg}', {
   eager: true,
   import: 'default',
   query: '?url',
 }) as Record<string, string>
 
 // Prefer a real bitmap export over the placeholder when both are present.
-const priority = ['.png', '.jpg', '.jpeg', '.webp', '.svg']
+const priority = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg']
 
 const byKey = new Map<string, { url: string; rank: number }>()
 

@@ -8,9 +8,6 @@ const year = new Date().getFullYear()
   <footer class="footer">
     <div class="shell footer__inner">
       <p class="mono footer__item">© {{ year }} {{ profile.name }}</p>
-      <p class="mono footer__item footer__colophon">
-        Set in Fraunces &amp; Instrument Sans · Built with Vue &amp; TypeScript
-      </p>
     </div>
   </footer>
 </template>
@@ -31,9 +28,5 @@ const year = new Date().getFullYear()
 .footer__item {
   color: var(--c-muted);
   font-size: var(--t-xs);
-}
-
-.footer__colophon {
-  text-align: right;
 }
 </style>

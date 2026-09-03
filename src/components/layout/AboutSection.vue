@@ -3,6 +3,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { motion, useInView } from 'motion-v'
 import { useMotion } from '@/composables/useMotion'
 import { asset } from '@/data/assets'
+import { profile } from '@/data/profile'
 
 /**
  * About, built as a bento composition.
@@ -25,11 +26,8 @@ const media = {
   music: asset('about/music-mask'),
 }
 
-/**
- * The vanity slug is the one in the author's own post URLs
- * (`linkedin.com/posts/neubii_…`), not a guess.
- */
-const linkedin = 'https://www.linkedin.com/in/neubii/'
+/* One source of truth for the profile URLs; see `data/profile.ts`. */
+const linkedin = profile.links.find((l) => l.label === 'LinkedIn')?.href
 
 /* The headline is set word by word so each full stop can take the accent —
    three claims, three beats, rather than one long string. */
@@ -206,7 +204,7 @@ const loves = [
               Kerala <span class="id__arrow" aria-hidden="true">→</span> Mannheim
             </p>
 
-            <a class="id__link" :href="linkedin" target="_blank" rel="noopener noreferrer">
+            <a v-if="linkedin" class="id__link" :href="linkedin" target="_blank" rel="noopener noreferrer">
               <svg class="id__glyph" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path
                   d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm6 0h3.8v1.7h.05c.53-.95 1.83-1.95 3.76-1.95C20.4 8.75 21 11.1 21 14.16V21h-4v-6.06c0-1.45-.03-3.3-2.02-3.3-2.03 0-2.34 1.57-2.34 3.2V21H9V9Z"
