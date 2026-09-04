@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import ArrowLink from '@/components/ui/ArrowLink.vue'
-import Annotation from '@/components/ui/Annotation.vue'
 import GridRules from '@/components/ui/GridRules.vue'
+import HeroStatement from '@/components/ui/HeroStatement.vue'
 import MotionToggle from '@/components/ui/MotionToggle.vue'
 import SectionHead from '@/components/ui/SectionHead.vue'
 import AboutSection from '@/components/layout/AboutSection.vue'
 import SkillsetSection from '@/components/layout/SkillsetSection.vue'
 import VantaBirds from '@/components/ui/VantaBirds.vue'
 import WorksShowcase from '@/components/project/WorksShowcase.vue'
-import { projects } from '@/data/projects'
 import { profile } from '@/data/profile'
 </script>
 
@@ -28,16 +27,9 @@ import { profile } from '@/data/profile'
       <GridRules class="hero__rules" :columns="4" ticks />
 
       <div class="shell hero__inner">
-        <p class="mono hero__eyebrow">
-          Product Developer
-          <span class="hero__slash" aria-hidden="true">/</span>
-          UI/UX Developer
-        </p>
+        <p class="mono hero__eyebrow">Let's fly higher, together.</p>
 
-        <h1 id="hero-title" class="display hero__title">
-          I design the interface,<br />
-          then I <Annotation :delay="1100">build</Annotation> it.
-        </h1>
+        <HeroStatement class="hero__statement" />
 
         <p class="hero__lede">{{ profile.intro }}</p>
 
@@ -46,11 +38,11 @@ import { profile } from '@/data/profile'
         </div>
       </div>
 
-      <!-- Ruler foot: a measured bottom edge that also carries the two things
-           worth saying here — how much work there is, and control over the
-           motion behind it. -->
+      <!-- Ruler foot. The rule runs the full measure and the two controls are
+           set into it, the way a caption is set into a printed rule — the line
+           breaks for them and closes again after. Nothing sits below it. -->
       <div class="shell hero__foot">
-        <p class="mono hero__foot-item">{{ projects.length }} projects</p>
+        <span class="hero__foot-rule" aria-hidden="true" />
 
         <div class="hero__foot-controls">
           <MotionToggle />
@@ -151,30 +143,28 @@ import { profile } from '@/data/profile'
   z-index: 2;
 }
 
+/* Set from the left, on the ruler the rest of the site is set from. A
+   statement this long reads as a paragraph when it is centred; ranged left it
+   reads as a statement, and it gives the lens a stable left edge to work
+   against. */
 .hero__inner {
   position: relative;
   z-index: 3;
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  text-align: center;
+  text-align: left;
   padding-block: clamp(2rem, 6vh, 4rem);
 }
 
 .hero__eyebrow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0 0.15rem;
-  max-width: 100%;
   color: var(--c-hero-muted);
   font-size: var(--t-xs);
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  margin-bottom: clamp(1.75rem, 5vh, 3rem);
+  margin-bottom: clamp(1.25rem, 3.5vh, 2rem);
 }
 
 /* Wide tracking is the point of this line, but at 390px it runs past the
@@ -182,36 +172,24 @@ import { profile } from '@/data/profile'
 @media (max-width: 30rem) {
   .hero__eyebrow {
     font-size: 0.6875rem;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
   }
 }
 
-.hero__slash {
-  color: var(--c-hero-accent);
-  padding-inline: 0.55rem;
-}
-
-.hero__title {
-  font-size: var(--t-4xl);
-  /* Optical size wound right up: at this scale Fraunces gets the fine
-     hairlines and high contrast that carry the editorial voice. */
-  font-variation-settings:
-    'opsz' 144,
-    'SOFT' 0,
-    'WONK' 1;
-  line-height: 0.98;
-  letter-spacing: -0.028em;
-  max-width: 18ch;
-  text-wrap: balance;
+/* Full measure. The line count is set by the type size against the ruler's own
+   width, not by a `ch` cap — `ch` here would resolve against the body size this
+   wrapper inherits, not the display size the sentence is actually set in. */
+.hero__statement {
+  width: 100%;
 }
 
 .hero__lede {
-  margin-top: clamp(1.5rem, 4vh, 2.5rem);
-  max-width: 48ch;
+  margin-top: clamp(1.5rem, 4vh, 2.25rem);
+  max-width: 62ch;
   font-size: var(--t-lg);
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--c-hero-muted);
-  text-wrap: balance;
+  text-wrap: pretty;
 }
 
 .hero__cta {
@@ -220,21 +198,31 @@ import { profile } from '@/data/profile'
 
 /* ── Hero foot ─────────────────────────────────────────────────────────── */
 
+/* The rule is an element rather than a border, so the two controls can be set
+   into the line itself instead of sitting under it: the hairline runs the
+   measure, breaks for the labels, and the row ends there. The left of the rule
+   is deliberately empty. */
 .hero__foot {
   position: relative;
   z-index: 3;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: clamp(0.9rem, 2.5vw, 1.75rem);
   padding-block: 0.35rem;
-  border-top: 1px solid var(--c-hero-rule);
+}
+
+.hero__foot-rule {
+  flex: 1 1 auto;
+  min-width: 1.5rem;
+  height: 1px;
+  background: var(--c-hero-rule);
 }
 
 .hero__foot-controls {
   display: flex;
   align-items: center;
   gap: 0.9rem;
+  flex: none;
 }
 
 .hero__foot-divider {
@@ -242,18 +230,6 @@ import { profile } from '@/data/profile'
   height: 1.05rem;
   flex: none;
   background: var(--c-hero-rule-strong);
-}
-
-/* On a phone the ruler row keeps the control and drops the count, which the
-   work section states again a screen later. */
-@media (max-width: 34rem) {
-  .hero__foot > .hero__foot-item {
-    display: none;
-  }
-
-  .hero__foot {
-    justify-content: center;
-  }
 }
 
 .hero__foot-item {

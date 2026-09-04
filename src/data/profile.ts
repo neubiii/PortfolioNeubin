@@ -14,9 +14,9 @@ export const profile = {
   secondRole: 'UI/UX Developer',
   email: 'neubinsebastian01@gmail.com',
 
-  /** Supporting line under the hero headline. Rewrite in your own voice. */
+  /** Supporting line under the hero statement. */
   intro:
-    'Product design and front-end engineering in one pair of hands, so the thing that ships is the thing that was designed.',
+    'I work mainly across B2B and enterprise products — complex workflows, data-rich interfaces and AI-assisted experiences — and I\u2019m comfortable switching mindsets between designer and developer when the problem needs both.',
 
   /**
    * Both taken from the author's own URLs already in this repo — the project

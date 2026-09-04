@@ -30,6 +30,45 @@ import { useMotion } from '@/composables/useMotion'
  * calls `resize()` on every later change, so the initial mount, a route
  * return, a window resize and a late font reflow all take the same path.
  *
+ * ── Why the first flock used to be malformed ───────────────────────────────
+ * BIRDS keeps the simulation's texture size in a module-level `let WIDTH`,
+ * seeded at 32, and writes it in exactly one place — inside the geometry
+ * builder:
+ *
+ *     WIDTH = Math.pow(2, options.quantity); BIRDS = WIDTH * WIDTH
+ *
+ * but `onInit()` runs the GPU compute renderer *before* the geometry:
+ *
+ *     initComputeRenderer()   // reads WIDTH → 32 on the very first build
+ *     initGpgpuBirds()        // getNewBirdGeometry() writes WIDTH
+ *
+ * So the first build ever made in a page simulates into a 32×32 texture while
+ * its geometry addresses that texture as if it were `2 ** quantity` across.
+ * Every later build — a theme rebuild, a route return — finds WIDTH already
+ * written and agrees with itself. Measured here at 1440×828: 32×32 on hard
+ * load, 5.657×5.657 after a theme toggle, same options both times. That is the
+ * difference, and it is why the flock looked right only after a toggle.
+ *
+ * Two things fix it, and both are needed.
+ *
+ * `QUANTITY` is an integer. Each of a bird's three triangles carries its own
+ * reference UV (BIRDS indexes triangles, not birds), and the vertex shader
+ * turns the sampled velocity into an orientation basis:
+ *
+ *     float xz = length(velocity.xz); float cosry = velocity.x / xz;
+ *
+ * A fractional WIDTH puts every UV between texel centres, so each triangle
+ * samples a bilinear blend of unrelated boids; when a blend cancels out,
+ * `xz → 0` makes that basis NaN and the triangle collapses — a body whose
+ * wings are gone, which is what "one-winged" was. An integer WIDTH lands each
+ * UV on a texel centre and the blending stops.
+ *
+ * `build()` then checks its own work: it compares the compute texture Vanta
+ * actually allocated against `2 ** QUANTITY` and, if they disagree, rebuilds
+ * once through this same function. That only ever fires on the first build in
+ * a page's lifetime, it needs no timeout, and it costs nothing on a Vanta that
+ * one day fixes the ordering itself.
+ *
  * ── Everything else ────────────────────────────────────────────────────────
  * - `three` and `vanta` are dynamic imports, so ~600 kB of WebGL never enters
  *   the initial bundle and never loads at all under reduced motion.
@@ -62,6 +101,8 @@ interface VantaEffect {
   animationLoop?: () => void
   req?: number
   prevNow?: number
+  /** Vanta's GPGPU simulation — read only to verify the texture it allocated. */
+  gpuCompute?: { variables?: { renderTargets?: { width?: number }[] }[] }
 }
 
 type Factory = (options: Record<string, unknown>) => VantaEffect
@@ -112,7 +153,20 @@ const palette = () => {
   }
 }
 
-const build = async () => {
+/**
+ * Flock size, as Vanta's exponent: it simulates a `2 ** QUANTITY` square of
+ * boids, so this is 4 ** QUANTITY birds — 64 on a desktop, 16 on a phone.
+ * Integers only; see the note above for why a fractional one breaks the birds.
+ */
+const QUANTITY = { wide: 3, small: 2 }
+
+/** The texture width Vanta's geometry will address, for the check below. */
+const expectedWidth = (quantity: number) => 2 ** quantity
+
+const computeWidth = (vanta: VantaEffect) =>
+  vanta.gpuCompute?.variables?.[0]?.renderTargets?.[0]?.width
+
+const build = async (correcting = false): Promise<void> => {
   if (building || instance.value || disposed || !el.value) return
   building = true
 
@@ -129,6 +183,7 @@ const build = async () => {
     if (disposed || !el.value) return
 
     const small = window.matchMedia('(max-width: 48rem)').matches
+    const quantity = small ? QUANTITY.small : QUANTITY.wide
     const { bg, c1, c2 } = palette()
 
     instance.value = BIRDS({
@@ -166,10 +221,21 @@ const build = async () => {
       separation: 80.0,
       alignment: 26.0,
       cohesion: 18.0,
-      quantity: small ? 1.5 : 2.5,
+      quantity,
     })
 
     running.value = true
+
+    // Did Vanta simulate into the texture its own geometry addresses? On the
+    // first build in a page it will not have, because the module-level WIDTH is
+    // still the library's seed. Rebuild once, through this same path — by then
+    // the geometry step has written WIDTH and the two agree.
+    const built = computeWidth(instance.value)
+    if (!correcting && built !== undefined && built !== expectedWidth(quantity)) {
+      teardown()
+      building = false
+      return build(true)
+    }
   } catch (error) {
     // A failed chunk or an unsupported driver leaves the static hero in place,
     // which is a complete design in its own right.
