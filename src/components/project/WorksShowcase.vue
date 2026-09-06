@@ -156,7 +156,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
                       </span>
                     </p>
 
-                    <h3 class="display entry__title">{{ entry.title }}</h3>
+                    <h3 class="entry__title">{{ entry.title }}</h3>
 
                     <ul class="entry__tags">
                       <li v-for="topic in entry.topics" :key="topic" class="mono entry__tag">
@@ -211,7 +211,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
                     <span>{{ project.year }}</span>
                   </p>
 
-                  <h3 class="display entry__title">{{ project.title }}</h3>
+                  <h3 class="entry__title">{{ project.title }}</h3>
 
                   <ul class="entry__tags">
                     <li v-for="tag in project.tags" :key="tag" class="mono entry__tag">{{ tag }}</li>
@@ -281,7 +281,8 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
 
 <style scoped>
 .works {
-  padding-block: clamp(3.5rem, 7vw, 6rem);
+  padding-top: var(--section-y);
+  padding-bottom: 0;
 }
 
 /* ── Head ──────────────────────────────────────────────────────────────── */
@@ -446,8 +447,15 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
   background: var(--c-rule-strong);
 }
 
+/* Sans, not the display serif. These are scanned down a list at list size,
+   which is exactly where Fraunces stops being readable — its hairlines and
+   high contrast are drawn for the hero, not for a row someone is skimming. */
 .entry__title {
-  font-size: var(--t-xl);
+  font-family: var(--font-sans);
+  font-size: clamp(1.1875rem, 1.05rem + 0.55vw, 1.5rem);
+  font-weight: 550;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
   transition:
     color var(--dur) var(--ease-out),
     transform var(--dur) var(--ease-out);

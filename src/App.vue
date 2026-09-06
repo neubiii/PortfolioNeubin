@@ -1,9 +1,26 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { RouterView } from 'vue-router'
 import SiteHeader from '@/components/layout/SiteHeader.vue'
 import SiteFooter from '@/components/layout/SiteFooter.vue'
 import ContactBlock from '@/components/layout/ContactBlock.vue'
 import GrainOverlay from '@/components/ui/GrainOverlay.vue'
+import { router } from '@/router'
+
+/**
+ * Contact and the footer close every page, so they live in the shell rather
+ * than in each route. That made them the whole page for a moment on a cold
+ * load: route components are imported lazily, so the shell painted while
+ * `<main>` was still empty, and Contact — the only content there was — filled
+ * the viewport until the chunk arrived and pushed it down a screen.
+ *
+ * `isReady()` settles once the first navigation has resolved, which includes
+ * loading that chunk. Holding the page's closing sections until then means
+ * they are never on screen without the page they close. No timeout, nothing
+ * hidden: they simply are not rendered yet.
+ */
+const routed = ref(false)
+void router.isReady().then(() => (routed.value = true))
 </script>
 
 <template>
@@ -18,8 +35,10 @@ import GrainOverlay from '@/components/ui/GrainOverlay.vue'
     </RouterView>
   </main>
 
-  <ContactBlock />
-  <SiteFooter />
+  <template v-if="routed">
+    <ContactBlock />
+    <SiteFooter />
+  </template>
 </template>
 
 <style scoped>

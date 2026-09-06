@@ -264,8 +264,12 @@ import { profile } from '@/data/profile'
 
 /* ── Shared section rhythm ─────────────────────────────────────────────── */
 
+/* Sections pay the rhythm on their top edge only. Two sections each padding
+   themselves top and bottom made every interior boundary twice the gap that
+   hero → work has, which is the one that reads correctly. */
 .section {
-  padding-block: var(--section-y);
+  padding-top: var(--section-y);
+  padding-bottom: 0;
 }
 
 

@@ -82,7 +82,11 @@
   --t-5xl: clamp(3.25rem, 1.1rem + 9.6vw, 10rem);
 
   /* Rhythm */
-  --section-y: clamp(4.5rem, 9vw, 9rem);
+  /* The gap between one section's last content and the next section's rule.
+     Taken from the Work section, whose rhythm was the one that read correctly;
+     sections pay it on their top edge only, so a boundary is exactly this
+     value rather than two paddings stacked. */
+  --section-y: clamp(3.5rem, 7vw, 6rem);
   --gutter: clamp(1.25rem, 4vw, 4.5rem);
   --measure: 68ch;
 

@@ -332,7 +332,8 @@ const loves = [
   --a-on-dark: var(--a-blush);
   --a-on-dark-quiet: rgb(241 207 224 / 0.76);
 
-  padding-block: var(--section-y);
+  padding-top: var(--section-y);
+  padding-bottom: 0;
 }
 
 [data-theme='dark'] .about {

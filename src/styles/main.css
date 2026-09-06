@@ -24,7 +24,9 @@
 
   --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
   --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+  /* Code only — the hero's construction fragments. Not a UI typeface, so it
+     is a system stack rather than a third downloaded family. */
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
 
   --text-xs: var(--t-xs);
   --text-sm: var(--t-sm);
@@ -187,21 +189,26 @@
     letter-spacing: -0.015em;
   }
 
-  /* Label: the mono voice. Metadata, eyebrows, indices, column headers. */
+  /* Label: metadata, eyebrows, indices, column headers.
+     Set in the sans, not a third typeface — the editorial voice here comes
+     from case, tracking and weight, which is what a mono was standing in for.
+     Monospace is kept for text that is literally code. */
   .label {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: var(--t-xs);
-    font-weight: 500;
-    letter-spacing: 0.13em;
+    font-weight: 600;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
     line-height: 1.4;
   }
 
+  /* The same voice one step up, for readable metadata: counts, notes, dates. */
   .mono {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: var(--t-sm);
+    font-weight: 500;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.06em;
   }
 
   .lede {

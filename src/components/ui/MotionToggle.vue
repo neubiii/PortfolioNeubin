@@ -40,7 +40,7 @@ const { active, supported, toggle, label } = useMotion()
   min-height: 2.75rem;
   padding-inline: 0.25rem;
   margin-inline: -0.25rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--t-xs);
   letter-spacing: 0.12em;
   text-transform: uppercase;

@@ -52,7 +52,7 @@ const links = computed(() => [
 
     <div class="wp__body">
       <h3 class="mono wp__title">{{ entry.title }}</h3>
-      <p class="display wp__hook">{{ entry.hook }}</p>
+      <p class="wp__hook">{{ entry.hook }}</p>
       <p class="wp__summary">{{ entry.summary }}</p>
 
       <ul class="wp__topics">
@@ -164,8 +164,11 @@ const links = computed(() => [
 
 /* The hook is the panel's image. */
 .wp__hook {
-  font-size: var(--t-xl);
-  line-height: 1.16;
+  font-family: var(--font-sans);
+  font-size: clamp(1.125rem, 1.02rem + 0.45vw, 1.375rem);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
   max-width: 26ch;
   margin-bottom: 1.25rem;
 }

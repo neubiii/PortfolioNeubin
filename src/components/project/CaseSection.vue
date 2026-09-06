@@ -203,7 +203,7 @@ defineProps<{ section: CaseSection }>()
 }
 
 .cs__stat-label {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--t-xs);
   letter-spacing: 0.12em;
   text-transform: uppercase;

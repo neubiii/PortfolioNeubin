@@ -122,7 +122,10 @@ const toTop = () => {
 
 <style scoped>
 .contact {
-  --contact-y: clamp(4rem, 9vw, 8rem);
+  /* The closing block keeps a bottom edge — it is a coloured band, and the
+     footer below it is a thin rule rather than another section. The arched
+     plate is grounded against this same value, so the two stay in step. */
+  --contact-y: var(--section-y);
   /* One right edge for the whole left composition. */
   --contact-measure: 38rem;
   position: relative;
@@ -179,13 +182,14 @@ const toTop = () => {
   display: inline-block;
   max-width: 100%;
   padding-block: 0.35rem;
-  font-family: var(--font-display);
-  font-variation-settings:
-    'opsz' 48,
-    'SOFT' 20,
-    'WONK' 1;
-  font-size: var(--t-xl);
-  line-height: 1.2;
+  /* Sans: an address is scanned character by character, and the serif's
+     punctuation and figures are the hardest part of it to read. The heading
+     above stays display — that is the large editorial moment here. */
+  font-family: var(--font-sans);
+  font-size: clamp(1.25rem, 1.1rem + 0.62vw, 1.625rem);
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  line-height: 1.3;
   /* Long address, narrow phone: break inside the word rather than off the
      edge of the screen. */
   overflow-wrap: anywhere;

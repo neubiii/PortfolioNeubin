@@ -3,7 +3,15 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { onKeyStroke, useEventListener, useScrollLock, useWindowScroll } from '@vueuse/core'
 import ThemeToggle from './ThemeToggle.vue'
+import { useScrollSpy } from '@/composables/useScrollSpy'
 import { profile } from '@/data/profile'
+
+/**
+ * The reference line the scrollspy reads, a little below the 4.5rem sticky
+ * header — far enough that a section counts as current once its own heading
+ * has settled under the bar rather than the instant its top edge touches it.
+ */
+const SPY_LINE = 128
 
 const route = useRoute()
 const { y } = useWindowScroll()
@@ -54,11 +62,23 @@ watch(
 )
 const overHero = computed(() => !open.value && heroHeight.value > 0 && y.value < heroHeight.value - 96)
 
-/** Every nav item is now a section of the home page, so match path AND hash. */
+/**
+ * Which item is lit.
+ *
+ * On the home page that is a question about where the visitor is, not about
+ * what the URL says — the hash is written once by a click and then goes stale
+ * the moment anyone scrolls, and rewriting it continuously would fill their
+ * back button with their own scrolling. So the scrollspy answers it, and the
+ * URL is left alone.
+ *
+ * Elsewhere — a project page — no section is in view, so nothing is lit.
+ */
+const { active } = useScrollSpy(['work', 'about', 'skillset', 'contact'], SPY_LINE)
+
 const isActive = (to: string) => {
   const [path, hash] = to.split('#')
   if (route.path !== (path || '/')) return false
-  return hash ? route.hash === `#${hash}` : !route.hash
+  return hash ? active.value === hash : false
 }
 </script>
 
@@ -79,6 +99,7 @@ const isActive = (to: string) => {
               :to="link.to"
               class="link-grow header__link"
               :data-active="String(isActive(link.to))"
+              :aria-current="isActive(link.to) ? 'true' : undefined"
             >
               {{ link.label }}
             </RouterLink>
@@ -120,7 +141,13 @@ const isActive = (to: string) => {
         <nav class="shell panel__inner" aria-label="Primary (mobile)">
           <ul>
             <li v-for="link in links" :key="link.label">
-              <RouterLink :to="link.to" class="display panel__link">{{ link.label }}</RouterLink>
+              <RouterLink
+                :to="link.to"
+                class="panel__link"
+                :data-active="String(isActive(link.to))"
+                :aria-current="isActive(link.to) ? 'true' : undefined"
+                >{{ link.label }}</RouterLink
+              >
             </li>
           </ul>
           <a
@@ -179,7 +206,7 @@ const isActive = (to: string) => {
   background: var(--c-ink);
   color: var(--c-paper);
   padding: 0.55rem 1rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--t-sm);
   z-index: 2;
   transition: transform var(--dur) var(--ease-out);
@@ -277,7 +304,7 @@ const isActive = (to: string) => {
    own inline-flex centring, which is what pushed GitHub off the shared axis. */
 .header__github {
   display: none;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--t-xs);
   line-height: 1;
   letter-spacing: 0.08em;
@@ -373,7 +400,8 @@ const isActive = (to: string) => {
 }
 
 .panel__link:hover,
-.panel__link:focus-visible {
+.panel__link:focus-visible,
+.panel__link[data-active='true'] {
   color: var(--c-accent);
 }
 

@@ -196,7 +196,7 @@ const captionId = computed(() => `cap-${props.item.src.replace(/\W+/g, '-')}`)
   gap: 0.5rem;
   min-height: 2.75rem;
   margin-top: 0.5rem;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--t-xs);
   letter-spacing: 0.1em;
   text-transform: uppercase;
