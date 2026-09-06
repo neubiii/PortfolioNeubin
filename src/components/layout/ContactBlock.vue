@@ -45,21 +45,6 @@ const rise = (delay = 0, distance = 16) =>
         transition: { duration: 0.58, delay, ease },
       }
     : {}
-
-/**
- * Back to top. The scroll is smooth only when motion is welcome — under a
- * reduced-motion preference it jumps, which is the point of the setting.
- *
- * Focus moves with it. Scrolling alone leaves the keyboard caret at the bottom
- * of the page, so the next Tab lands back in the footer; `#main` is the same
- * target the skip link uses and it carries `tabindex="-1"` for exactly this.
- * `preventScroll` lets the smooth scroll play instead of being pre-empted by
- * the jump that focusing would otherwise cause.
- */
-const toTop = () => {
-  document.getElementById('main')?.focus({ preventScroll: true })
-  window.scrollTo({ top: 0, behavior: motionOk.value ? 'smooth' : 'auto' })
-}
 </script>
 
 <template>
@@ -92,11 +77,6 @@ const toTop = () => {
               >
                 {{ link.label }} <span aria-hidden="true">↗</span>
               </a>
-            </li>
-            <li class="contact__top">
-              <button type="button" class="mono contact__link link-underline" @click="toTop">
-                Back to top <span aria-hidden="true">↑</span>
-              </button>
             </li>
           </ul>
         </motion.div>
@@ -225,24 +205,6 @@ const toTop = () => {
 .contact__link:hover,
 .contact__link:focus-visible {
   color: var(--c-on-deep);
-}
-
-/* A control, not a destination — so it is a button, styled as the same
-   editorial link and set at the far end of the row rather than listed as a
-   third profile. */
-.contact__top {
-  margin-left: auto;
-}
-
-.contact__top .contact__link {
-  cursor: pointer;
-}
-
-@media (max-width: 46rem) {
-  .contact__top {
-    margin-left: 0;
-    flex-basis: 100%;
-  }
 }
 
 .contact :focus-visible {

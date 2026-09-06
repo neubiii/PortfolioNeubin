@@ -166,6 +166,9 @@ const isActive = (to: string) => {
 
 <style scoped>
 .header {
+  /* The bar's own height, named once: the mobile panel hangs off it and the
+     hero measures against it. */
+  --header-h: 4.5rem;
   position: sticky;
   top: 0;
   z-index: 50;
@@ -221,7 +224,7 @@ const isActive = (to: string) => {
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
-  min-height: 4.5rem;
+  min-height: var(--header-h);
 }
 
 .header__mark {
@@ -371,20 +374,38 @@ const isActive = (to: string) => {
 
 /* ── Mobile panel ──────────────────────────────────────────────────────── */
 
+/**
+ * The panel hangs off the bottom of the bar.
+ *
+ * It used to be `position: fixed` against the viewport — which it never was:
+ * `.header` carries a `backdrop-filter`, and a filtered element becomes the
+ * containing block for its fixed descendants. So `inset: 4.5rem 0 0` resolved
+ * against the 4.5rem bar instead of the screen and the panel computed to the
+ * 1px of its own border, clipping every link out of sight.
+ *
+ * Absolute against that same bar is what the layout actually wanted, and it
+ * lets the sheet take the height of its own contents. The cap is only for
+ * short screens — landscape on a phone — where it becomes scrollable instead
+ * of running off the bottom.
+ */
 .panel {
-  position: fixed;
-  inset: 4.5rem 0 0;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: calc(100dvh - var(--header-h));
   background: var(--c-paper);
   border-top: 1px solid var(--c-rule);
+  border-bottom: 1px solid var(--c-rule);
   overflow-y: auto;
+  /* No horizontal scroll of its own, whatever a long label does. */
+  overflow-x: hidden;
 }
 
 .panel__inner {
-  padding-block: clamp(2rem, 8vw, 4rem);
+  padding-block: clamp(1.5rem, 6vw, 2.5rem);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 100%;
 }
 
 .panel__link {
@@ -406,17 +427,35 @@ const isActive = (to: string) => {
 }
 
 .panel__github {
-  margin-top: 3rem;
+  margin-top: 2rem;
   color: var(--c-muted);
 }
 
+/* The sheet drops out from under the bar: a short slide with the fade, from
+   the edge it is attached to. */
 .panel-enter-active,
 .panel-leave-active {
-  transition: opacity var(--dur) var(--ease-out);
+  transition:
+    opacity var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-out);
 }
 
 .panel-enter-from,
 .panel-leave-to {
   opacity: 0;
+  transform: translateY(-0.75rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-enter-active,
+  .panel-leave-active {
+    transition: none;
+  }
+
+  .panel-enter-from,
+  .panel-leave-to {
+    opacity: 1;
+    transform: none;
+  }
 }
 </style>

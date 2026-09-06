@@ -42,8 +42,17 @@ void router.isReady().then(() => (routed.value = true))
 </template>
 
 <style scoped>
+/**
+ * Sections pay the rhythm on their top edge, which leaves the last one on a
+ * page with no closing space — and the next thing down is Contact, a coloured
+ * band, so its last line of text ran straight into the maroon. This is the
+ * page's own closing space rather than a second padding on whichever section
+ * happens to be last: one rule, the same on every route, and the same value
+ * every other boundary uses.
+ */
 #main {
   outline: none;
+  padding-bottom: var(--section-y);
 }
 
 /* Route change: a short cross-fade with a few pixels of travel. Fast enough
