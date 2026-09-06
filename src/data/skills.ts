@@ -104,7 +104,7 @@ export const skills: SkillItem[] = [
   { id: 'figjam', name: 'FigJam', kind: 'tool', domains: ['ux'], level: 'advanced' },
 
   // Cross-domain: it exists to carry a design across into code.
-  { id: 'figma-make', name: 'Figma Make', kind: 'tool', domains: ['ux', 'development'], level: 'above-average' },
+  { id: 'figma-make', name: 'Figma Make', kind: 'tool', domains: ['ux', 'development'], level: 'advanced' },
   { id: 'canva', name: 'Canva', kind: 'tool', domains: ['ux'], level: 'above-average' },
   { id: 'tsc-cms', name: 'TSC CMS', kind: 'tool', domains: ['ux'], level: 'above-average' },
   { id: 'sharepoint', name: 'SharePoint', kind: 'tool', domains: ['ux'], level: 'above-average' },

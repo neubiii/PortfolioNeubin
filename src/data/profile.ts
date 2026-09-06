@@ -12,7 +12,7 @@ export const profile = {
   /** Rendered as the hero headline. `emphasis` is the word the annotation marks. */
   role: 'Product Developer',
   secondRole: 'UI/UX Developer',
-  email: 'neubinsebastian01@gmail.com',
+  email: 'neubinsebastian0@gmail.com',
 
   /** Supporting line under the hero statement. */
   intro:
