@@ -5,14 +5,10 @@ import { useMediaQuery } from '@vueuse/core'
 /**
  * The layout ruler.
  *
- * These are not decorative lines — the element is a `.shell`, so it inherits
- * the exact max-width and gutter every other block on the site uses. The
- * outer two rules therefore land on the real content boundary (the same axis
- * the wordmark and the headline start from), and the interior rules fall on
- * quarter divisions of that measure: columns 1, 4, 7, 10 and 13 of the site's
- * twelve-column grid.
- *
- * Five vertical rules, not thirty. An editorial layout guide, not graph paper.
+ * Not decorative lines: the element is a `.shell`, so it inherits the exact
+ * max-width and gutter every other block uses. The outer two rules land on the
+ * real content boundary and the interior rules on quarter divisions of that
+ * measure — columns 1, 4, 7, 10 and 13 of the twelve-column grid.
  */
 const props = withDefaults(
   defineProps<{
@@ -68,8 +64,8 @@ const columns = computed(() => (wide.value ? props.columns : props.columnsSm))
   border-left: 1px solid var(--rules-color, var(--c-rule));
 }
 
-/* Ruler ticks sit on the same axes as the rules, so the marks read as a
-   measurement scale rather than as ornament. */
+/* Ticks sit on the same axes as the rules, so the marks read as a measurement
+   scale rather than as ornament. */
 .rules__tick {
   position: absolute;
   top: 0;

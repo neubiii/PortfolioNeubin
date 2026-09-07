@@ -1,12 +1,8 @@
 <script setup lang="ts">
 /**
  * The LinkedIn mark, drawn rather than imported — a whole icon package for one
- * glyph is not worth the bytes.
- *
- * Monochrome and `currentColor` on purpose: it inherits the maroon and ink of
- * whatever it sits in, so the source is legible without dropping LinkedIn's
- * blue into an otherwise editorial palette. Decorative — the visible label
- * beside it carries the meaning.
+ * glyph is not worth the bytes. `currentColor` on purpose, so it inherits the
+ * ink of whatever it sits in. Decorative: the label beside it carries meaning.
  */
 </script>
 
@@ -27,7 +23,7 @@
   width: 1.05em;
   height: 1.05em;
   flex: none;
-  /* Optical alignment against a mono cap height, not the baseline. */
+  /* Optical alignment against a cap height, not the baseline. */
   transform: translateY(0.1em);
 }
 </style>

@@ -8,16 +8,11 @@ import GrainOverlay from '@/components/ui/GrainOverlay.vue'
 import { router } from '@/router'
 
 /**
- * Contact and the footer close every page, so they live in the shell rather
- * than in each route. That made them the whole page for a moment on a cold
- * load: route components are imported lazily, so the shell painted while
- * `<main>` was still empty, and Contact — the only content there was — filled
- * the viewport until the chunk arrived and pushed it down a screen.
- *
- * `isReady()` settles once the first navigation has resolved, which includes
- * loading that chunk. Holding the page's closing sections until then means
- * they are never on screen without the page they close. No timeout, nothing
- * hidden: they simply are not rendered yet.
+ * Contact and the footer live in the shell rather than in each route, so on a
+ * cold load they were the only thing in the document while the lazily-imported
+ * route was still in flight — a screenful of Contact before the page arrived.
+ * `isReady()` resolves once that chunk has loaded, so they are simply not
+ * rendered until the page they close exists.
  */
 const routed = ref(false)
 void router.isReady().then(() => (routed.value = true))
@@ -42,21 +37,14 @@ void router.isReady().then(() => (routed.value = true))
 </template>
 
 <style scoped>
-/**
- * Sections pay the rhythm on their top edge, which leaves the last one on a
- * page with no closing space — and the next thing down is Contact, a coloured
- * band, so its last line of text ran straight into the maroon. This is the
- * page's own closing space rather than a second padding on whichever section
- * happens to be last: one rule, the same on every route, and the same value
- * every other boundary uses.
- */
+/* Sections pay their spacing on the top edge, so the last one on a page has
+   no closing space of its own — and Contact, the coloured band below, would
+   meet it directly. */
 #main {
   outline: none;
   padding-bottom: var(--section-y);
 }
 
-/* Route change: a short cross-fade with a few pixels of travel. Fast enough
-   that it never delays reading the next page. */
 .route-enter-active,
 .route-leave-active {
   transition:

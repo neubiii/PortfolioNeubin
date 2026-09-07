@@ -3,16 +3,10 @@ import { computed, ref, watch } from 'vue'
 /**
  * Whether the hero's decorative motion should run.
  *
- * Three states rather than a boolean, so the OS preference and an explicit
- * choice can coexist:
- *
- *   'system' — follow `prefers-reduced-motion` (the default)
- *   'on'     — the visitor asked for motion, overriding a reduced-motion OS setting
- *   'off'    — the visitor paused it
- *
- * Module-level refs plus `sessionStorage`: the choice survives navigating into
- * a project and back for the length of the session, and is forgotten after it.
- * Deliberately not a store — one preference does not need infrastructure.
+ * Three states, not a boolean, so the OS preference and an explicit choice can
+ * coexist: 'system' follows `prefers-reduced-motion`, 'on' overrides it, 'off'
+ * pauses. Held at module level and mirrored to sessionStorage, so the choice
+ * survives navigating into a project and back.
  */
 export type MotionPreference = 'system' | 'on' | 'off'
 
@@ -36,13 +30,11 @@ watch(preference, (value) => {
     if (value === 'system') sessionStorage.removeItem(KEY)
     else sessionStorage.setItem(KEY, value)
   } catch {
-    /* private mode — the in-memory value still holds for this session */
+    /* Private mode: the in-memory value still holds for this session. */
   }
 })
 
-/** Reactive, so a visitor toggling the OS setting is picked up live. */
 const reducedMotion = ref(false)
-/** WebGL support is fixed for the session; no point re-testing it. */
 const supported = ref(false)
 
 if (typeof window !== 'undefined') {
@@ -64,31 +56,28 @@ if (typeof window !== 'undefined') {
 }
 
 /**
- * The single answer the hero acts on. Reduced motion is authoritative on load,
- * because `preference` starts at `'system'` — nothing ever starts and then
- * stops.
+ * Motion the visitor is happy with. Reduced motion is authoritative on load,
+ * since `preference` starts at 'system' — motion never starts and then stops.
  */
-const active = computed(
-  () =>
-    supported.value &&
-    (preference.value === 'on' || (preference.value === 'system' && !reducedMotion.value)),
+const motionOk = computed(
+  () => preference.value === 'on' || (preference.value === 'system' && !reducedMotion.value),
 )
+
+/** The same question plus WebGL — the hero's flock, and nothing else. */
+const active = computed(() => supported.value && motionOk.value)
 
 export function useMotion() {
   const toggle = () => {
     preference.value = active.value ? 'off' : 'on'
   }
 
-  /**
-   * The button names the action it performs. Under a reduced-motion OS setting
-   * that has not been overridden it offers to enable motion rather than to
-   * "resume" something the visitor never saw.
-   */
+  /* Name the action, not the state: under an un-overridden reduced-motion
+     setting the button offers to enable motion, not to resume it. */
   const label = computed(() => {
     if (active.value) return 'Pause motion'
     if (preference.value === 'system' && reducedMotion.value) return 'Enable motion'
     return 'Resume motion'
   })
 
-  return { preference, reducedMotion, supported, active, toggle, label }
+  return { preference, reducedMotion, motionOk, supported, active, toggle, label }
 }

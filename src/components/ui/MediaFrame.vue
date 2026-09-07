@@ -4,26 +4,10 @@ import { asset, isPlaceholder } from '@/data/assets'
 import type { MediaItem } from '@/types'
 
 /**
- * Presents one image.
- *
- * The screenshot is the visual. There is no decorative frame, no background
- * behind it, no forced height, and nothing is cropped to fill a box — a phone
- * screen at 786×1704 renders at 786×1704's aspect and stops there.
- *
- * Three modes, chosen by the data rather than inferred from the aspect ratio:
- *
- * - `natural` (default) — intrinsic aspect, borderless. Every case-study image.
- * - `longform` — a page capture too tall to sit inline (evergrove/page is
- *   2882×8958 ≈ eight screens). Collapsed to a readable height with an explicit
- *   expand control. Deliberately NOT an inner scroll container: one of those
- *   swallows the wheel while the pointer is over it, which is exactly the
- *   scroll trap this component used to have.
- * - `crop` — a cropped tile at a ratio the caller supplies, for the work index,
- *   where a single shared rhythm matters more than each cover's own shape.
- *
- * `ratio` only reserves space before load. It is dropped the moment the browser
- * knows the real dimensions, so a stale value in the data can never distort an
- * image the owner swaps in later.
+ * Presents one image: intrinsic aspect, no frame, no background, nothing
+ * cropped to fill a box. The three display modes are described on `MediaItem`
+ * in `@/types`; `ratio` only reserves space before load and is dropped once
+ * the browser knows the real dimensions.
  */
 const props = withDefaults(
   defineProps<{
@@ -59,7 +43,7 @@ const captionId = computed(() => `cap-${props.item.src.replace(/\W+/g, '-')}`)
 
 <template>
   <figure class="frame" :data-mode="mode" :data-interactive="interactive">
-    <!-- crop: the only mode with a box of its own. -->
+    <!-- The only mode with a box of its own. -->
     <div v-if="mode === 'crop'" class="frame__crop" :style="{ aspectRatio: ratio }">
       <img
         v-if="src"
@@ -71,11 +55,12 @@ const captionId = computed(() => `cap-${props.item.src.replace(/\W+/g, '-')}`)
         :loading="eager ? 'eager' : 'lazy'"
         :decoding="eager ? 'sync' : 'async'"
       />
-      <p v-if="pending" class="mono frame__pending">Placeholder</p>
+      <p v-if="pending" class="meta frame__pending">Placeholder</p>
     </div>
 
-    <!-- longform: collapsed by height, expanded by a real button. No inner
-         scroller, so the wheel always belongs to the page. -->
+    <!-- Collapsed by height, expanded by a real button. Deliberately not an
+         inner scroller: one of those swallows the wheel while the pointer is
+         over it. -->
     <div v-else-if="mode === 'longform'" class="frame__long" :data-expanded="expanded">
       <img
         v-if="src"
@@ -99,7 +84,6 @@ const captionId = computed(() => `cap-${props.item.src.replace(/\W+/g, '-')}`)
       </button>
     </div>
 
-    <!-- natural: just the image. -->
     <img
       v-else-if="src"
       class="frame__img"
@@ -125,9 +109,8 @@ const captionId = computed(() => `cap-${props.item.src.replace(/\W+/g, '-')}`)
   min-width: 0;
 }
 
-/* `display: block` on every image: an inline image sits on the text baseline
-   and leaves a few pixels of descender gap under it, which reads as stray
-   padding inside a figure. */
+/* Block, not inline: an inline image sits on the text baseline and leaves a
+   descender gap under it that reads as stray padding. */
 .frame__img {
   display: block;
   width: 100%;
@@ -135,8 +118,6 @@ const captionId = computed(() => `cap-${props.item.src.replace(/\W+/g, '-')}`)
   background: none;
   border: 0;
 }
-
-/* ── Crop — the work index only ────────────────────────────────────────── */
 
 .frame__crop {
   position: relative;
@@ -168,8 +149,6 @@ const captionId = computed(() => `cap-${props.item.src.replace(/\W+/g, '-')}`)
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
-
-/* ── Longform ──────────────────────────────────────────────────────────── */
 
 .frame__long {
   position: relative;
@@ -205,7 +184,7 @@ const captionId = computed(() => `cap-${props.item.src.replace(/\W+/g, '-')}`)
 }
 
 /* While collapsed the control sits over the fade, so it reads as the way out
-   of the clip rather than as a caption below an arbitrary cut. */
+   of the clip rather than as a caption under an arbitrary cut. */
 .frame__long:not([data-expanded='true']) .frame__expand {
   position: absolute;
   left: 0;
@@ -227,8 +206,6 @@ const captionId = computed(() => `cap-${props.item.src.replace(/\W+/g, '-')}`)
 .frame__expand-icon[data-open='true'] {
   transform: rotate(180deg);
 }
-
-/* ── Caption ───────────────────────────────────────────────────────────── */
 
 .frame__caption {
   margin-top: 0.85rem;

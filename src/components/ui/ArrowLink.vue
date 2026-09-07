@@ -4,8 +4,7 @@ import { RouterLink } from 'vue-router'
 
 /**
  * The site's one call-to-action shape: a ruled row whose arrow travels on
- * hover/focus. Not a pill, not a filled button — it reads as a line of type
- * with a rule under it, which is what the rest of the page is made of.
+ * hover and focus. Not a pill, not a filled button.
  */
 const props = withDefaults(
   defineProps<{

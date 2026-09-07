@@ -6,11 +6,8 @@ import ThemeToggle from './ThemeToggle.vue'
 import { useScrollSpy } from '@/composables/useScrollSpy'
 import { profile } from '@/data/profile'
 
-/**
- * The reference line the scrollspy reads, a little below the 4.5rem sticky
- * header — far enough that a section counts as current once its own heading
- * has settled under the bar rather than the instant its top edge touches it.
- */
+/** The line the scrollspy reads: below the sticky bar, far enough that a
+ *  section counts as current once its own heading has settled under it. */
 const SPY_LINE = 128
 
 const route = useRoute()
@@ -19,12 +16,9 @@ const scrolled = computed(() => y.value > 24)
 
 /**
  * Every destination is a section of the home page, so every item is a hash
- * link — including Work, which no longer has a route of its own. From a
- * project page these resolve to `/#…`, and the router's `scrollBehavior` waits
- * for the section to mount before scrolling to it.
- *
- * Experience appears only once there is real experience data; a nav item
- * pointing at an empty section is a dead link.
+ * link — including Work, which no longer has a route of its own. Experience
+ * appears only once there is experience data; a nav item pointing at an empty
+ * section is a dead link.
  */
 const links = computed(() => [
   { label: 'Work', to: '/#work' },
@@ -39,16 +33,10 @@ const github = profile.links.find((l) => l.label === 'GitHub')
 const open = ref(false)
 const locked = useScrollLock(document.body)
 watch(open, (v) => (locked.value = v))
-watch(
-  () => route.fullPath,
-  () => (open.value = false),
-)
 onKeyStroke('Escape', () => (open.value = false))
 
-/**
- * The home hero is a near-black block, so the header inverts while it is over
- * it and returns to the paper treatment once the page scrolls past.
- */
+/* The home hero is a near-black block, so the header inverts while it is over
+   it and returns to the paper treatment once the page scrolls past. */
 const heroHeight = ref(0)
 const measureHero = () => {
   const el = document.querySelector<HTMLElement>('[data-hero]')
@@ -56,22 +44,22 @@ const measureHero = () => {
 }
 onMounted(measureHero)
 useEventListener(window, 'resize', measureHero)
+
 watch(
   () => route.fullPath,
-  () => nextTick(measureHero),
+  () => {
+    open.value = false
+    nextTick(measureHero)
+  },
 )
 const overHero = computed(() => !open.value && heroHeight.value > 0 && y.value < heroHeight.value - 96)
 
 /**
- * Which item is lit.
- *
- * On the home page that is a question about where the visitor is, not about
- * what the URL says — the hash is written once by a click and then goes stale
- * the moment anyone scrolls, and rewriting it continuously would fill their
- * back button with their own scrolling. So the scrollspy answers it, and the
- * URL is left alone.
- *
- * Elsewhere — a project page — no section is in view, so nothing is lit.
+ * Which item is lit — a question about where the visitor is, not about what the
+ * URL says. The hash goes stale the moment anyone scrolls, and rewriting it
+ * continuously would fill the back button with their own scrolling, so the
+ * scrollspy answers it and the URL is left alone. Off the home page nothing is
+ * lit.
  */
 const { active } = useScrollSpy(['work', 'about', 'skillset', 'contact'], SPY_LINE)
 
@@ -108,7 +96,7 @@ const isActive = (to: string) => {
       </nav>
 
       <!-- One aligned control group: every child is a 2.75rem-tall inline-flex
-           box centred on the same axis, with the divider centred between them. -->
+           box on the same axis, with the divider centred between them. -->
       <div class="header__meta">
         <a
           v-if="github"
@@ -135,7 +123,6 @@ const isActive = (to: string) => {
       </div>
     </div>
 
-    <!-- Mobile panel. Full-bleed, large type: the nav becomes the page. -->
     <Transition name="panel">
       <div v-if="open" id="mobile-nav" class="panel">
         <nav class="shell panel__inner" aria-label="Primary (mobile)">
@@ -155,7 +142,7 @@ const isActive = (to: string) => {
             :href="github.href"
             target="_blank"
             rel="noopener noreferrer"
-            class="mono panel__github"
+            class="meta panel__github"
             >GitHub ↗</a
           >
         </nav>
@@ -166,8 +153,7 @@ const isActive = (to: string) => {
 
 <style scoped>
 .header {
-  /* The bar's own height, named once: the mobile panel hangs off it and the
-     hero measures against it. */
+  /* Named once: the mobile panel hangs off it and the hero measures against it. */
   --header-h: 4.5rem;
   position: sticky;
   top: 0;
@@ -185,9 +171,8 @@ const isActive = (to: string) => {
   border-bottom-color: var(--c-rule);
 }
 
-/* Over the dark hero the bar carries the hero's ink instead of the page's.
-   Re-pointing the tokens means every child — links, divider, toggle — inverts
-   together without a single per-element override. */
+/* Over the dark hero the bar carries the hero's ink. Re-pointing the tokens
+   inverts every child at once — links, divider, toggle. */
 .header[data-over-hero='true'] {
   background: transparent;
   backdrop-filter: none;
@@ -228,15 +213,13 @@ const isActive = (to: string) => {
 }
 
 .header__mark {
-  /* `baseline`, not `center`: an empty inline-flex item takes its baseline
-     from its bottom margin edge, so the dot sits ON the wordmark's baseline
-     the way a full stop does. Centring it and then nudging with a margin —
-     which is what this used to do — left the dot floating below the type. */
+  /* `baseline`, not `center`: an empty inline-flex item takes its baseline from
+     its bottom margin edge, so the dot sits ON the wordmark's baseline. */
   display: inline-flex;
   align-items: baseline;
   gap: 0.22rem;
   /* Padding, not min-height: the target grows around the baseline instead of
-     stretching the flex line and pushing the dot out of alignment again. */
+     stretching the flex line and pushing the dot out of alignment. */
   padding-block: 0.72rem;
   color: var(--c-ink);
 }
@@ -294,17 +277,14 @@ const isActive = (to: string) => {
   color: var(--c-accent);
 }
 
-/* ── Right-hand control group ──────────────────────────────────────────── */
-
 .header__meta {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-/* Hidden below 42rem by `visibility`-free removal from flow, but when shown it
-   MUST stay inline-flex: `display: block` here was overriding `.link-grow`'s
-   own inline-flex centring, which is what pushed GitHub off the shared axis. */
+/* Must stay inline-flex when shown: `display: block` here overrides
+   `.link-grow`'s own centring and pushes GitHub off the shared axis. */
 .header__github {
   display: none;
   font-family: var(--font-sans);
@@ -372,21 +352,13 @@ const isActive = (to: string) => {
   transform: translateY(-0.165rem) rotate(-45deg);
 }
 
-/* ── Mobile panel ──────────────────────────────────────────────────────── */
-
 /**
- * The panel hangs off the bottom of the bar.
- *
- * It used to be `position: fixed` against the viewport — which it never was:
  * `.header` carries a `backdrop-filter`, and a filtered element becomes the
- * containing block for its fixed descendants. So `inset: 4.5rem 0 0` resolved
- * against the 4.5rem bar instead of the screen and the panel computed to the
- * 1px of its own border, clipping every link out of sight.
- *
- * Absolute against that same bar is what the layout actually wanted, and it
- * lets the sheet take the height of its own contents. The cap is only for
- * short screens — landscape on a phone — where it becomes scrollable instead
- * of running off the bottom.
+ * containing block for its fixed descendants — so `position: fixed` here
+ * resolved against the 4.5rem bar, not the viewport, and the panel collapsed
+ * to the 1px of its own border. Absolute against that same bar is what the
+ * layout wants, and it lets the sheet take the height of its contents. The
+ * cap only matters on short screens, where it becomes scrollable.
  */
 .panel {
   position: absolute;
@@ -431,8 +403,6 @@ const isActive = (to: string) => {
   color: var(--c-muted);
 }
 
-/* The sheet drops out from under the bar: a short slide with the fade, from
-   the edge it is attached to. */
 .panel-enter-active,
 .panel-leave-active {
   transition:

@@ -3,12 +3,11 @@ import { ref } from 'vue'
 import { useIntersectionObserver } from '@vueuse/core'
 
 /**
- * A single, restrained entrance: content lifts a few pixels into place once,
- * the first time it is scrolled to. Never on a loop, never on every element.
+ * A single entrance: content lifts a few pixels into place the first time it is
+ * scrolled to.
  *
- * Under `prefers-reduced-motion` the CSS collapses the transition, so the
- * content is simply present — the observer still fires and the class still
- * lands, which keeps the markup identical between the two modes.
+ * Under `prefers-reduced-motion` the CSS collapses the transition — the observer
+ * still fires and the class still lands, so the markup is identical either way.
  */
 const props = withDefaults(defineProps<{ delay?: number; as?: string }>(), {
   delay: 0,

@@ -1,9 +1,7 @@
 /*
- * Design tokens.
- *
- * Raw values live here as `--c-*` / `--t-*` custom properties so the theme can be
- * swapped at runtime. `main.css` maps them into Tailwind's `@theme` layer, which is
- * what generates the `bg-paper` / `text-ink` style utilities used across components.
+ * Design tokens. Raw values live here as `--c-*` / `--t-*` custom properties so
+ * the theme can be swapped at runtime; `main.css` maps them into Tailwind's
+ * `@theme` layer.
  *
  * Contrast (WCAG 2.1, verified both themes):
  *   ink on paper      16.9 : 1     accent on paper   9.8 : 1  (light)  6.2 : 1 (dark)
@@ -31,10 +29,9 @@
   --c-accent-hover: #5e0e1d;
   --c-accent-soft: rgb(122 18 38 / 0.08);
 
-  /* Solid maroon block behind light text. Kept separate from `--c-accent`
-     because the accent has to lighten in the dark theme to stay legible AS
-     text, and a light accent cannot then carry light text as a background.
-     Light: 12.4:1 against --c-on-deep. Dark: 8.4:1. */
+  /* Solid maroon behind light text. Separate from `--c-accent`, which has to
+     lighten in dark mode to stay legible as text — and a light accent cannot
+     then carry light text. Light 12.4:1, dark 8.4:1 against --c-on-deep. */
   --c-cta: #7a1226;
   --c-cta-hover: #5e0e1d;
 
@@ -46,13 +43,10 @@
   --c-focus: #7a1226;
 
   /* ── Hero ────────────────────────────────────────────────────────────────
-     The landing hero is its own block — a shade deeper than the page ground so
-     it reads as a distinct surface — and it is the canvas the Vanta flock moves
-     across. `--vanta-*` are the flock's own colours, read straight out of CSS
-     by `VantaBirds.vue` so this file stays the single source of palette truth.
-
-     Light hero contrast: ink 15.6:1 · muted 6.2:1 · accent 9.0:1
-     ──────────────────────────────────────────────────────────────────────── */
+     Its own block, a shade deeper than the page ground. `--vanta-*` are the
+     flock's colours, read out of CSS by `VantaBirds.vue` so this file stays the
+     single source of palette truth.
+     Contrast: ink 15.6:1 · muted 6.2:1 · accent 9.0:1 */
   --c-hero-bg: #efe9e2;
   --c-hero-ink: #16110f;
   --c-hero-muted: #5b504a;
@@ -82,9 +76,7 @@
   --t-5xl: clamp(3.25rem, 1.1rem + 9.6vw, 10rem);
 
   /* Rhythm */
-  /* The gap between one section's last content and the next section's rule.
-     Taken from the Work section, whose rhythm was the one that read correctly;
-     sections pay it on their top edge only, so a boundary is exactly this
+  /* Sections pay this on their top edge only, so a boundary is exactly this
      value rather than two paddings stacked. */
   --section-y: clamp(3.5rem, 7vw, 6rem);
   --gutter: clamp(1.25rem, 4vw, 4.5rem);

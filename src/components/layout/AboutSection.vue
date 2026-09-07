@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { motion, useInView } from 'motion-v'
 import { useMotion } from '@/composables/useMotion'
 import { asset } from '@/data/assets'
@@ -8,16 +8,12 @@ import { profile } from '@/data/profile'
 /**
  * About, built as a bento composition.
  *
- * The rest of the site is paper, hairlines and maroon. This one block turns the
- * volume up: a local plum-to-magenta palette, colour-blocked panels and a
- * cut-out portrait on a hard magenta spot. It is the only place on the site
- * where the person outranks the work, so it is the only place that gets to look
- * different — but the type, the grid and the paper it sits on are the site's,
+ * The one block on the site where the person outranks the work, so the only one
+ * with a local palette — but the type, the grid and the paper are the site's,
  * which is what keeps it from reading as a foreign object.
  *
- * The layout is one twelve-column grid, not a stack of independent cards: the
- * identity panel runs the full height of the right-hand column, so the two
- * halves are locked together rather than merely adjacent.
+ * One twelve-column grid, not a stack of cards: the identity panel runs the
+ * full height of the right-hand column, locking the two halves together.
  */
 const media = {
   portrait: asset('about/portrait-cut'),
@@ -26,17 +22,14 @@ const media = {
   music: asset('about/music-mask'),
 }
 
-/* One source of truth for the profile URLs; see `data/profile.ts`. */
 const linkedin = profile.links.find((l) => l.label === 'LinkedIn')?.href
 
-/* The headline is set word by word so each full stop can take the accent —
-   three claims, three beats, rather than one long string. */
+/* Set word by word so each full stop can take the accent. */
 const claims = ['Learner', 'Problem Solver', 'Storyteller']
 
 /**
  * The counts. `value` is what the tally lands on, `decimals` how it is written
- * on the way there, and `suffix` is held back until the count finishes so the
- * plus does not sit next to a number that is still moving.
+ * on the way there, and `suffix` is held back until the count finishes.
  */
 const stats = [
   {
@@ -56,31 +49,20 @@ const stats = [
   },
 ]
 
-/* ── Entrance and counters ────────────────────────────────────────────────
-   Both run on Motion for Vue rather than on a hand-rolled observer. Two
-   previous attempts drove CSS transitions from custom IntersectionObserver
-   state and both measured correct while looking wrong in a real browser — the
-   first fired while the grid was still a strip at the bottom edge of the
-   screen, the second could apply its hidden state and its revealed state in the
-   same render when a block was already in view at mount, so the browser never
-   painted a start frame to transition from. `whileInView` owns that lifecycle,
-   which removes the class of bug entirely.
+/* ── Entrance and counters ───────────────────────────────────────────────
+   Both run on Motion for Vue rather than a hand-rolled observer: driving CSS
+   transitions from custom IntersectionObserver state could apply the hidden and
+   revealed states in the same render for a block already in view at mount, so
+   the browser never painted a frame to transition from. `whileInView` owns that
+   lifecycle.
 
    `amount: 'some'` with the root's bottom pulled up a quarter gives the
    asymmetry this needs: a block arrives once it crosses into the upper
-   three-quarters of the screen, and only leaves once it is completely above the
-   viewport. So nothing animates at the very edge of vision, nothing visibly
-   fades out while you are still looking at it, and coming back re-runs it. */
-const { preference, reducedMotion } = useMotion()
+   three-quarters, and leaves only once it is completely above the viewport. */
+const { motionOk } = useMotion()
 
-/**
- * `useMotion().active` also asks for WebGL, because it answers for the hero's
- * flock. Nothing here needs a canvas, so this asks the narrower question: has
- * the visitor paused motion, or does the system say reduce?
- */
-const motionOk = computed(
-  () => preference.value === 'on' || (preference.value === 'system' && !reducedMotion.value),
-)
+/* `active` from useMotion also asks for WebGL, which answers for the hero's
+   flock. Nothing here needs a canvas, so ask the narrower question. */
 
 const viewport = { amount: 'some', margin: '0px 0px -25% 0px', once: false } as const
 const ease = [0.16, 1, 0.3, 1]
@@ -99,11 +81,9 @@ const from = (dir: From, delay = 0) =>
       }
     : {}
 
-/* ── Counting up ──────────────────────────────────────────────────────────
-   Tied to the counts block's own in-view state, so the numbers are on screen
-   while they move, and re-armed by the same signal: it goes false only once the
-   block is fully out of the trigger zone, which is why scrolling around inside
-   the section does not restart it. */
+/* Tied to the counts block's own in-view state, so the numbers are on screen
+   while they move. It goes false only once the block is fully out of the
+   trigger zone, which is why scrolling inside the section does not restart it. */
 const tallies = ref(stats.map(() => 0))
 const counted = ref(false)
 
@@ -162,14 +142,11 @@ const loves = [
 <template>
   <section id="about" class="about" aria-labelledby="about-title">
     <div class="shell">
-      <!-- The same ruler row the Work section opens with: the section's own
-           name in the accent, on a rule, above everything else. -->
       <div class="about__head">
         <h2 id="about-title" class="label about__marker">About</h2>
       </div>
 
       <div class="bento">
-        <!-- ── Statement ────────────────────────────────────────────────── -->
         <motion.p class="display about__title" v-bind="from('top')">
           <template v-for="(claim, i) in claims" :key="claim"
             ><template v-if="i">{{ ' ' }}</template
@@ -179,12 +156,10 @@ const loves = [
           >
         </motion.p>
 
-        <!-- ── Identity ─────────────────────────────────────────────────── -->
         <motion.article class="panel id" v-bind="from('left')">
           <!-- An arched window cut into the panel. The cut-out stands on its
-               floor and is trimmed by its sides, so the flat bottom edge of the
-               source image reads as the frame's own baseline rather than as a
-               photograph that ran out. -->
+               floor, so the flat bottom edge of the source reads as the frame's
+               own baseline. -->
           <div class="id__stage">
             <div class="id__frame">
               <img
@@ -198,9 +173,9 @@ const loves = [
           </div>
 
           <div class="id__foot">
-            <p class="mono id__hello">I’m</p>
+            <p class="meta id__hello">I’m</p>
             <p class="display id__name">Neubin<br />Sebastian</p>
-            <p class="mono id__route">
+            <p class="meta id__route">
               Kerala <span class="id__arrow" aria-hidden="true">→</span> Mannheim
             </p>
 
@@ -216,7 +191,6 @@ const loves = [
           </div>
         </motion.article>
 
-        <!-- ── The short version ────────────────────────────────────────── -->
         <motion.article class="panel story" v-bind="from('top', 0.09)">
           <p class="label story__kicker">The short version</p>
 
@@ -228,13 +202,12 @@ const loves = [
           </p>
 
           <p class="story__open">
-            <span class="mono">Open to</span>
+            <span class="meta">Open to</span>
             <span class="story__dots" aria-hidden="true" />
-            <span class="mono story__roles">UI/UX Design · Front-end</span>
+            <span class="meta story__roles">UI/UX Design · Front-end</span>
           </p>
         </motion.article>
 
-        <!-- ── Two counts ───────────────────────────────────────────────── -->
         <motion.div ref="counts" class="stats" v-bind="from('right', 0.15)">
           <article
             v-for="(stat, i) in stats"
@@ -253,7 +226,6 @@ const loves = [
           </article>
         </motion.div>
 
-        <!-- ── Off the clock ────────────────────────────────────────────── -->
         <motion.h3 class="display-soft loves__head" v-bind="from('bottom')">
           Things I love most…
         </motion.h3>
@@ -275,15 +247,14 @@ const loves = [
                 loading="lazy"
                 decoding="async"
               />
-              <!-- The headphones arrive as black line art on transparent, so
-                   they are used as a mask. Here that keeps them ink-dark on the
-                   pale ground rather than tinting them into the panel. -->
+              <!-- Black line art on transparent, used as a mask so it stays
+                   ink-dark on the pale ground rather than tinted into it. -->
               <span v-else class="love__art" aria-hidden="true" />
             </div>
 
             <p class="love__label">
-              <span class="mono love__name">{{ love.label }}</span>
-              <span class="mono love__note">{{ love.note }}</span>
+              <span class="meta love__name">{{ love.label }}</span>
+              <span class="meta love__note">{{ love.note }}</span>
             </p>
           </li>
         </motion.ul>
@@ -293,21 +264,13 @@ const loves = [
 </template>
 
 <style scoped>
-/* ── Local palette ────────────────────────────────────────────────────────
-   One anchor and two accents, rather than a family of purples: a deep
-   navy-violet carries the identity panel, burgundy and rose carry the accent
-   cards, and a single pale lilac is the one light note — used twice, in the
-   count and in the music card, so the two rhyme instead of introducing a
-   second light tone. The burgundy is a shade off the site's own maroon, which
-   is what keeps this block related to the rest of the page.
-
-   Every pairing is fixed ink on a fixed ground, so the colour-blocked panels
-   need no dark-theme variant; only the accents that land on the page ground
-   follow the theme. */
-/* The entrance offsets the counts block 24px to the right before it arrives,
-   which on a narrow screen is 24px of horizontal scroll until it does. Clipped
-   rather than hidden: `clip` does not create a scroll container, and nothing in
-   this section is meant to bleed sideways past it anyway. */
+/* ── Local palette ───────────────────────────────────────────────────────
+   One anchor and two accents rather than a family of purples. Every pairing is
+   fixed ink on a fixed ground, so the colour-blocked panels need no dark-theme
+   variant; only the accents that land on the page ground follow the theme. */
+/* The counts block enters 24px to the right, which on a narrow screen is 24px
+   of horizontal scroll until it arrives. `clip`, not `hidden`: it creates no
+   scroll container. */
 .about {
   overflow-x: clip;
 
@@ -320,9 +283,8 @@ const loves = [
   --a-blush: #f1cfe0;
   --a-graphite: #171227;
 
-  /* Accents need two values: one legible on the navy panel, one on paper —
-     and the paper one has to flip, because a mid-tone rose is 3.2:1 on the
-     dark theme's ground. */
+  /* Accents need two values: one legible on the navy panel, one on paper — and
+     the paper one has to flip, since a mid-tone rose is 3.2:1 on dark. */
   --a-accent-lift: #e88ab0;
   --a-accent-ink: #9d2660;
 
@@ -340,10 +302,9 @@ const loves = [
   --a-accent-ink: #e88ab0;
 }
 
-/* ── Section head ─────────────────────────────────────────────────────────
-   Deliberately the Work section's row rather than the marker-and-title block
-   the later sections use: this section's own title is the statement inside the
-   composition, so the opener only has to name the section. */
+/* The Work section's ruler row rather than the marker-and-title block the later
+   sections use: this section's title is the statement inside the composition,
+   so the opener only names the section. */
 .about__head {
   display: flex;
   align-items: baseline;
@@ -359,10 +320,8 @@ const loves = [
   margin: 0;
 }
 
-/* ── The grid ─────────────────────────────────────────────────────────────
-   One grid, four rows. The identity panel spans all of them, which is what
-   makes the two halves a single composition instead of a sidebar beside a
-   stack. */
+/* One grid, four rows. The identity panel spans all of them, which makes the
+   two halves a single composition rather than a sidebar beside a stack. */
 .bento {
   display: grid;
   gap: clamp(0.75rem, 1.1vw, 1rem);
@@ -407,8 +366,8 @@ const loves = [
   }
 }
 
-/* Tablet: the identity panel goes wide across the top, the rest keeps its
-   bento logic underneath rather than collapsing into one column. */
+/* Tablet: the identity panel goes wide across the top, the rest keeps its bento
+   logic underneath rather than collapsing into one column. */
 @media (min-width: 44rem) and (max-width: 63.99rem) {
   .bento {
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -438,18 +397,13 @@ const loves = [
   }
 }
 
-/* ── Panels ───────────────────────────────────────────────────────────── */
-
-/* Square. The composition is sharper for it, and the one curve left in the
-   section — the arched window — now reads as a deliberate shape rather than as
-   the largest of several radii. */
+/* Square, so the one curve left in the section — the arched window — reads as
+   a deliberate shape rather than the largest of several radii. */
 .panel {
   position: relative;
   border-radius: 0;
   overflow: hidden;
 }
-
-/* ── Identity ─────────────────────────────────────────────────────────── */
 
 .id {
   display: grid;
@@ -467,13 +421,11 @@ const loves = [
   min-height: 12rem;
 }
 
-/* The window. A single arch — the top corners are one elliptical sweep, the
-   bottom two are the panel's own radius — recessed a shade below the panel so
-   it reads as cut into it rather than laid on top. */
+/* A single arch — the top corners are one elliptical sweep, the bottom two the
+   panel's own radius — recessed a shade so it reads as cut into the panel. */
 .id__frame {
   position: relative;
-  /* The window has its own proportion now. It used to inherit the photograph's,
-     which is why the figure filled it edge to edge with nowhere to breathe. */
+  /* The window has its own proportion rather than the photograph's. */
   height: min(100%, 29rem);
   aspect-ratio: 41 / 52;
   width: auto;
@@ -486,11 +438,10 @@ const loves = [
 }
 
 /* Placed inside the window rather than filling it, and standing on its floor.
-   The source file is cropped tight to the visible subject, so `bottom: 0` puts
-   the body on the frame's baseline rather than on the edge of a transparent
-   box, and `translateX(-50%)` centres the person rather than that box. Height
-   is what is set — width follows from the aspect — so the side margins are a
-   consequence of the size and stay put; the 18% left over goes above the head. */
+   The source is cropped tight to the subject, so `bottom: 0` puts the body on
+   the frame's baseline and `translateX(-50%)` centres the person rather than a
+   transparent box. Height is set and width follows, so the side margins stay
+   put. */
 .id__portrait {
   position: absolute;
   left: 50%;
@@ -537,8 +488,8 @@ const loves = [
   padding-inline: 0.15rem;
 }
 
-/* Not a button and not a raw URL: a ruled row, the way the rest of the site
-   sets its links, in this panel's palette. */
+/* A ruled row, the way the rest of the site sets its links, in this panel's
+   palette. */
 .id__link {
   display: flex;
   align-items: center;
@@ -579,8 +530,6 @@ const loves = [
   border-radius: 0.2rem;
 }
 
-/* ── Headline ─────────────────────────────────────────────────────────── */
-
 .about__title {
   align-self: start;
   /* Set as running text with real spaces rather than as flex items with a gap:
@@ -598,8 +547,6 @@ const loves = [
 .about__stop {
   color: var(--a-accent-ink);
 }
-
-/* ── The short version ────────────────────────────────────────────────── */
 
 .story {
   display: grid;
@@ -622,9 +569,8 @@ const loves = [
   text-wrap: pretty;
 }
 
-/* Availability, set as a ruled row rather than a banner: the same device the
-   card already used for the two cities, carrying the thing a reader actually
-   needs to find. */
+/* A ruled row rather than a banner: the same device the card already uses for
+   the two cities. */
 .story__open {
   display: flex;
   align-items: center;
@@ -639,7 +585,6 @@ const loves = [
   color: var(--c-ink);
 }
 
-/* Drawn rather than stated. */
 .story__dots {
   flex: 1;
   height: 1px;
@@ -648,8 +593,6 @@ const loves = [
   background-size: 5px 1px;
   background-repeat: repeat-x;
 }
-
-/* ── Counts ───────────────────────────────────────────────────────────── */
 
 .stats {
   display: grid;
@@ -678,7 +621,7 @@ const loves = [
   font-size: clamp(2.4rem, 4vw, 3.4rem);
   line-height: 0.9;
   /* Lining, fixed-width digits: the tally runs 0 → 10 and 0.0 → 3.5, and
-     proportional figures would jitter the whole line on every frame. */
+     proportional figures would jitter the line on every frame. */
   font-variant-numeric: tabular-nums lining-nums;
 }
 
@@ -709,8 +652,6 @@ const loves = [
   max-width: 22ch;
 }
 
-/* ── Off the clock ────────────────────────────────────────────────────── */
-
 .loves__head {
   align-self: end;
   margin-top: clamp(0.5rem, 1.5vw, 1.25rem);
@@ -724,8 +665,7 @@ const loves = [
 }
 
 /* Picture edge to edge, caption sitting on it — no strip underneath, so the
-   card is one image rather than an image plus a bar. Only the music card shows
-   its ground, and it is the light note of the section. */
+   card is one image rather than an image plus a bar. */
 .love {
   position: relative;
   transition:
@@ -756,9 +696,8 @@ const loves = [
   transition: transform var(--dur-slow) var(--ease-out);
 }
 
-/* The picture's lower third is darkened a touch so the caption block has
-   something settled to sit on. Not on the music card: its ground is pale by
-   design and a vignette would muddy it. */
+/* The picture's lower third is darkened so the caption has something settled to
+   sit on. Not on the music card: its ground is pale by design. */
 .love[data-love='mountains'] .love__media::after,
 .love[data-love='snow'] .love__media::after {
   content: '';
@@ -768,8 +707,8 @@ const loves = [
   pointer-events: none;
 }
 
-/* Mask, not image: only the alpha of the source is used, so the headphones
-   stay ink-dark on the pale ground instead of being tinted into it. */
+/* Mask, not image: only the source's alpha is used, so the headphones stay
+   ink-dark on the pale ground instead of being tinted into it. */
 .love__art {
   position: absolute;
   inset: 5% 10% 22%;
@@ -826,8 +765,6 @@ const loves = [
   }
 }
 
-/* ── Small screens ────────────────────────────────────────────────────── */
-
 @media (max-width: 43.99rem) {
   .id__stage {
     min-height: 21rem;
@@ -843,7 +780,7 @@ const loves = [
   }
 
   /* Wider crops so three full-width cards stay a band rather than a column of
-     squares — the caption treatment is the same one the desktop uses. */
+     squares. */
   .love__media {
     aspect-ratio: 16 / 9;
   }

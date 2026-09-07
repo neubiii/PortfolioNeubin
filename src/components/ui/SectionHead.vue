@@ -1,10 +1,8 @@
 <script setup lang="ts">
 /**
  * Section opener: a hairline rule, a marker in column 1, the title beside it.
- *
- * The marker is a navigational system shared with the case-study rail — it is
- * not a decorative eyebrow, and it carries the section's own name rather than
- * a generic kicker.
+ * The marker is shared with the case-study rail rather than a decorative
+ * eyebrow, and carries the section's own name.
  */
 defineProps<{
   marker: string
@@ -23,7 +21,7 @@ defineProps<{
     <component :is="`h${level ?? 2}`" :id="`${id}-title`" class="display-soft section-head__title">
       {{ title }}
     </component>
-    <p v-if="note" class="mono section-head__note">{{ note }}</p>
+    <p v-if="note" class="meta section-head__note">{{ note }}</p>
   </header>
 </template>
 

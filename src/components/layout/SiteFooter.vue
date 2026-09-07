@@ -1,29 +1,20 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useMotion } from '@/composables/useMotion'
 import { profile } from '@/data/profile'
 
 const year = new Date().getFullYear()
 
-/**
- * `useMotion().active` also asks for WebGL, because it answers for the hero's
- * flock. A scroll needs no canvas, so this asks the narrower question: has the
- * visitor paused motion, or does the system say reduce?
- */
-const { preference, reducedMotion } = useMotion()
-const motionOk = computed(
-  () => preference.value === 'on' || (preference.value === 'system' && !reducedMotion.value),
-)
+/* `active` from useMotion also asks for WebGL, which answers for the hero's
+   flock. A scroll needs no canvas, so ask the narrower question. */
+const { motionOk } = useMotion()
 
 /**
- * Back to top. The scroll is smooth only when motion is welcome — under a
- * reduced-motion preference it jumps, which is the point of the setting.
+ * Smooth only when motion is welcome; a jump otherwise.
  *
- * Focus moves with it. Scrolling alone leaves the keyboard caret in the footer,
- * so the next Tab would land back where it started; `#main` is the same target
- * the skip link uses and it carries `tabindex="-1"` for exactly this.
- * `preventScroll` lets the smooth scroll play instead of being pre-empted by
- * the jump that focusing would otherwise cause.
+ * Focus moves with the scroll — without it the keyboard caret stays in the
+ * footer and the next Tab lands back where it started. `#main` carries
+ * `tabindex="-1"` for this and for the skip link; `preventScroll` lets the
+ * smooth scroll play instead of being pre-empted by focus.
  */
 const toTop = () => {
   document.getElementById('main')?.focus({ preventScroll: true })
@@ -34,13 +25,11 @@ const toTop = () => {
 <template>
   <footer class="footer">
     <div class="shell footer__inner">
-      <p class="mono footer__item">© {{ year }} {{ profile.name }}</p>
+      <p class="meta footer__item">© {{ year }} {{ profile.name }}</p>
 
-      <!-- A control, not a destination — so a button, set as plain text at the
-           opposite end of the rule. `link-grow` is the site's own nav rule: it
-           keeps a 44px target while the underline still sits tight under the
-           text rather than at the foot of the hit area. -->
-      <button type="button" class="mono footer__item footer__top link-grow" @click="toTop">
+      <!-- `link-grow` keeps a 44px target while the underline stays tight
+           under the text rather than at the foot of the hit area. -->
+      <button type="button" class="meta footer__item footer__top link-grow" @click="toTop">
         Back to top <span aria-hidden="true">↑</span>
       </button>
     </div>
@@ -50,8 +39,6 @@ const toTop = () => {
 <style scoped>
 .footer {
   background: var(--c-paper);
-  /* Lighter than it was: the Back to top control carries its own 2.75rem
-     target, so the row keeps the height the footer already had. */
   padding-block: 1rem;
 }
 
@@ -69,7 +56,6 @@ const toTop = () => {
 }
 
 .footer__top {
-  /* Flex drops the whitespace between the label and its arrow — put it back. */
   gap: 0.35rem;
   cursor: pointer;
   transition: color var(--dur) var(--ease-out);

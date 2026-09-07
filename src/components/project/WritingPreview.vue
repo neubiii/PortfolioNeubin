@@ -6,19 +6,12 @@ import { seriesPosition } from '@/data/writing'
 import type { WritingEntry } from '@/types'
 
 /**
- * The centre panel for a piece of writing.
+ * The centre panel for a piece of writing. There is no screenshot to lead with,
+ * so the hook does the work a cover image does elsewhere.
  *
- * Writing has no screenshot to lead with, so the hook does the work the cover
- * image does elsewhere: set large in the display face, it is the one thing
- * carrying the panel. Everything under it exists to answer "why should I open
- * this" before the visitor leaves for LinkedIn.
- *
- * A piece that belongs to a series gets a faint accent ground and the run's
- * name, marked with the same tick the case-study contents rail uses: one rule
- * per part, the current one longer and in accent. That says "three posts, you
- * are looking at the second" without merging them into a single fake article,
- * and it borrows a device the site already speaks rather than bolting a
- * coloured stripe onto the side of a card.
+ * A piece in a series gets a faint accent ground and the run's name, marked
+ * with the same tick the case-study contents rail uses — one rule per part, the
+ * current one longer.
  */
 const props = defineProps<{ entry: WritingEntry }>()
 
@@ -33,11 +26,11 @@ const links = computed(() => [
 <template>
   <article class="wp" :data-series="Boolean(entry.series)">
     <header class="wp__top">
-      <p class="mono wp__source">
+      <p class="meta wp__source">
         <SourceMark />
         <span>{{ entry.source }}</span>
       </p>
-      <p v-if="entry.series" class="mono wp__series">
+      <p v-if="entry.series" class="meta wp__series">
         <span>{{ entry.series }}</span>
         <span v-if="part" class="wp__ticks" aria-hidden="true">
           <span
@@ -51,12 +44,12 @@ const links = computed(() => [
     </header>
 
     <div class="wp__body">
-      <h3 class="mono wp__title">{{ entry.title }}</h3>
+      <h3 class="meta wp__title">{{ entry.title }}</h3>
       <p class="wp__hook">{{ entry.hook }}</p>
       <p class="wp__summary">{{ entry.summary }}</p>
 
       <ul class="wp__topics">
-        <li v-for="topic in entry.topics" :key="topic" class="mono wp__topic">{{ topic }}</li>
+        <li v-for="topic in entry.topics" :key="topic" class="meta wp__topic">{{ topic }}</li>
       </ul>
     </div>
 
@@ -67,27 +60,23 @@ const links = computed(() => [
 <style scoped>
 .wp {
   display: grid;
-  /* Body takes the slack so the call to action sits on the floor of the panel
-     whatever the summary's length — the button never wanders between items. */
+  /* Body takes the slack, so the call to action stays on the floor of the panel
+     whatever the summary's length. */
   grid-template-rows: auto 1fr auto;
   gap: clamp(1.5rem, 3vw, 2.25rem);
   padding: clamp(1.4rem, 3vw, 2rem);
   /* Tall enough for the longest entry at the narrowest three-column width, so
-     the panel is one fixed size: hovering down the list moves the highlight,
-     never the panel's bottom edge. The slack lands above the button, which the
-     `1fr` body row keeps pinned to the floor. */
+     hovering down the list moves the highlight, never the panel's bottom edge. */
   min-height: 36rem;
   background: var(--c-surface);
   border: 1px solid var(--c-rule);
 }
 
-/* The series treatment is a flat tint and the tick row above — no stripe down
-   the edge, which is the one thing that would make this read as a card. */
+/* A flat tint and the tick row above — no stripe down the edge, which is the
+   one thing that would make this read as a card. */
 .wp[data-series='true'] {
   background: var(--c-accent-soft);
 }
-
-/* ── Top bar ───────────────────────────────────────────────────────────── */
 
 .wp__top {
   display: flex;
@@ -119,8 +108,8 @@ const links = computed(() => [
   text-align: right;
 }
 
-/* One rule per part, the current one longer — the same signal the case-study
-   contents rail uses for the section you are reading. */
+/* One rule per part, the current one longer — the same signal the contents
+   rail uses for the section you are reading. */
 .wp__ticks {
   display: flex;
   align-items: center;
@@ -147,8 +136,6 @@ const links = computed(() => [
   }
 }
 
-/* ── Body ──────────────────────────────────────────────────────────────── */
-
 .wp__body {
   align-content: start;
 }
@@ -162,7 +149,6 @@ const links = computed(() => [
   margin-bottom: 1rem;
 }
 
-/* The hook is the panel's image. */
 .wp__hook {
   font-family: var(--font-sans);
   font-size: clamp(1.125rem, 1.02rem + 0.45vw, 1.375rem);

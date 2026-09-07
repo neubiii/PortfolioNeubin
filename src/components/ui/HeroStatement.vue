@@ -3,37 +3,26 @@ import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vu
 import { useMotion } from '@/composables/useMotion'
 
 /**
- * The hero statement, and the one interaction the page is built around.
+ * The hero statement, and the interaction the page is built around: moving a
+ * pointer across the type opens a lens onto the construction underneath —
+ * design guides over `UI/UX design`, layout boxes and declarations over
+ * `front-end development`, both half-present in between.
  *
- * ── The idea ───────────────────────────────────────────────────────────────
- * The sentence claims two disciplines. Rather than assert that twice, the type
- * itself can be inspected: move a pointer across it and a lens opens onto the
- * construction underneath. Over `UI/UX design` that construction is a design
- * file — outlined letterforms, a baseline, alignment ticks, a measured space.
- * Over `front-end development` it is an implementation — layout boxes around
- * the words and the few declarations that would place them. Between the two,
- * both are half present. The claim gets demonstrated instead of stated.
+ * One semantic `<h1>` carries the sentence; every other layer is `aria-hidden`
+ * and inert. The base text and its outlined twin are set from the same words at
+ * the same size in the same box, so they register by construction, and two
+ * complementary radial masks cut one where they reveal the other. The marks are
+ * an SVG laid out from measured word boxes, so they sit on the real type at any
+ * size and after any font swap.
  *
- * ── How it is built ────────────────────────────────────────────────────────
- * One semantic `<h1>` carries the sentence and nothing else does; every other
- * layer is `aria-hidden` and inert. The base text and its outlined twin are set
- * from the same words at the same size in the same box, so they register by
- * construction rather than by tuning, and two exactly complementary radial
- * masks cut one where they reveal the other — inside the lens the letter is an
- * outline, outside it is solid, and the letterform runs continuously across the
- * edge. The marks are an SVG laid out from the measured word boxes, so they sit
- * on the real type at any size, after any font swap, at any breakpoint.
- *
- * Nothing here changes document geometry. The lens is masks and opacity over a
- * layout that is already final: the sentence never moves, never reflows, and
- * reads identically with the interaction switched off.
+ * Nothing here changes document geometry: the sentence never moves, never
+ * reflows, and reads identically with the interaction switched off.
  */
 
 /**
- * The sentence, as the pieces it is made of. The two `anchor` groups are the
- * phrases the interaction is pinned to — and the only phrases that may not
- * break across a line. That is the whole of the art direction: those two hold
- * together, everything else wraps wherever the measure puts it.
+ * The sentence, in the pieces it is made of. The two `anchor` groups are the
+ * phrases the interaction is pinned to, and the only ones that may not break
+ * across a line.
  */
 const SEGMENTS: { words: string[]; anchor?: 'design' | 'code' }[] = [
   { words: ['Neubin', 'Sebastian', 'is', 'an', 'experienced', 'professional', 'in'] },
@@ -68,13 +57,9 @@ const TOKENS: Token[] = (() => {
   return out
 })()
 
-const { preference, reducedMotion } = useMotion()
-const motionOk = computed(
-  () => preference.value === 'on' || (preference.value === 'system' && !reducedMotion.value),
-)
+const { motionOk } = useMotion()
 
-/** A lens needs a pointer that hovers. Coarse input gets the static hero, which
- *  is the whole statement on its own. */
+/** A lens needs a pointer that hovers. Coarse input gets the static hero. */
 const fine = ref(false)
 const enabled = computed(() => fine.value && motionOk.value)
 
@@ -86,8 +71,6 @@ const setWord = (el: Element | ComponentPublicInstanceLike | null, slot: number)
   if (el instanceof HTMLElement) slots[slot] = el
 }
 type ComponentPublicInstanceLike = { $el?: unknown }
-
-/* ── Measured geometry ──────────────────────────────────────────────────── */
 
 type Box = { x: number; y: number; w: number; h: number; line: number; anchor?: string }
 
@@ -113,7 +96,7 @@ const measure = () => {
   })
 
   // Words sharing a top edge are one line — which is how the guides find the
-  // real wrap, rather than assuming one.
+  // real wrap rather than assuming one.
   const tops: number[] = []
   boxes.value = raw.map((b) => {
     let line = tops.findIndex((t) => Math.abs(t - b.y) < 6)
@@ -143,12 +126,9 @@ const lines = computed(() => {
 /**
  * Distance along the sentence as it is read, rather than along the x axis.
  *
- * The two anchored phrases rarely share a line — at most widths `UI/UX design`
- * ends one line and `front-end development` begins the next — so a horizontal
- * ramp between them would run backwards. Folding the line index into the
- * coordinate makes the ramp follow the reading path instead, which is what the
- * effect is actually about: moving *through* the sentence, from one discipline
- * to the other.
+ * The two anchored phrases rarely share a line, so a horizontal ramp between
+ * them would run backwards. Folding the line index into the coordinate makes
+ * the ramp follow the reading path instead.
  */
 const flowAt = (x: number, y: number) => {
   const rows = lines.value
@@ -163,8 +143,8 @@ const flowAt = (x: number, y: number) => {
     }
   }
   // A fraction of the line's own inked width, not of the column: the lines are
-  // ragged, and measuring against the column would map the empty right margin
-  // to a stretch of the ramp with no type under it.
+  // ragged, and the column would map the empty right margin onto a stretch of
+  // the ramp with no type under it.
   const across = Math.min(1, Math.max(0, (x - best.x) / Math.max(best.w, 1)))
   return best.line + across
 }
@@ -183,11 +163,8 @@ const anchors = computed(() => {
   return { design: at('design'), code: at('code') }
 })
 
-/**
- * One measurement per line — the space between its first two words, annotated
- * the way a spacing spec would be. More than one would be clutter, which is the
- * failure this effect has to avoid.
- */
+/** One measurement per line — the space between its first two words. More than
+ *  one is clutter, which is the failure this effect has to avoid. */
 const gaps = computed(() =>
   lines.value
     .map((row) => {
@@ -214,13 +191,8 @@ const fragments = computed(() =>
   })),
 )
 
-/* ── The lens ───────────────────────────────────────────────────────────── */
-
-/**
- * Target and eased position. The lens trails the pointer by a frame or two —
- * enough to read as an instrument being moved across the type rather than as a
- * decal stuck to the cursor.
- */
+/** The lens trails the pointer by a frame or two — an instrument being moved
+ *  across the type, not a decal stuck to the cursor. */
 const target = { x: 0, y: 0, on: 0 }
 const eased = { x: 0, y: 0, on: 0 }
 let frame = 0
@@ -229,9 +201,8 @@ let last = 0
 
 /**
  * Half-life smoothing rather than a fixed per-frame fraction: `0.16 * delta`
- * each frame would drift twice as fast on a 120Hz display as on a 60Hz one,
- * and crawl on a machine that is busy. This converges in the same wall-clock
- * time wherever it runs.
+ * would drift twice as fast at 120Hz as at 60Hz, and crawl on a busy machine.
+ * This converges in the same wall-clock time wherever it runs.
  */
 const smooth = (from: number, to: number, halfLife: number, dt: number) =>
   to + (from - to) * Math.pow(2, -dt / halfLife)
@@ -239,16 +210,15 @@ const smooth = (from: number, to: number, halfLife: number, dt: number) =>
 /**
  * Where the lens stands between the two disciplines: 0 at the centre of
  * `UI/UX design`, 1 at the centre of `front-end development`, ramping through
- * the words between them. Both mark layers read this one number, so crossing
- * the sentence is a single gradual change of language rather than two states
- * swapping over.
+ * the words between. Both mark layers read this one number, so crossing the
+ * sentence is a gradual change of language rather than two states swapping.
  */
 const mix = () => {
   const { design, code } = anchors.value
   if (!design || !code) return 0
   const span = code.flow - design.flow
-  // In line-fractions now, not pixels: the two anchors are typically a little
-  // under one line apart.
+  // Line-fractions, not pixels: the two anchors are typically a little under
+  // one line apart.
   if (Math.abs(span) < 0.02) return 0
   return Math.min(1, Math.max(0, (flowAt(eased.x, eased.y) - design.flow) / span))
 }
@@ -260,8 +230,8 @@ const paint = () => {
   host.style.setProperty('--lens-y', `${eased.y.toFixed(1)}px`)
   host.style.setProperty('--lens-on', eased.on.toFixed(3))
   host.style.setProperty('--lens-mix', mix().toFixed(3))
-  // The base only wears a mask while the lens is actually open, so at rest the
-  // headline is plain text with no compositing layer of any kind.
+  // The base only wears a mask while the lens is open, so at rest the headline
+  // is plain text with no compositing layer.
   const lit = eased.on > 0.002
   if (lit !== open.value) open.value = lit
 }
@@ -272,12 +242,12 @@ const tick = (now: number) => {
 
   eased.x = smooth(eased.x, target.x, 62, dt)
   eased.y = smooth(eased.y, target.y, 62, dt)
-  // Closing is quicker than following: leaving should feel like lifting the
-  // instrument away, not like it drifting shut.
+  // Closing is quicker than following — leaving should feel like lifting the
+  // instrument away.
   eased.on = smooth(eased.on, target.on, target.on === 0 ? 40 : 55, dt)
 
-  // Land it rather than approach forever — an exponential never quite arrives,
-  // and a lens left 2% open is a lens that never closed.
+  // Land it: an exponential never quite arrives, and a lens left 2% open is a
+  // lens that never closed.
   if (
     Math.abs(target.x - eased.x) < 0.4 &&
     Math.abs(target.y - eased.y) < 0.4 &&
@@ -324,8 +294,6 @@ const close = () => {
   run()
 }
 
-/* ── Lifecycle ──────────────────────────────────────────────────────────── */
-
 let observer: ResizeObserver | null = null
 
 onMounted(() => {
@@ -335,8 +303,7 @@ onMounted(() => {
   query.addEventListener('change', (event) => (fine.value = event.matches))
 
   // Geometry comes from what the browser actually laid out, so the marks
-  // survive a font swap, a resize and every step of the fluid type scale
-  // without a single hard-coded number.
+  // survive a font swap, a resize and every step of the fluid type scale.
   observer = new ResizeObserver(() => measure())
   if (root.value) observer.observe(root.value)
   measure()
@@ -370,8 +337,8 @@ watch(enabled, (on) => {
     @pointermove="onPointerMove"
     @pointerleave="close"
   >
-    <!-- The sentence. The only copy of it anything reads. The word spans carry
-         no styling — they exist so the marks can find the type. -->
+    <!-- The only copy of the sentence anything reads. The word spans carry no
+         styling — they exist so the marks can find the type. -->
     <h1 id="hero-title" class="display statement__text">
       <template v-for="(token, t) in TOKENS" :key="t">
         <span v-if="token.kind === 'hold'" class="statement__hold"
@@ -391,9 +358,8 @@ watch(enabled, (on) => {
       </template>
     </h1>
 
-    <!-- ── Construction layers ─────────────────────────────────────────────
-         Decorative twins of the sentence above: inert, hidden from assistive
-         technology, and painted only inside the lens. -->
+    <!-- Decorative twins of the sentence above: inert, hidden from assistive
+         technology, painted only inside the lens. -->
     <div v-if="enabled" class="statement__scan" aria-hidden="true">
       <!-- The same sentence as outline, registered by construction. -->
       <p class="display statement__text statement__ghost">
@@ -411,8 +377,8 @@ watch(enabled, (on) => {
         :height="size.h"
         fill="none"
       >
-        <!-- Design construction: the grammar of setting type — where the line
-             sits, where each word starts, how wide the space between is. -->
+        <!-- Design construction: where the line sits, where each word starts,
+             how wide the space between is. -->
         <g class="marks marks--design">
           <template v-for="row in lines" :key="`d${row.line}`">
             <line
@@ -461,7 +427,7 @@ watch(enabled, (on) => {
           </template>
         </g>
 
-        <!-- Implementation: the same words seen as boxes, with the couple of
+        <!-- Implementation: the same words as boxes, with the couple of
              declarations that would place them. -->
         <g class="marks marks--code">
           <rect
@@ -496,8 +462,8 @@ watch(enabled, (on) => {
 
 .statement__text {
   font-size: clamp(2.25rem, 1.05rem + 4.2vw, 5.25rem);
-  /* Optical size wound right up: at this scale Fraunces gets the fine
-     hairlines and high contrast that carry the editorial voice. */
+  /* Optical size wound right up: at this scale Fraunces gets the hairlines and
+     contrast that carry the editorial voice. */
   font-variation-settings:
     'opsz' 144,
     'SOFT' 0,
@@ -518,11 +484,9 @@ watch(enabled, (on) => {
   display: inline;
 }
 
-/* ── The lens ──────────────────────────────────────────────────────────── */
-
-/* Inside the lens the solid letter is cut away and its outline is revealed in
-   exactly the same place, so the letterform reads as continuous across the
-   edge. The two masks are complements of one another. */
+/* Complementary masks: inside the lens the solid letter is cut away and its
+   outline revealed in exactly the same place, so the letterform reads as
+   continuous across the edge. */
 .statement[data-open='true'] .statement__text:not(.statement__ghost) {
   -webkit-mask-image: radial-gradient(
     circle var(--lens-r) at var(--lens-x) var(--lens-y),
@@ -578,9 +542,8 @@ watch(enabled, (on) => {
   stroke: var(--c-hero-accent);
 }
 
-/* The crossfade that makes one instrument out of two languages: at the design
-   anchor only guides, at the code anchor only boxes, and through the words
-   between them both at once. */
+/* Crossfade between the two languages: at the design anchor only guides, at
+   the code anchor only boxes, both at once through the words between. */
 .marks--design {
   opacity: clamp(0, calc(1.12 - var(--lens-mix) * 1.5), 1);
 }
@@ -618,10 +581,8 @@ watch(enabled, (on) => {
   text-anchor: middle;
 }
 
-/* ── Entrance ──────────────────────────────────────────────────────────── */
-
 /* Restrained on purpose: the lens is the moment, and a headline that performed
-   on arrival would only compete with it. */
+   on arrival would compete with it. */
 .statement[data-motion='true'] .statement__text:not(.statement__ghost) {
   animation: statement-resolve 720ms var(--ease-out) both;
 }

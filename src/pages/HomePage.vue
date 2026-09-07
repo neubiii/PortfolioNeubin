@@ -13,21 +13,15 @@ import { profile } from '@/data/profile'
 
 <template>
   <div>
-    <!-- ── Hero ──────────────────────────────────────────────────────────────
-         A near-black block in both themes: it is the ground the flock moves
-         across, and fixing it makes the type contrast a constant rather than
-         something that depends on the visitor's theme.
-
-         Layering, back to front: Vanta canvas (inert) → veil → layout ruler →
-         content. Only the content layer takes pointer events.
-    ─────────────────────────────────────────────────────────────────────── -->
+    <!-- Layering, back to front: Vanta canvas (inert) → veil → layout ruler →
+         content. Only the content layer takes pointer events. -->
     <section class="hero" data-hero aria-labelledby="hero-title">
       <VantaBirds class="hero__vanta" />
       <div class="hero__veil" aria-hidden="true" />
       <GridRules class="hero__rules" :columns="4" ticks />
 
       <div class="shell hero__inner">
-        <p class="mono hero__eyebrow">Let's fly higher, together.</p>
+        <p class="meta hero__eyebrow">Let's fly higher, together.</p>
 
         <HeroStatement class="hero__statement" />
 
@@ -38,32 +32,26 @@ import { profile } from '@/data/profile'
         </div>
       </div>
 
-      <!-- Ruler foot. The rule runs the full measure and the two controls are
-           set into it, the way a caption is set into a printed rule — the line
-           breaks for them and closes again after. Nothing sits below it. -->
       <div class="shell hero__foot">
         <span class="hero__foot-rule" aria-hidden="true" />
 
         <div class="hero__foot-controls">
           <MotionToggle />
           <span class="hero__foot-divider" aria-hidden="true" />
-          <p class="mono hero__foot-item">
+          <p class="meta hero__foot-item">
             Scroll <span class="hero__foot-arrow" aria-hidden="true">↓</span>
           </p>
         </div>
       </div>
     </section>
 
-    <!-- ── Work — the single browsing experience, anchored at #work ────── -->
     <WorksShowcase />
 
-    <!-- ── About ─────────────────────────────────────────────────────────── -->
     <AboutSection />
 
-    <!-- ── Skillset ──────────────────────────────────────────────────────── -->
     <SkillsetSection />
 
-    <!-- ── Experience — renders only when there is real data to show ─────── -->
+    <!-- Renders only when there is real data to show. -->
     <section
       v-if="profile.experience.length"
       class="shell section"
@@ -73,10 +61,10 @@ import { profile } from '@/data/profile'
 
       <ol class="exp">
         <li v-for="role in profile.experience" :key="role.period + role.org" class="exp__row">
-          <p class="mono exp__period">{{ role.period }}</p>
+          <p class="meta exp__period">{{ role.period }}</p>
           <div>
             <h3 class="exp__title">{{ role.title }}</h3>
-            <p class="mono exp__org">{{ role.org }}</p>
+            <p class="meta exp__org">{{ role.org }}</p>
           </div>
           <p class="exp__note">{{ role.note }}</p>
         </li>
@@ -86,7 +74,6 @@ import { profile } from '@/data/profile'
 </template>
 
 <style scoped>
-/* ── Hero ──────────────────────────────────────────────────────────────── */
 
 .hero {
   position: relative;
@@ -94,15 +81,14 @@ import { profile } from '@/data/profile'
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* Header is sticky and 4.5rem tall, so hero + header fills exactly one
-     viewport. `svh` keeps that true under mobile browser chrome. */
+  /* Hero + the 4.5rem sticky header fill exactly one viewport. `svh` keeps
+     that true under mobile browser chrome. */
   min-height: calc(100svh - 4.5rem);
   padding-block: clamp(4rem, 12vh, 8rem) 0;
   background: var(--c-hero-bg);
   overflow: hidden;
 
-  /* Re-point the palette for this block. Every child — the annotation, the
-     arrow link, the rules — reads these, so one declaration inverts the lot. */
+  /* Re-point the palette for this block; every child reads these tokens. */
   --c-ink: var(--c-hero-ink);
   --c-muted: var(--c-hero-muted);
   --c-accent: var(--c-hero-accent);
@@ -120,9 +106,8 @@ import { profile } from '@/data/profile'
   z-index: 0;
 }
 
-/* Washes toward the hero's own ground — darkening in dark mode, lightening in
-   light mode — so a bird crossing behind the headline never costs contrast.
-   Not a panel: it has no edge. */
+/* Washes toward the hero's own ground so a bird crossing behind the headline
+   never costs contrast. Not a panel: it has no edge. */
 .hero__veil {
   position: absolute;
   inset: 0;
@@ -143,10 +128,6 @@ import { profile } from '@/data/profile'
   z-index: 2;
 }
 
-/* Set from the left, on the ruler the rest of the site is set from. A
-   statement this long reads as a paragraph when it is centred; ranged left it
-   reads as a statement, and it gives the lens a stable left edge to work
-   against. */
 .hero__inner {
   position: relative;
   z-index: 3;
@@ -176,9 +157,9 @@ import { profile } from '@/data/profile'
   }
 }
 
-/* Full measure. The line count is set by the type size against the ruler's own
-   width, not by a `ch` cap — `ch` here would resolve against the body size this
-   wrapper inherits, not the display size the sentence is actually set in. */
+/* No `ch` cap: `ch` would resolve against the body size this wrapper inherits,
+   not the display size the sentence is set in. The type size against the
+   ruler's width sets the line count. */
 .hero__statement {
   width: 100%;
 }
@@ -196,12 +177,9 @@ import { profile } from '@/data/profile'
   margin-top: clamp(2rem, 5vh, 3.25rem);
 }
 
-/* ── Hero foot ─────────────────────────────────────────────────────────── */
-
-/* The rule is an element rather than a border, so the two controls can be set
-   into the line itself instead of sitting under it: the hairline runs the
-   measure, breaks for the labels, and the row ends there. The left of the rule
-   is deliberately empty. */
+/* The rule is an element rather than a border, so the two controls sit inside
+   the line rather than under it: the hairline runs the measure, breaks for the
+   labels, and closes again. */
 .hero__foot {
   position: relative;
   z-index: 3;
@@ -262,19 +240,12 @@ import { profile } from '@/data/profile'
   }
 }
 
-/* ── Shared section rhythm ─────────────────────────────────────────────── */
-
-/* Sections pay the rhythm on their top edge only. Two sections each padding
-   themselves top and bottom made every interior boundary twice the gap that
-   hero → work has, which is the one that reads correctly. */
+/* Top edge only. Padding both ends made every interior boundary twice the
+   hero → work gap, which is the one that reads correctly. */
 .section {
   padding-top: var(--section-y);
   padding-bottom: 0;
 }
-
-
-
-/* ── Experience ────────────────────────────────────────────────────────── */
 
 .exp {
   border-top: 1px solid var(--c-rule);

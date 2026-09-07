@@ -1,10 +1,6 @@
 /**
- * Content model for the portfolio.
- *
- * The section kinds below were derived from the case studies that actually
- * exist in the Figma file — a two-up contrast, a stat trio, a pull quote, a
- * numbered sequence — rather than invented up front. Adding Phase 2's
- * development projects should be a data change, not a component change.
+ * Content model for the portfolio. Adding a project should be a data change,
+ * not a component change.
  */
 
 export type Discipline = 'ux' | 'development' | 'writing'
@@ -15,27 +11,21 @@ export interface MediaItem {
   /** Empty string marks the image decorative; it is then hidden from AT. */
   alt: string
   /**
-   * The asset's true intrinsic aspect, e.g. `786/1704`. Used only to reserve
-   * space before the image loads — it is dropped once the real dimensions are
-   * known, so a stale value can never crop or letterbox the final image.
+   * True intrinsic aspect, e.g. `786/1704`. Reserves space before load and is
+   * dropped once the real dimensions are known, so a stale value here can
+   * never crop or letterbox the image.
    */
   ratio?: string
   /**
-   * How the image is presented.
-   *
-   * `natural`  (default) — the screenshot is the visual. Intrinsic aspect, no
-   *            frame, no background, never cropped. Every case-study image.
+   * `natural`  (default) — intrinsic aspect, no frame, never cropped.
    * `longform` — a full-page capture too tall to sit inline (evergrove/page is
-   *            2882×8958). Collapsed with an explicit expand control.
-   * `crop`     — a deliberately cropped tile at a ratio the component supplies.
-   *            Index covers only, so the work list keeps one rhythm.
+   *              2882×8958). Collapsed with an explicit expand control.
+   * `crop`     — a cropped tile at a ratio the component supplies, so the work
+   *              index keeps one rhythm.
    */
   display?: 'natural' | 'longform' | 'crop'
-  /**
-   * `object-position` for the cropped preview stage, e.g. `'center top'`.
-   * Only consulted when the image is cropped; defaults to centred. Set it on a
-   * cover whose subject sits off-centre and would otherwise be trimmed.
-   */
+  /** `object-position` for the cropped preview, e.g. `'center top'`. Set it on
+   *  a cover whose subject sits off-centre and would otherwise be trimmed. */
   previewPosition?: string
   caption?: string
 }
@@ -49,10 +39,8 @@ export interface ProjectMeta {
   context?: string
 }
 
-/**
- * A call to action on a project page. A project that has no real destination
- * carries no link — there are no placeholders waiting for a URL.
- */
+/** A call to action on a project page. A project with no real destination
+ *  carries no link. */
 export interface ProjectLink {
   label: string
   href: string
@@ -86,7 +74,6 @@ export interface SplitSection {
   columns: { label: string; heading: string; body: string }[]
 }
 
-/** A trio of figures. Every value here is taken verbatim from the case study. */
 export interface StatSection {
   kind: 'stats'
   id: string
@@ -132,12 +119,9 @@ export type CaseSection =
   | ListSection
 
 /**
- * A piece of writing published somewhere else.
- *
- * Deliberately not a `Project`: there is no page to route to and no case study
- * to render, so modelling it as one would mean five empty project pages. The
- * showcase treats it as an index entry whose only destination is the original
- * post.
+ * A piece of writing published elsewhere. Deliberately not a `Project`: there
+ * is no page to route to, so modelling it as one would mean empty project
+ * pages. Its only destination is the original post.
  */
 export interface WritingEntry {
   /** Selection key for the preview. Not a route — writing has none. */
@@ -145,12 +129,9 @@ export interface WritingEntry {
   title: string
   /** Set when the piece belongs to a run; parts then share a treatment. */
   series?: string
-  /** The line that earns the click. */
   hook: string
-  /** What the post is actually about, in one or two sentences. */
   summary: string
   topics: string[]
-  /** Where it was published — shown as the source indicator. */
   source: string
   /** The original post. Always external, always a new tab. */
   href: string
@@ -162,51 +143,35 @@ export type TitledSection = Extract<CaseSection, { title?: string }>
 export interface Project {
   slug: string
   title: string
-  /** Kicker from the case study — e.g. "AGENTIC UX · SAP FIORI FOR iOS". */
   eyebrow: string
-  /** The display headline on the project page. */
   headline: string
-  /** The 2–3 sentence hook surfaced in the work index. */
   hook: string
-  /** Longer standfirst opening the project page. */
   summary: string
-  /**
-   * The categories a project appears under. An array rather than a single
-   * value because the filter reads the same either way, and a piece of work
-   * that genuinely belongs in two tabs should not need a duplicate entry.
-   */
+  /** An array, not a single value: work that genuinely belongs in two tabs
+   *  should not need a duplicate entry. */
   disciplines: Discipline[]
   year: string
   tags: string[]
   cover: MediaItem
   meta: ProjectMeta
   /**
-   * `case-study` renders the narrative page with the sticky rail.
-   * `gallery`    renders the visual-first presentation, for work with real
-   *              craft behind it but no documented process to narrate.
-   * `deep-dive`  is the development shape: same rail, but the sections are
-   *              architecture, decisions and contribution rather than
-   *              research and testing. It is a label and a set of sections,
-   *              not a second page component.
+   * `case-study` — the narrative page with the sticky rail.
+   * `gallery`    — visual-first, for work with no documented process.
+   * `deep-dive`  — the same rail over architecture and decisions rather than
+   *                research and testing. A label and a set of sections, not a
+   *                second page component.
    */
   presentation: 'case-study' | 'gallery' | 'deep-dive'
   sections: CaseSection[]
   links: ProjectLink[]
   featured: boolean
-  /** Rendered at the foot of a case study when the source material carries one. */
   scopeNote?: string
 }
 
-/* ── Skillset ──────────────────────────────────────────────────────────────
-   Kept deliberately small. Everything the Skillset section shows is derived
-   from these four fields, so changing what a thing is called, how well it is
-   known, or which side of the practice it belongs to is a one-line edit in
-   `@/data/skills` and nothing else. */
+/* ── Skillset ─────────────────────────────────────────────────────────── */
 
-/**
- * Self-assessed depth. Ordered from strongest to lightest; the display order
- * and any labelling come from `LEVELS` in the data file, not from a component.
- */
+/** Self-assessed depth, ordered strongest to lightest. Display order and
+ *  labels come from `LEVELS` in `@/data/skills`. */
 export type SkillLevel = 'advanced' | 'above-average' | 'working-knowledge' | 'familiar'
 
 /** Which side of the practice an item belongs to. Both is allowed. */

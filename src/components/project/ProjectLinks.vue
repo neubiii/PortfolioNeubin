@@ -3,12 +3,9 @@ import { computed } from 'vue'
 import type { ProjectLink } from '@/types'
 
 /**
- * The calls to action for a project, rendered from its `links` array.
- *
- * One component for both page shapes: the rail uses it in the sidebar, gallery
- * pages use it under the standfirst. Nothing is hardcoded per project — a
- * UI/UX entry carries its Figma prototype, a development entry its repository,
- * and a project with neither renders nothing at all.
+ * The calls to action for a project, rendered from its `links` array. One
+ * component for both page shapes — the rail and the gallery standfirst. A
+ * project with no links renders nothing.
  */
 const props = withDefaults(
   defineProps<{

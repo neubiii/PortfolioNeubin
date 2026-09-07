@@ -1,4 +1,4 @@
-import type { SkillDomain, SkillItem, SkillKind, SkillLevel } from '@/types'
+import type { SkillItem, SkillKind, SkillLevel } from '@/types'
 
 /**
  * SKILLSET
@@ -34,11 +34,6 @@ export const LEVEL_LABEL: Record<SkillLevel, string> = {
   'above-average': 'Above average',
   'working-knowledge': 'Working knowledge',
   familiar: 'Familiar',
-}
-
-export const DOMAIN_LABEL: Record<SkillDomain, string> = {
-  ux: 'UI/UX',
-  development: 'Development',
 }
 
 export const skills: SkillItem[] = [
@@ -142,12 +137,6 @@ const rank = (item: SkillItem) => LEVELS.indexOf(item.level)
 export const byLevel = (items: SkillItem[]): SkillItem[] =>
   [...items].sort((a, b) => rank(a) - rank(b))
 
-export const inDomain = (domain: SkillDomain, kind?: SkillKind): SkillItem[] =>
-  skills.filter((item) => item.domains.includes(domain) && (!kind || item.kind === kind))
-
 export const ofKind = (kind: SkillKind): SkillItem[] => skills.filter((item) => item.kind === kind)
 
 /** Items practised on both sides of the work. */
-export const crossDisciplinary = (): SkillItem[] => skills.filter((item) => item.domains.length > 1)
-
-export const findSkill = (id: string): SkillItem | undefined => skills.find((item) => item.id === id)

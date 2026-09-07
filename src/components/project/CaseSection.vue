@@ -4,19 +4,15 @@ import Reveal from '@/components/ui/Reveal.vue'
 import type { CaseSection } from '@/types'
 
 /**
- * Renders one section of a project page.
- *
- * Each kind gets a composition of its own rather than a shared card: a split
- * is a two-up contrast on a rule, stats are a ruled trio with large figures,
- * a quote breaks the measure entirely. That variety is what stops a case study
- * reading like a form someone filled in.
+ * Renders one section of a project page. Each kind gets a composition of its
+ * own rather than a shared card, which is what stops a case study reading like
+ * a form someone filled in.
  */
 defineProps<{ section: CaseSection }>()
 </script>
 
 <template>
   <section :id="section.id" class="cs" :data-kind="section.kind">
-    <!-- Heading block, shared by every kind that carries a title. -->
     <header v-if="'title' in section && section.title" class="cs__head">
       <p v-if="'marker' in section && section.marker" class="label cs__marker">
         {{ section.marker }}
@@ -54,7 +50,7 @@ defineProps<{ section: CaseSection }>()
     <!-- ── Pull quote ────────────────────────────────────────────────────── -->
     <Reveal v-else-if="section.kind === 'quote'" as="figure" class="cs__quote">
       <blockquote class="display-soft cs__quote-text">{{ section.text }}</blockquote>
-      <figcaption class="mono cs__quote-by">{{ section.attribution }}</figcaption>
+      <figcaption class="meta cs__quote-by">{{ section.attribution }}</figcaption>
     </Reveal>
 
     <!-- ── Numbered sequence ─────────────────────────────────────────────── -->
@@ -87,8 +83,8 @@ defineProps<{ section: CaseSection }>()
 </template>
 
 <style scoped>
-/* Anchor clearance is owned by `scroll-padding-top` on <html> in main.css —
-   a scroll-margin here as well would stack, doubling the offset. */
+/* Anchor clearance is owned by `scroll-padding-top` on <html> in main.css — a
+   scroll-margin here as well would stack, doubling the offset. */
 .cs + .cs {
   margin-top: clamp(3.5rem, 7vw, 6rem);
 }
@@ -120,7 +116,6 @@ defineProps<{ section: CaseSection }>()
 }
 
 /* ── Prose ─────────────────────────────────────────────────────────────── */
-
 .cs__prose {
   max-width: var(--measure);
 }
@@ -136,7 +131,6 @@ defineProps<{ section: CaseSection }>()
 }
 
 /* ── Split ─────────────────────────────────────────────────────────────── */
-
 .cs__split {
   display: grid;
   gap: 2.5rem;
@@ -180,7 +174,6 @@ defineProps<{ section: CaseSection }>()
 }
 
 /* ── Stats ─────────────────────────────────────────────────────────────── */
-
 .cs__stats {
   display: grid;
   gap: 2.25rem;
@@ -226,7 +219,6 @@ defineProps<{ section: CaseSection }>()
 }
 
 /* ── Quote ─────────────────────────────────────────────────────────────── */
-
 .cs__quote {
   margin: 0;
   padding-block: clamp(1rem, 3vw, 2rem);
@@ -260,7 +252,6 @@ defineProps<{ section: CaseSection }>()
 }
 
 /* ── Steps ─────────────────────────────────────────────────────────────── */
-
 .cs__steps {
   display: grid;
   gap: 0;
@@ -306,7 +297,6 @@ defineProps<{ section: CaseSection }>()
 }
 
 /* ── List ──────────────────────────────────────────────────────────────── */
-
 .cs__list {
   margin: 0;
   border-top: 1px solid var(--c-rule-strong);
@@ -337,7 +327,6 @@ defineProps<{ section: CaseSection }>()
 }
 
 /* ── Media ─────────────────────────────────────────────────────────────── */
-
 .cs__media {
   display: grid;
   gap: clamp(1.25rem, 3vw, 2.25rem);

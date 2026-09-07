@@ -1,11 +1,6 @@
 <script setup lang="ts">
-/**
- * Paper grain.
- *
- * The one ambient treatment on the site. It gives the off-white ground a
- * printed quality that flat colour does not have, and it replaces the
- * gradient-blob reflex entirely. Static, GPU-cheap, and pointer-transparent.
- */
+/** Paper grain: the one ambient treatment on the site. Static, GPU-cheap and
+ *  pointer-transparent. */
 </script>
 
 <template>

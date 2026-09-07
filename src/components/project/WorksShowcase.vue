@@ -7,30 +7,26 @@ import { categories, presentationLabel, projectsIn, type CategoryId } from '@/da
 import { writing } from '@/data/writing'
 
 /**
- * The one place work is browsed.
- *
- * Categories are a filter over the same list, not three components: an entry
- * appears under every discipline it claims. Adding work is a data change;
- * nothing here needs to know about it.
+ * The one place work is browsed. Categories filter a single list rather than
+ * splitting into three components, so an entry appears under every discipline
+ * it claims and adding work is a data change.
  *
  * Above 75rem the composition is three columns — half the index, the preview,
- * the other half — so the last project sits at the same eye level as the first
- * instead of trailing a long single list. Below that the preview column is
- * dropped and each row carries what the preview would have shown, because a
- * touch visitor has no hover to discover anything with.
+ * the other half — so the last project sits at the same eye level as the first.
+ * Below that the preview column is dropped and each row carries what the
+ * preview would have shown, since touch has no hover to discover it with.
  *
- * Writing runs through the same composition with two differences: a row is an
+ * Writing shares the whole composition; only two things differ: a row is an
  * external link rather than a route, and the centre panel is typographic
- * because a LinkedIn post has no screenshot to show. Everything else — the
- * split, the hover, the dimming, the sticky column — is shared.
+ * because a post has no screenshot.
  */
 const active = ref<CategoryId>('ux')
 const tabs = ref<(HTMLButtonElement | null)[]>([])
 
 /**
  * Numbering is per category, not global: the first project in this tab is 01
- * whichever tab it is. A stored index on the project could not do that, because
- * the same project holds a different position in each list it appears in.
+ * whichever tab it is. A stored index could not do that, since the same project
+ * holds a different position in each list it appears in.
  */
 const ordinal = (i: number) => String(i + 1).padStart(2, '0')
 
@@ -94,16 +90,12 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
 <template>
   <section id="work" class="works" aria-labelledby="works-title">
     <div class="shell">
-      <!-- A ruler row, not an introduction. The projects are the content. -->
       <div class="works__head">
         <h2 id="works-title" class="label works__title">Work</h2>
-        <p class="mono works__count">{{ count }} {{ isWriting ? 'posts' : 'projects' }}</p>
+        <p class="meta works__count">{{ count }} {{ isWriting ? 'posts' : 'projects' }}</p>
       </div>
 
-      <!-- Category nav: type on a rule, with the active item carrying the
-           accent underline. The same language as the rest of the site's
-           navigation — no chips. -->
-      <div class="works__tabs" role="tablist" aria-label="Filter work by category">
+      <div class="ruler works__tabs" role="tablist" aria-label="Filter work by category">
         <button
           v-for="(category, i) in categories"
           :key="category.id"
@@ -111,7 +103,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
           :id="tabId(category.id)"
           type="button"
           role="tab"
-          class="tab"
+          class="ruler__item"
           :aria-selected="active === category.id"
           :aria-controls="'works-panel'"
           :tabindex="active === category.id ? 0 : -1"
@@ -120,15 +112,13 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
           @keydown="onTabKey($event, i)"
         >
           <span>{{ category.label }}</span>
-          <span class="mono tab__count">{{ countIn(category.id) }}</span>
+          <span class="meta tab__count">{{ countIn(category.id) }}</span>
         </button>
       </div>
 
       <div id="works-panel" role="tabpanel" :aria-labelledby="tabId(active)">
         <Transition name="fade" mode="out-in">
-          <!-- Populated category -->
           <div v-if="count" :key="active" class="works__grid" @mouseleave="previewKey = null">
-            <!-- ── Writing: external entries, typographic preview ─────────── -->
             <template v-if="isWriting">
               <ol
                 v-for="(group, side) in writingGroups"
@@ -148,7 +138,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
                     @mouseenter="previewKey = entry.id"
                     @focus="previewKey = entry.id"
                   >
-                    <p class="mono entry__meta">
+                    <p class="meta entry__meta">
                       <span class="entry__index">{{ index }}</span>
                       <span class="entry__rule" aria-hidden="true" />
                       <span :data-series="Boolean(entry.series)">
@@ -159,7 +149,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
                     <h3 class="entry__title">{{ entry.title }}</h3>
 
                     <ul class="entry__tags">
-                      <li v-for="topic in entry.topics" :key="topic" class="mono entry__tag">
+                      <li v-for="topic in entry.topics" :key="topic" class="meta entry__tag">
                         {{ topic }}
                       </li>
                     </ul>
@@ -168,7 +158,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
                          the panel would have said. -->
                     <p class="entry__lede">{{ entry.hook }}</p>
 
-                    <p class="mono entry__go">
+                    <p class="meta entry__go">
                       <span>View {{ entry.source }} post</span>
                       <span class="entry__go-mark" aria-hidden="true">↗</span>
                     </p>
@@ -188,7 +178,6 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
               </div>
             </template>
 
-            <!-- ── Projects ───────────────────────────────────────────────── -->
             <template v-else>
             <ol
               v-for="(group, side) in groups"
@@ -205,7 +194,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
                   @mouseenter="previewKey = project.slug"
                   @focus="previewKey = project.slug"
                 >
-                  <p class="mono entry__meta">
+                  <p class="meta entry__meta">
                     <span class="entry__index">{{ index }}</span>
                     <span class="entry__rule" aria-hidden="true" />
                     <span>{{ project.year }}</span>
@@ -214,10 +203,10 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
                   <h3 class="entry__title">{{ project.title }}</h3>
 
                   <ul class="entry__tags">
-                    <li v-for="tag in project.tags" :key="tag" class="mono entry__tag">{{ tag }}</li>
+                    <li v-for="tag in project.tags" :key="tag" class="meta entry__tag">{{ tag }}</li>
                   </ul>
 
-                  <p class="mono entry__kind">
+                  <p class="meta entry__kind">
                     {{ presentationLabel[project.presentation] }}
                     <span class="entry__arrow" aria-hidden="true">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -235,9 +224,8 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
               </li>
             </ol>
 
-            <!-- The visual centre. A fixed 16:10 stage the cover fills, so the
-                 stage is dimensionally stable while every project still uses
-                 the whole of it. -->
+            <!-- A fixed 16:10 stage the cover fills, so it is dimensionally
+                 stable while every project still uses the whole of it. -->
             <div class="works__preview">
               <RouterLink
                 v-if="preview"
@@ -259,7 +247,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
 
                 <Transition name="fade" mode="out-in">
                   <div :key="preview.slug" class="preview__body">
-                    <p class="mono preview__name">{{ preview.title }}</p>
+                    <p class="meta preview__name">{{ preview.title }}</p>
                     <p class="preview__hook">{{ preview.hook }}</p>
                   </div>
                 </Transition>
@@ -268,9 +256,9 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
             </template>
           </div>
 
-          <!-- Empty category. One honest line on a rule — no skeletons, no
-               placeholder cards standing in for work that does not exist. -->
-          <p v-else :key="`${active}-empty`" class="mono works__empty">
+          <!-- One honest line on a rule — no skeletons, no placeholder cards
+               standing in for work that does not exist. -->
+          <p v-else :key="`${active}-empty`" class="meta works__empty">
             {{ activeCategory.empty }}
           </p>
         </Transition>
@@ -284,8 +272,6 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
   padding-top: var(--section-y);
   padding-bottom: 0;
 }
-
-/* ── Head ──────────────────────────────────────────────────────────────── */
 
 .works__head {
   display: flex;
@@ -308,49 +294,8 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
   text-transform: uppercase;
 }
 
-/* ── Category nav ──────────────────────────────────────────────────────── */
-
 .works__tabs {
-  display: flex;
-  gap: clamp(1.25rem, 3vw, 2.5rem);
-  border-bottom: 1px solid var(--c-rule);
   margin-bottom: clamp(1.75rem, 3vw, 2.75rem);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.works__tabs::-webkit-scrollbar {
-  display: none;
-}
-
-.tab {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.45rem;
-  white-space: nowrap;
-  /* Padding, not min-height: it gives the 44px target while keeping the
-     underline tight under the label. `min-height` stretched the box and left
-     the accent rule floating well below the word it belongs to. */
-  padding-block: 0.8rem;
-  /* The active rule sits on the tablist's own border, so the underline reads
-     as part of the ruler rather than as a separate widget. */
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  color: var(--c-muted);
-  font-weight: 500;
-  font-size: var(--t-sm);
-  transition:
-    color var(--dur) var(--ease-out),
-    border-color var(--dur) var(--ease-out);
-}
-
-.tab:hover {
-  color: var(--c-ink);
-}
-
-.tab[data-active='true'] {
-  color: var(--c-accent);
-  border-bottom-color: var(--c-accent);
 }
 
 .tab__count {
@@ -358,10 +303,8 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
   color: var(--c-muted);
 }
 
-/* ── Empty category ────────────────────────────────────────────────────── */
-
-/* Closed off by a rule so the category still reads as a section with an
-   answer in it, rather than as the page running out of content. */
+/* Closed off by a rule, so the category still reads as a section with an
+   answer in it rather than as the page running out of content. */
 .works__empty {
   color: var(--c-muted);
   font-size: var(--t-sm);
@@ -369,8 +312,6 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
   border-bottom: 1px solid var(--c-rule);
   max-width: 46ch;
 }
-
-/* ── Composition ───────────────────────────────────────────────────────── */
 
 .works__grid {
   display: grid;
@@ -404,12 +345,10 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
 }
 
 /* An odd split leaves the right column one row shorter; without this the
-   column simply ends early, which reads as a missing rule. */
+   column ends early, which reads as a missing rule. */
 .works__col:empty {
   display: none;
 }
-
-/* ── Entry ─────────────────────────────────────────────────────────────── */
 
 .entry {
   display: block;
@@ -447,9 +386,8 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
   background: var(--c-rule-strong);
 }
 
-/* Sans, not the display serif. These are scanned down a list at list size,
-   which is exactly where Fraunces stops being readable — its hairlines and
-   high contrast are drawn for the hero, not for a row someone is skimming. */
+/* Sans, not the display serif: these are scanned down a list at list size,
+   which is where Fraunces stops being readable. */
 .entry__title {
   font-family: var(--font-sans);
   font-size: clamp(1.1875rem, 1.05rem + 0.55vw, 1.5rem);
@@ -518,8 +456,6 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
   color: var(--c-accent);
 }
 
-/* ── Row image — the touch-friendly path ───────────────────────────────── */
-
 .entry__media {
   display: grid;
   gap: 0.85rem;
@@ -539,31 +475,27 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
   max-width: 52ch;
 }
 
-/* ── Writing rows ──────────────────────────────────────────────────────── */
-
-/* The meta line is a system label everywhere else in this component — a bare
-   year — so the source and the series name are set the same way rather than
-   dropped in as running text. */
+/* The meta line is a system label everywhere else here — a bare year — so the
+   source and series name are set the same way rather than as running text. */
 .entry--writing .entry__meta span:last-child {
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 /* The series name takes the source's place, so a run of parts is visible while
-   scanning the list and not only inside the panel. */
+   scanning the list, not only inside the panel. */
 .entry__meta [data-series='true'] {
   color: var(--c-accent);
 }
 
-/* Selecting a post changes the panel instead of navigating, so the row it
-   belongs to has to say so — otherwise nothing connects the two. */
+/* Selecting a post changes the panel instead of navigating, so the row has to
+   say so — otherwise nothing connects the two. */
 @media (min-width: 75rem) {
   .entry--writing[data-current='true'] .entry__title {
     color: var(--c-accent);
   }
 }
 
-/* Below the preview breakpoint the hook stands in for the panel. */
 .entry__lede {
   display: none;
   margin-top: 1rem;
@@ -580,7 +512,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
 }
 
 /* Always visible, unlike the project rows' arrow: on a touch screen this is
-   the only thing telling the visitor where the row goes. */
+   the only thing saying where the row goes. */
 .entry__go {
   display: flex;
   align-items: center;
@@ -611,8 +543,6 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
     transform: none;
   }
 }
-
-/* ── Preview ───────────────────────────────────────────────────────────── */
 
 .works__preview {
   display: none;

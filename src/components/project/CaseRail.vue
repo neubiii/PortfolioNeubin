@@ -6,19 +6,13 @@ import type { CaseSection, Project } from '@/types'
 
 /**
  * The sticky rail on a case-study page: project metadata, then a contents list
- * that tracks the reading position.
- *
- * Follows the reference pinned on the concept canvas (Role / Platform /
- * Timeline / … + "On this page"), with two changes: rows with no data are
- * omitted rather than shown empty, and the contents list is a real `nav` of
- * in-page links, so it works without a pointer.
+ * that tracks the reading position. Rows with no data are omitted rather than
+ * shown empty, and the contents list is a real `nav` of in-page links.
  */
 const props = defineProps<{ project: Project }>()
 
-/** Term and detail, in the order the rail lists them. Annotated rather than
- *  `as const`: the literal terms would narrow the tuple past what the filter
- *  below can name, and it is the empty details that matter here, not the
- *  labels. */
+/** Annotated rather than `as const`: the literal terms would narrow the tuple
+ *  past what the filter below can name. */
 type MetaRow = readonly [term: string, detail: string | undefined]
 
 const meta = computed(() =>
@@ -87,9 +81,8 @@ const { active } = useScrollSpy(() => titled.value.map((s) => s.id))
 
 @media (min-width: 64rem) {
   .rail {
-    /* Sticky lives on the grid item in ProjectPage. The rail only needs to fit
-       inside it and scroll when the contents list is genuinely taller than the
-       viewport. No `overscroll-behavior: contain` — the wheel must still reach
+    /* Sticky lives on the grid item in ProjectPage; the rail only has to fit
+       inside it. No `overscroll-behavior: contain` — the wheel must still reach
        the page once this reaches its end. */
     min-height: 0;
     overflow-y: auto;
@@ -97,8 +90,6 @@ const { active } = useScrollSpy(() => titled.value.map((s) => s.id))
     scrollbar-width: thin;
   }
 }
-
-/* ── Meta ──────────────────────────────────────────────────────────────── */
 
 .rail__meta {
   margin: 0;
@@ -122,9 +113,8 @@ const { active } = useScrollSpy(() => titled.value.map((s) => s.id))
   line-height: 1.4;
 }
 
-/* ── Contents — hidden below the sticky breakpoint, where the page is one
-      column and an in-page index earns nothing. ──────────────────────────── */
-
+/* Hidden below the sticky breakpoint, where the page is one column and an
+   in-page index earns nothing. */
 .rail__toc {
   display: none;
 }
@@ -178,5 +168,4 @@ const { active } = useScrollSpy(() => titled.value.map((s) => s.id))
   width: 1.5rem;
   background: var(--c-accent);
 }
-
 </style>

@@ -16,7 +16,7 @@ watchEffect(() => {
   try {
     localStorage.setItem('theme', theme.value)
   } catch {
-    /* private mode — the in-memory value still works for this session */
+    /* Private mode: the in-memory value still works for this session. */
   }
 })
 

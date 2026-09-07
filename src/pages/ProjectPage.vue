@@ -24,8 +24,7 @@ watch(
 )
 
 // The hero image is pulled out of the section list and given the full width
-// under the title, so the work is the first thing on the page. A project
-// without an explicit hero section leads with its cover rather than with prose.
+// under the title, so the work is the first thing on the page.
 const hero = computed(() => {
   const explicit = project.value?.sections.find((s) => s.kind === 'media' && s.id === 'hero')
   if (explicit && explicit.kind === 'media') return explicit.items[0]
@@ -36,11 +35,8 @@ const body = computed(() =>
   (project.value?.sections ?? []).filter((s) => !(s.kind === 'media' && s.id === 'hero')),
 )
 
-/**
- * Case studies and development deep dives both earn the rail — meta, contents
- * and calls to action. A gallery has neither the metadata nor the section count
- * to fill one, so its links move under the standfirst instead.
- */
+/** A gallery has neither the metadata nor the section count to fill a rail, so
+ *  its links move under the standfirst instead. */
 const hasRail = computed(() => project.value?.presentation !== 'gallery')
 
 const kind = computed(() =>
@@ -50,14 +46,13 @@ const kind = computed(() =>
 
 <template>
   <article v-if="project" class="project">
-    <!-- ── Title ─────────────────────────────────────────────────────────── -->
     <header class="shell project__head">
       <nav class="project__crumb" aria-label="Breadcrumb">
-        <RouterLink to="/#work" class="mono project__back">
+        <RouterLink to="/#work" class="meta project__back">
           <span aria-hidden="true">←</span> Work
         </RouterLink>
-        <span class="mono project__crumb-sep" aria-hidden="true">/</span>
-        <span class="mono project__crumb-current">{{ project.title }}</span>
+        <span class="meta project__crumb-sep" aria-hidden="true">/</span>
+        <span class="meta project__crumb-current">{{ project.title }}</span>
       </nav>
 
       <p class="label project__eyebrow">{{ project.eyebrow }}</p>
@@ -67,8 +62,8 @@ const kind = computed(() =>
       <p class="lede project__summary">{{ project.summary }}</p>
 
       <ul class="project__tags">
-        <li v-for="tag in project.tags" :key="tag" class="mono project__tag">{{ tag }}</li>
-        <li class="mono project__tag project__tag--accent">{{ kind }}</li>
+        <li v-for="tag in project.tags" :key="tag" class="meta project__tag">{{ tag }}</li>
+        <li class="meta project__tag project__tag--accent">{{ kind }}</li>
       </ul>
 
       <ProjectLinks v-if="!hasRail" :links="project.links" layout="inline" class="project__cta" />
@@ -78,7 +73,6 @@ const kind = computed(() =>
       <MediaFrame :item="hero" eager />
     </div>
 
-    <!-- ── Body ──────────────────────────────────────────────────────────── -->
     <div class="shell project__body" :data-rail="hasRail">
       <aside v-if="hasRail" class="project__rail">
         <CaseRail :project="project" />
@@ -91,7 +85,6 @@ const kind = computed(() =>
       </div>
     </div>
 
-    <!-- ── Pager ─────────────────────────────────────────────────────────── -->
     <nav v-if="next" class="shell project__next" aria-label="Next project">
       <RouterLink :to="`/work/${next.slug}`" class="next">
         <p class="label next__label">Next project</p>
@@ -112,7 +105,6 @@ const kind = computed(() =>
 </template>
 
 <style scoped>
-/* ── Head ──────────────────────────────────────────────────────────────── */
 
 .project__head {
   padding-top: clamp(2rem, 5vw, 3.5rem);
@@ -197,8 +189,6 @@ const kind = computed(() =>
   padding-bottom: clamp(3rem, 6vw, 5rem);
 }
 
-/* ── Body ──────────────────────────────────────────────────────────────── */
-
 .project__body {
   padding-bottom: clamp(3rem, 7vw, 6rem);
 }
@@ -208,16 +198,15 @@ const kind = computed(() =>
     display: grid;
     grid-template-columns: 16rem minmax(0, 1fr);
     column-gap: clamp(2.5rem, 6vw, 6rem);
-    /* `stretch`, not `start`: the aside spans the full row so its sticky
-       position has somewhere to travel. With `start` the item collapsed to its
-       own content height and sticky had zero range — which is why the rail
-       scrolled away with the page. */
+    /* `stretch`, not `start`: the aside must span the full row for sticky to
+       have anywhere to travel. With `start` it collapsed to its own content
+       height and the rail scrolled away with the page. */
     align-items: stretch;
   }
 }
 
 /* Below the rail breakpoint the meta table still reads well above the content;
-   the contents list is redundant there because the page is one column. */
+   the contents list is redundant there, since the page is one column. */
 .project__rail {
   margin-bottom: clamp(3rem, 6vw, 4rem);
 }
@@ -248,8 +237,6 @@ const kind = computed(() =>
   line-height: 1.6;
   max-width: 76ch;
 }
-
-/* ── Pager ─────────────────────────────────────────────────────────────── */
 
 .project__next {
   padding-bottom: clamp(3rem, 7vw, 5rem);

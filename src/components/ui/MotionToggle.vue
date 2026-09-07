@@ -2,16 +2,12 @@
 import { useMotion } from '@/composables/useMotion'
 
 /**
- * Pause / resume the hero's decorative flock.
+ * Pause / resume the hero's flock.
  *
- * Set in the hero's ruler foot, in the same mono the rest of that row uses —
- * a line of type on the page's own grid, not a floating pill. The button names
- * the action it will perform ("Pause motion" / "Resume motion"), which is the
- * standard media-control pattern and needs no `aria-pressed` to be understood:
- * the accessible name changes with the state.
- *
- * It renders only where WebGL exists, so it never offers to resume something
- * that could not run in the first place.
+ * The button names the action it will perform, which is the standard
+ * media-control pattern and needs no `aria-pressed`: the accessible name
+ * changes with the state. Rendered only where WebGL exists, so it never offers
+ * to resume something that could not run.
  */
 const { active, supported, toggle, label } = useMotion()
 </script>
@@ -36,7 +32,6 @@ const { active, supported, toggle, label } = useMotion()
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  /* Comfortable target without disturbing the ruler row's baseline. */
   min-height: 2.75rem;
   padding-inline: 0.25rem;
   margin-inline: -0.25rem;

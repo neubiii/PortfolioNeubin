@@ -24,8 +24,8 @@
 
   --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
   --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
-  /* Code only — the hero's construction fragments. Not a UI typeface, so it
-     is a system stack rather than a third downloaded family. */
+  /* Code only — the hero's construction fragments. A system stack rather than
+     a third downloaded family. */
   --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
 
   --text-xs: var(--t-xs);
@@ -141,8 +141,8 @@
 @layer components {
   /* ---- Layout primitives ------------------------------------------------ */
 
-  /* The page grid. Everything aligns to these 12 columns; the asymmetry in the
-     layouts comes from where content starts, not from ad-hoc margins. */
+  /* The page measure. Asymmetry in the layouts comes from where content starts,
+     not from ad-hoc margins. */
   .shell {
     width: 100%;
     max-width: 96rem;
@@ -150,18 +150,8 @@
     padding-inline: var(--gutter);
   }
 
-  .grid12 {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: clamp(1rem, 2vw, 2rem);
-  }
-
   .rule-t {
     border-top: 1px solid var(--c-rule);
-  }
-
-  .rule-b {
-    border-bottom: 1px solid var(--c-rule);
   }
 
   /* ---- Type roles ------------------------------------------------------- */
@@ -189,10 +179,8 @@
     letter-spacing: -0.015em;
   }
 
-  /* Label: metadata, eyebrows, indices, column headers.
-     Set in the sans, not a third typeface — the editorial voice here comes
-     from case, tracking and weight, which is what a mono was standing in for.
-     Monospace is kept for text that is literally code. */
+  /* Eyebrows, indices, column headers. Set in the sans: the editorial voice
+     here comes from case, tracking and weight. */
   .label {
     font-family: var(--font-sans);
     font-size: var(--t-xs);
@@ -202,8 +190,9 @@
     line-height: 1.4;
   }
 
-  /* The same voice one step up, for readable metadata: counts, notes, dates. */
-  .mono {
+  /* The same voice one step up, for readable metadata: counts, notes, dates.
+     Named for its role, not a typeface — it is set in the sans like `.label`. */
+  .meta {
     font-family: var(--font-sans);
     font-size: var(--t-sm);
     font-weight: 500;
@@ -217,8 +206,48 @@
     max-width: var(--measure);
   }
 
-  .prose-measure {
-    max-width: var(--measure);
+  /* The category ruler: text controls on a hairline, the active one carrying a
+     2px accent rule that sits on that same line. The work index and the skillset
+     lens are the same control, so they are the same CSS. */
+  .ruler {
+    display: flex;
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    border-bottom: 1px solid var(--c-rule);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .ruler::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ruler__item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    white-space: nowrap;
+    /* Padding, not min-height: the 44px target without pushing the rule away
+       from the label. */
+    padding-block: 0.8rem;
+    /* The active rule sits on the ruler's own border, so it reads as part of
+       the line rather than as a separate widget. */
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    color: var(--c-muted);
+    font-weight: 500;
+    font-size: var(--t-sm);
+    transition:
+      color var(--dur) var(--ease-out),
+      border-color var(--dur) var(--ease-out);
+  }
+
+  .ruler__item:hover {
+    color: var(--c-ink);
+  }
+
+  .ruler__item[data-active='true'] {
+    color: var(--c-accent);
+    border-bottom-color: var(--c-accent);
   }
 
   /* ---- Interaction ------------------------------------------------------ */
@@ -245,10 +274,9 @@
     background-size: 0% 1px;
   }
 
-  /* Grows in on hover/focus instead — for nav items, which start bare.
-     Built on a pseudo-element rather than a background, so the link can carry
-     a 44px tall hit area (WCAG 2.5.8) while the rule still sits tight under
-     the text rather than 44px below it. */
+  /* For nav items, which start bare. A pseudo-element rather than a background,
+     so the link can carry a 44px hit area (WCAG 2.5.8) while the rule still
+     sits tight under the text rather than 44px below it. */
   .link-grow {
     position: relative;
     display: inline-flex;
@@ -275,32 +303,9 @@
     transform: scaleX(1);
   }
 
-  /* Standalone links that need a real target without changing their look. */
-  .tap-target {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-  }
 }
 
 @layer utilities {
-  .tnum {
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* Bleeds an element out of the grid to the viewport edge. */
-  .bleed {
-    margin-inline: calc(var(--gutter) * -1);
-  }
-
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .no-scrollbar {
-    scrollbar-width: none;
-  }
-
   .sr-only {
     position: absolute;
     width: 1px;

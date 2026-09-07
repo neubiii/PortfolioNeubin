@@ -14,7 +14,7 @@ import type { WritingEntry } from '@/types'
  */
 
 /** Shared by the three parts, so the run reads as one body of work. */
-export const AI_UX_PATTERNS = 'AI UX Patterns Series'
+const AI_UX_PATTERNS = 'AI UX Patterns Series'
 
 export const writing: WritingEntry[] = [
   {
@@ -71,9 +71,6 @@ export const writing: WritingEntry[] = [
     href: 'https://www.linkedin.com/posts/neubii_uxdesign-userresearch-mentalhealthtech-activity-7398043308272308225-6aYt',
   },
 ]
-
-export const findWriting = (id: string): WritingEntry | undefined =>
-  writing.find((entry) => entry.id === id)
 
 /**
  * Where an entry sits inside its series, counted from the list rather than
