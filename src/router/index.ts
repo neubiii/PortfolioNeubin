@@ -44,7 +44,7 @@ const routes: RouteRecordRaw[] = [
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-  async scrollBehavior(to, from, saved) {
+  async scrollBehavior(to, _from, saved) {
     // Back and forward restore where the visitor actually was.
     if (saved) return saved
 

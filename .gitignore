@@ -1,5 +1,25 @@
+# Dependencies
 node_modules
+
+# Build output
 dist
-.DS_Store
-*.local
+*.tsbuildinfo
+
+# Local environment — never commit real values
+.env
+.env.*
+!.env.example
+
+# Caches / local overrides
 .vite
+*.local
+
+# Editor and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

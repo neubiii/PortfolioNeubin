@@ -15,6 +15,12 @@ import type { CaseSection, Project } from '@/types'
  */
 const props = defineProps<{ project: Project }>()
 
+/** Term and detail, in the order the rail lists them. Annotated rather than
+ *  `as const`: the literal terms would narrow the tuple past what the filter
+ *  below can name, and it is the empty details that matter here, not the
+ *  labels. */
+type MetaRow = readonly [term: string, detail: string | undefined]
+
 const meta = computed(() =>
   (
     [
@@ -24,7 +30,7 @@ const meta = computed(() =>
       ['Context', props.project.meta.context],
       ['Method', props.project.meta.method],
       ['Output', props.project.meta.output],
-    ] as const
+    ] as readonly MetaRow[]
   )
     .filter((row): row is readonly [string, string] => Boolean(row[1]))
     .map(([term, detail]) => ({ term, detail })),

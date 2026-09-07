@@ -35,14 +35,18 @@ recruiter arrives looking for one or the other.
 src/
   assets/<project>/     images, one folder per project — see ASSETS.md
   components/
-    layout/             header, footer, contact block, theme toggle
-    project/            WorksShowcase · CaseRail · CaseSection
-    ui/                 MediaFrame · GridRules · VantaBirds · MotionToggle
-                        Reveal · ArrowLink · SectionHead · Annotation · GrainOverlay
+    layout/             header, footer, contact block, about, skillset,
+                        theme toggle
+    project/            WorksShowcase · CaseRail · CaseSection · WritingPreview
+                        ProjectLinks
+    ui/                 HeroStatement · VantaBirds · MediaFrame · GridRules
+                        MotionToggle · Reveal · ArrowLink · SectionHead
+                        SourceMark · GrainOverlay
   composables/          useTheme · useMotion · useScrollSpy
   data/
     projects.ts         all project content — the single source of truth
     profile.ts          name, intro, capabilities, facts, experience
+    writing.ts          the LinkedIn writing index
     assets.ts           resolves image keys to bundled URLs
   pages/                HomePage · ProjectPage · NotFoundPage
   styles/
