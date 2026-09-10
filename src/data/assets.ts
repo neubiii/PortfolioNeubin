@@ -10,8 +10,9 @@ const files = import.meta.glob('../assets/**/*.{png,jpg,jpeg,webp,gif,svg}', {
   query: '?url',
 }) as Record<string, string>
 
-// Prefer a real bitmap export over the placeholder when both are present.
-const priority = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg']
+// Preference order when a key resolves to more than one file: the modern
+// format first, an SVG placeholder last.
+const priority = ['.webp', '.png', '.jpg', '.jpeg', '.gif', '.svg']
 
 const byKey = new Map<string, { url: string; rank: number }>()
 
