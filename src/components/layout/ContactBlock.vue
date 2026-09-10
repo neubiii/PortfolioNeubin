@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { motion } from 'motion-v'
+import { ArrowUpRight } from 'lucide-vue-next'
 import { useMotion } from '@/composables/useMotion'
 import { asset } from '@/data/assets'
 import { profile } from '@/data/profile'
@@ -63,7 +64,7 @@ const rise = (delay = 0, distance = 16) =>
                 rel="noopener noreferrer"
                 class="meta contact__link link-underline"
               >
-                {{ link.label }} <span aria-hidden="true">↗</span>
+                {{ link.label }} <ArrowUpRight />
               </a>
             </li>
           </ul>

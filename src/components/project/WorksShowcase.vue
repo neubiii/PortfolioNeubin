@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
+import { ArrowRight, ArrowUpRight } from 'lucide-vue-next'
 import MediaFrame from '@/components/ui/MediaFrame.vue'
 import WritingPreview from '@/components/project/WritingPreview.vue'
 import { categories, presentationLabel, projectsIn, type CategoryId } from '@/data/projects'
@@ -54,21 +55,39 @@ const split = <T,>(rows: T[]) => [rows.slice(0, half.value), rows.slice(half.val
 const groups = computed(() => split(projectRows.value))
 const writingGroups = computed(() => split(writingRows.value))
 
-/** Whatever the pointer or focus is on: a project slug or a writing id. */
-const previewKey = ref<string | null>(null)
+/**
+ * Which row the preview is showing — a project slug or a writing id.
+ *
+ * `picked` is what the pointer or focus last chose; `current` resolves that to
+ * a row that always exists, falling back to the first in the category. So a
+ * category opens with its first row already active rather than with none, and
+ * leaving the list returns to it without a second piece of state to keep in
+ * step. One row is current at any moment, and it is the row the preview shows.
+ */
+const picked = ref<string | null>(null)
+
+const keys = computed(() =>
+  isWriting.value
+    ? writingRows.value.map((r) => r.entry.id)
+    : projectRows.value.map((r) => r.project.slug),
+)
+
+const current = computed(() =>
+  picked.value && keys.value.includes(picked.value) ? picked.value : keys.value[0],
+)
 
 const preview = computed(
   () =>
-    (projectRows.value.find((e) => e.project.slug === previewKey.value) ?? projectRows.value[0])
+    (projectRows.value.find((e) => e.project.slug === current.value) ?? projectRows.value[0])
       ?.project,
 )
 const writingPreview = computed(
-  () =>
-    (writingRows.value.find((e) => e.entry.id === previewKey.value) ?? writingRows.value[0])?.entry,
+  () => (writingRows.value.find((e) => e.entry.id === current.value) ?? writingRows.value[0])?.entry,
 )
 
-// A selection from the previous category is meaningless in this one.
-watch(active, () => (previewKey.value = null))
+// A project can appear under two disciplines, so a key alone would survive a
+// tab change. Every category starts at its own first row.
+watch(active, () => (picked.value = null))
 
 const tabId = (id: string) => `works-tab-${id}`
 
@@ -118,7 +137,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
 
       <div id="works-panel" role="tabpanel" :aria-labelledby="tabId(active)">
         <Transition name="fade" mode="out-in">
-          <div v-if="count" :key="active" class="works__grid" @mouseleave="previewKey = null">
+          <div v-if="count" :key="active" class="works__grid" @mouseleave="picked = null">
             <template v-if="isWriting">
               <ol
                 v-for="(group, side) in writingGroups"
@@ -133,10 +152,10 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
                     target="_blank"
                     rel="noopener noreferrer"
                     class="entry entry--writing"
-                    :data-dim="previewKey !== null && previewKey !== entry.id"
-                    :data-current="writingPreview?.id === entry.id"
-                    @mouseenter="previewKey = entry.id"
-                    @focus="previewKey = entry.id"
+                    :data-dim="current !== entry.id"
+                    :data-current="current === entry.id"
+                    @mouseenter="picked = entry.id"
+                    @focus="picked = entry.id"
                   >
                     <p class="meta entry__meta">
                       <span class="entry__index">{{ index }}</span>
@@ -160,7 +179,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
 
                     <p class="meta entry__go">
                       <span>View {{ entry.source }} post</span>
-                      <span class="entry__go-mark" aria-hidden="true">↗</span>
+                      <ArrowUpRight class="entry__go-mark" />
                     </p>
                     <span class="sr-only">(opens in a new tab)</span>
                   </a>
@@ -190,9 +209,10 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
                 <RouterLink
                   :to="`/work/${project.slug}`"
                   class="entry"
-                  :data-dim="previewKey !== null && previewKey !== project.slug"
-                  @mouseenter="previewKey = project.slug"
-                  @focus="previewKey = project.slug"
+                  :data-dim="current !== project.slug"
+                  :data-current="current === project.slug"
+                  @mouseenter="picked = project.slug"
+                  @focus="picked = project.slug"
                 >
                   <p class="meta entry__meta">
                     <span class="entry__index">{{ index }}</span>
@@ -208,11 +228,7 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
 
                   <p class="meta entry__kind">
                     {{ presentationLabel[project.presentation] }}
-                    <span class="entry__arrow" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="square" />
-                      </svg>
-                    </span>
+                    <ArrowRight class="entry__arrow" />
                   </p>
 
                   <!-- Below the preview breakpoint the image belongs to the row. -->
@@ -357,9 +373,10 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
   transition: opacity var(--dur) var(--ease-out);
 }
 
-/* Dim the rest only once the visitor is actually pointing at one, and only
-   where the preview exists to reward it. */
-@media (hover: hover) and (min-width: 75rem) {
+/* One row is current from the moment a category opens, so the rest recede
+   immediately — but only where the preview column exists to explain why. Below
+   that breakpoint every row carries its own image and nothing is dimmed. */
+@media (min-width: 75rem) {
   .entry[data-dim='true'] {
     opacity: 0.4;
   }
@@ -440,8 +457,9 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
 }
 
 .entry__arrow {
-  width: 1rem;
-  height: 1rem;
+  width: 1.05em;
+  height: 1.05em;
+  flex: none;
   opacity: 0;
   transform: translateX(-0.4rem);
   transition:
@@ -488,10 +506,11 @@ const onTabKey = (event: KeyboardEvent, index: number) => {
   color: var(--c-accent);
 }
 
-/* Selecting a post changes the panel instead of navigating, so the row has to
-   say so — otherwise nothing connects the two. */
+/* The current row is the one the preview is showing, so it carries the accent
+   the preview would give it. Writing needs this most — selecting a post changes
+   the panel instead of navigating — but the two lists behave the same way. */
 @media (min-width: 75rem) {
-  .entry--writing[data-current='true'] .entry__title {
+  .entry[data-current='true'] .entry__title {
     color: var(--c-accent);
   }
 }

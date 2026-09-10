@@ -8,7 +8,7 @@ export const profile = {
   email: 'neubinsebastian0@gmail.com',
 
   intro:
-    'I work mainly across B2B and enterprise products — complex workflows, data-rich interfaces and AI-assisted experiences — and I\u2019m comfortable switching mindsets between designer and developer when the problem needs both.',
+    'I work mainly across B2B and enterprise products - complex workflows, data-rich interfaces and AI-assisted experiences and I\u2019m comfortable switching mindsets between designer and developer when the problem needs both.',
 
   links: [
     { label: 'GitHub', href: 'https://github.com/neubiii', external: true },

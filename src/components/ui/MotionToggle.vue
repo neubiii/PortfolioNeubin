@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Pause, Play } from 'lucide-vue-next'
 import { useMotion } from '@/composables/useMotion'
 
 /**
@@ -14,14 +15,9 @@ const { active, supported, toggle, label } = useMotion()
 
 <template>
   <button v-if="supported" type="button" class="motion" @click="toggle">
-    <span class="motion__glyph" aria-hidden="true">
-      <svg v-if="active" viewBox="0 0 12 12" fill="currentColor">
-        <rect x="2" y="1.5" width="2.6" height="9" />
-        <rect x="7.4" y="1.5" width="2.6" height="9" />
-      </svg>
-      <svg v-else viewBox="0 0 12 12" fill="currentColor">
-        <path d="M2.5 1.5 L10.5 6 L2.5 10.5 Z" />
-      </svg>
+    <span class="motion__glyph">
+      <Pause v-if="active" fill="currentColor" stroke="none" />
+      <Play v-else fill="currentColor" stroke="none" />
     </span>
     <span class="motion__label">{{ label }}</span>
   </button>

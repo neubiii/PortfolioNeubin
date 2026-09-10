@@ -250,6 +250,18 @@
     border-bottom-color: var(--c-accent);
   }
 
+  /* ---- Icons ------------------------------------------------------------ */
+
+  /* One library (lucide-vue-next), one weight. 1.5 matches the hairline rules
+     the rest of the site is drawn with; Lucide's own default of 2 reads heavy
+     against this type. Size follows the text unless a wrapper sets its own,
+     and the colour is always inherited. */
+  .lucide {
+    width: 1em;
+    height: 1em;
+    stroke-width: 1.5;
+  }
+
   /* ---- Interaction ------------------------------------------------------ */
 
   /* Underline that grows from the leading edge. Used on every inline text link

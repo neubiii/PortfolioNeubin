@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ArrowDown } from 'lucide-vue-next'
 import ArrowLink from '@/components/ui/ArrowLink.vue'
 import GridRules from '@/components/ui/GridRules.vue'
 import HeroStatement from '@/components/ui/HeroStatement.vue'
@@ -39,7 +40,7 @@ import { profile } from '@/data/profile'
           <MotionToggle />
           <span class="hero__foot-divider" aria-hidden="true" />
           <p class="meta hero__foot-item">
-            Scroll <span class="hero__foot-arrow" aria-hidden="true">↓</span>
+            Scroll <ArrowDown class="hero__foot-arrow" />
           </p>
         </div>
       </div>
@@ -219,6 +220,7 @@ import { profile } from '@/data/profile'
 
 .hero__foot-arrow {
   display: inline-block;
+  vertical-align: -0.14em;
   margin-left: 0.35rem;
   animation: nudge 2.4s var(--ease-in-out) infinite;
 }

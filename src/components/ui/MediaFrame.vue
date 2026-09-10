@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { ChevronDown } from 'lucide-vue-next'
 import { asset, isPlaceholder } from '@/data/assets'
 import type { MediaItem } from '@/types'
 
@@ -76,11 +77,7 @@ const captionId = computed(() => `cap-${props.item.src.replace(/\W+/g, '-')}`)
       <div v-if="!expanded" class="frame__fade" aria-hidden="true" />
       <button type="button" class="frame__expand" @click="expanded = !expanded">
         <span>{{ expanded ? 'Collapse' : 'Show full page' }}</span>
-        <span class="frame__expand-icon" :data-open="expanded" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M6 9l6 6 6-6" stroke-linecap="square" />
-          </svg>
-        </span>
+        <ChevronDown class="frame__expand-icon" :data-open="expanded" />
       </button>
     </div>
 

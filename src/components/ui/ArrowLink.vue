@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
+import { ArrowRight } from 'lucide-vue-next'
 
 /**
  * The site's one call-to-action shape: a ruled row whose arrow travels on
@@ -34,10 +35,8 @@ const tag = computed(() => (isExternal.value ? 'a' : RouterLink))
     :data-size="props.size"
   >
     <span class="arrow-link__text"><slot /></span>
-    <span class="arrow-link__arrow" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="square" />
-      </svg>
+    <span class="arrow-link__arrow">
+      <ArrowRight />
     </span>
   </component>
 </template>

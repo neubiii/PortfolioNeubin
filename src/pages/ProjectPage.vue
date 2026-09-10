@@ -2,6 +2,7 @@
 import { computed, watch } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import CaseRail from '@/components/project/CaseRail.vue'
+import { ArrowLeft } from 'lucide-vue-next'
 import CaseSection from '@/components/project/CaseSection.vue'
 import MediaFrame from '@/components/ui/MediaFrame.vue'
 import ArrowLink from '@/components/ui/ArrowLink.vue'
@@ -49,7 +50,7 @@ const kind = computed(() =>
     <header class="shell project__head">
       <nav class="project__crumb" aria-label="Breadcrumb">
         <RouterLink to="/#work" class="meta project__back">
-          <span aria-hidden="true">←</span> Work
+          <ArrowLeft /> Work
         </RouterLink>
         <span class="meta project__crumb-sep" aria-hidden="true">/</span>
         <span class="meta project__crumb-current">{{ project.title }}</span>
@@ -124,6 +125,7 @@ const kind = computed(() =>
 .project__back {
   display: inline-flex;
   align-items: center;
+  gap: 0.35rem;
   min-height: 2.75rem;
   color: var(--c-muted);
   transition: color var(--dur) var(--ease-out);

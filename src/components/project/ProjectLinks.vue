@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { ArrowUpRight } from 'lucide-vue-next'
 import type { ProjectLink } from '@/types'
 
 /**
@@ -25,7 +26,7 @@ const ready = computed(() => props.links.filter((l) => l.href.trim().length > 0)
     <li v-for="link in ready" :key="link.href">
       <a :href="link.href" target="_blank" rel="noopener noreferrer" class="cta__link">
         <span>{{ link.label }}</span>
-        <span class="cta__mark" aria-hidden="true">↗</span>
+        <ArrowUpRight class="cta__mark" />
         <span class="sr-only">(opens in a new tab)</span>
       </a>
     </li>

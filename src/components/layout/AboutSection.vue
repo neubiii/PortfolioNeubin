@@ -1,20 +1,12 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { motion, useInView } from 'motion-v'
+import { ArrowUpRight, Linkedin } from 'lucide-vue-next'
 import { useMotion } from '@/composables/useMotion'
 import { asset } from '@/data/assets'
 import { profile } from '@/data/profile'
 
-/**
- * About, built as a bento composition.
- *
- * The one block on the site where the person outranks the work, so the only one
- * with a local palette — but the type, the grid and the paper are the site's,
- * which is what keeps it from reading as a foreign object.
- *
- * One twelve-column grid, not a stack of cards: the identity panel runs the
- * full height of the right-hand column, locking the two halves together.
- */
+
 const media = {
   portrait: asset('about/portrait-cut'),
   mountains: asset('about/mountains'),
@@ -49,20 +41,10 @@ const stats = [
   },
 ]
 
-/* ── Entrance and counters ───────────────────────────────────────────────
-   Both run on Motion for Vue rather than a hand-rolled observer: driving CSS
-   transitions from custom IntersectionObserver state could apply the hidden and
-   revealed states in the same render for a block already in view at mount, so
-   the browser never painted a frame to transition from. `whileInView` owns that
-   lifecycle.
 
-   `amount: 'some'` with the root's bottom pulled up a quarter gives the
-   asymmetry this needs: a block arrives once it crosses into the upper
-   three-quarters, and leaves only once it is completely above the viewport. */
 const { motionOk } = useMotion()
 
-/* `active` from useMotion also asks for WebGL, which answers for the hero's
-   flock. Nothing here needs a canvas, so ask the narrower question. */
+
 
 const viewport = { amount: 'some', margin: '0px 0px -25% 0px', once: false } as const
 const ease = [0.16, 1, 0.3, 1]
@@ -180,13 +162,9 @@ const loves = [
             </p>
 
             <a v-if="linkedin" class="id__link" :href="linkedin" target="_blank" rel="noopener noreferrer">
-              <svg class="id__glyph" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path
-                  d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm6 0h3.8v1.7h.05c.53-.95 1.83-1.95 3.76-1.95C20.4 8.75 21 11.1 21 14.16V21h-4v-6.06c0-1.45-.03-3.3-2.02-3.3-2.03 0-2.34 1.57-2.34 3.2V21H9V9Z"
-                />
-              </svg>
+              <Linkedin class="id__glyph" />
               <span class="id__handle">LinkedIn / neubii</span>
-              <span class="id__ext" aria-hidden="true">↗</span>
+              <ArrowUpRight class="id__ext" />
             </a>
           </div>
         </motion.article>
@@ -195,10 +173,8 @@ const loves = [
           <p class="label story__kicker">The short version</p>
 
           <p class="story__copy">
-            I’m from Kerala — the part of India that goes by God’s Own Country, and it earns
-            the name. Mannheim is home now, winters included. I like pulling a problem apart
-            and building whatever comes out of it, which is why I’ve never wanted to choose
-            between designing the thing and shipping it.
+            Born in Kerala. Currently in Mannheim. Still not sure how someone raised in 30°C weather became obsessed with snow. I like music a little too loud, trips that start with “we’ll figure it out,” meeting people from completely different worlds, and collecting stories that are better told in person than written on a portfolio.
+
           </p>
 
           <p class="story__open">
@@ -226,9 +202,9 @@ const loves = [
           </article>
         </motion.div>
 
-        <motion.h3 class="display-soft loves__head" v-bind="from('bottom')">
+        <!-- <motion.h3 class="display-soft loves__head" v-bind="from('bottom')">
           Things I love most…
-        </motion.h3>
+        </motion.h3> -->
 
         <motion.ul class="loves" v-bind="from('bottom', 0.1)">
           <li

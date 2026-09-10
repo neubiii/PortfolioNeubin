@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
+import { ArrowUpRight } from 'lucide-vue-next'
 import { onKeyStroke, useEventListener, useScrollLock, useWindowScroll } from '@vueuse/core'
 import ThemeToggle from './ThemeToggle.vue'
 import { useScrollSpy } from '@/composables/useScrollSpy'
@@ -143,8 +144,9 @@ const isActive = (to: string) => {
             target="_blank"
             rel="noopener noreferrer"
             class="meta panel__github"
-            >GitHub ↗</a
           >
+            GitHub <ArrowUpRight />
+          </a>
         </nav>
       </div>
     </Transition>
@@ -399,6 +401,9 @@ const isActive = (to: string) => {
 }
 
 .panel__github {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   margin-top: 2rem;
   color: var(--c-muted);
 }

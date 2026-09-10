@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ArrowUp } from 'lucide-vue-next'
 import { useMotion } from '@/composables/useMotion'
 import { profile } from '@/data/profile'
 
@@ -30,7 +31,7 @@ const toTop = () => {
       <!-- `link-grow` keeps a 44px target while the underline stays tight
            under the text rather than at the foot of the hit area. -->
       <button type="button" class="meta footer__item footer__top link-grow" @click="toTop">
-        Back to top <span aria-hidden="true">↑</span>
+        Back to top <ArrowUp />
       </button>
     </div>
   </footer>
