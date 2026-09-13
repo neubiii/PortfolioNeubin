@@ -6,7 +6,7 @@ This portfolio brings together product design case studies, front-end developmen
 
 ## Live site
 
-[neubinsebastian.com](https://neubinsebastian.com)
+https://neubinsebastian.vercel.app/
 
 
 ## What’s inside
