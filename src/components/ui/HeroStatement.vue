@@ -3,27 +3,17 @@ import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vu
 import { useMotion } from '@/composables/useMotion'
 
 /**
- * The hero statement, and the interaction the page is built around: moving a
- * pointer across the type opens a lens onto the construction underneath —
- * design guides over `UI/UX design`, layout boxes and declarations over
- * `front-end development`, both half-present in between.
+ * The hero statement: a pointer lens onto the construction under the type —
+ * design guides over `UI/UX design`, layout boxes over `front-end development`.
  *
- * One semantic `<h1>` carries the sentence; every other layer is `aria-hidden`
- * and inert. The base text and its outlined twin are set from the same words at
- * the same size in the same box, so they register by construction, and two
- * complementary radial masks cut one where they reveal the other. The marks are
- * an SVG laid out from measured word boxes, so they sit on the real type at any
- * size and after any font swap.
- *
- * Nothing here changes document geometry: the sentence never moves, never
- * reflows, and reads identically with the interaction switched off.
+ * One semantic `<h1>` carries the sentence; every other layer is `aria-hidden`.
+ * The base text and its outlined twin are set from the same words at the same
+ * size in the same box, so they register by construction. The sentence never
+ * moves or reflows, and reads identically with the interaction off.
  */
 
-/**
- * The sentence, in the pieces it is made of. The two `anchor` groups are the
- * phrases the interaction is pinned to, and the only ones that may not break
- * across a line.
- */
+/* The two `anchor` groups are the phrases the interaction is pinned to, and
+   the only ones that may not break across a line. */
 const SEGMENTS: { words: string[]; anchor?: 'design' | 'code' }[] = [
   { words: ['Neubin', 'Sebastian', 'is', 'an', 'experienced', 'professional', 'in'] },
   { words: ['UI/UX', 'design'], anchor: 'design' },
@@ -34,8 +24,7 @@ const SEGMENTS: { words: string[]; anchor?: 'design' | 'code' }[] = [
 /** Small enough to read as marginalia rather than as content. */
 const FRAGMENTS = ['<section>', 'display: grid', 'gap: 12px', '{ }']
 
-/** Flattened once, so the template stays a plain loop and every word knows the
- *  slot it must report its geometry into. */
+/** Flattened once, so every word knows the slot it reports geometry into. */
 type Token =
   | { kind: 'word'; text: string; slot: number }
   | { kind: 'hold'; anchor: string; words: { text: string; slot: number }[] }
@@ -95,8 +84,7 @@ const measure = () => {
     }
   })
 
-  // Words sharing a top edge are one line — which is how the guides find the
-  // real wrap rather than assuming one.
+  // Words sharing a top edge are one line: the real wrap, not an assumed one.
   const tops: number[] = []
   boxes.value = raw.map((b) => {
     let line = tops.findIndex((t) => Math.abs(t - b.y) < 6)
@@ -123,13 +111,8 @@ const lines = computed(() => {
     .sort((a, b) => a.line - b.line)
 })
 
-/**
- * Distance along the sentence as it is read, rather than along the x axis.
- *
- * The two anchored phrases rarely share a line, so a horizontal ramp between
- * them would run backwards. Folding the line index into the coordinate makes
- * the ramp follow the reading path instead.
- */
+/* Distance along the sentence as it is read. The anchors rarely share a line,
+   so a purely horizontal ramp between them would run backwards. */
 const flowAt = (x: number, y: number) => {
   const rows = lines.value
   if (!rows.length) return 0
@@ -142,9 +125,8 @@ const flowAt = (x: number, y: number) => {
       best = row
     }
   }
-  // A fraction of the line's own inked width, not of the column: the lines are
-  // ragged, and the column would map the empty right margin onto a stretch of
-  // the ramp with no type under it.
+  // Of the line's own inked width, not the column: the rag would otherwise map
+  // empty margin onto the ramp.
   const across = Math.min(1, Math.max(0, (x - best.x) / Math.max(best.w, 1)))
   return best.line + across
 }
@@ -163,8 +145,7 @@ const anchors = computed(() => {
   return { design: at('design'), code: at('code') }
 })
 
-/** One measurement per line — the space between its first two words. More than
- *  one is clutter, which is the failure this effect has to avoid. */
+/** One measurement per line; more than one reads as clutter. */
 const gaps = computed(() =>
   lines.value
     .map((row) => {
@@ -178,47 +159,37 @@ const gaps = computed(() =>
     .filter((g): g is NonNullable<typeof g> => g !== null),
 )
 
-/** The implementation fragments sit in the ragged margin at each line's end,
- *  clamped so a full-measure line pulls its label back inside the box. */
+/** Implementation fragments, one per line. */
 const fragments = computed(() =>
   lines.value.map((row) => ({
     line: row.line,
     x: row.x + 1,
-    // In the gap above the capitals, where the ascenders leave room. Set from
-    // the line's own box, so it stays there at every size.
+    // In the gap above the capitals, from the line's own box, so it holds at
+    // every size.
     y: row.y + row.h * 0.17,
     text: FRAGMENTS[row.line % FRAGMENTS.length],
   })),
 )
 
-/** The lens trails the pointer by a frame or two — an instrument being moved
- *  across the type, not a decal stuck to the cursor. */
+/** The lens trails the pointer: an instrument, not a decal on the cursor. */
 const target = { x: 0, y: 0, on: 0 }
 const eased = { x: 0, y: 0, on: 0 }
 let frame = 0
 let settled = true
 let last = 0
 
-/**
- * Half-life smoothing rather than a fixed per-frame fraction: `0.16 * delta`
- * would drift twice as fast at 120Hz as at 60Hz, and crawl on a busy machine.
- * This converges in the same wall-clock time wherever it runs.
- */
+/* Half-life smoothing, so it converges in the same wall-clock time at any
+   refresh rate. */
 const smooth = (from: number, to: number, halfLife: number, dt: number) =>
   to + (from - to) * Math.pow(2, -dt / halfLife)
 
-/**
- * Where the lens stands between the two disciplines: 0 at the centre of
- * `UI/UX design`, 1 at the centre of `front-end development`, ramping through
- * the words between. Both mark layers read this one number, so crossing the
- * sentence is a gradual change of language rather than two states swapping.
- */
+/* Where the lens stands between the two disciplines: 0 at `UI/UX design`, 1 at
+   `front-end development`. Both mark layers read this one number. */
 const mix = () => {
   const { design, code } = anchors.value
   if (!design || !code) return 0
   const span = code.flow - design.flow
-  // Line-fractions, not pixels: the two anchors are typically a little under
-  // one line apart.
+  // Line-fractions, not pixels.
   if (Math.abs(span) < 0.02) return 0
   return Math.min(1, Math.max(0, (flowAt(eased.x, eased.y) - design.flow) / span))
 }
@@ -230,8 +201,7 @@ const paint = () => {
   host.style.setProperty('--lens-y', `${eased.y.toFixed(1)}px`)
   host.style.setProperty('--lens-on', eased.on.toFixed(3))
   host.style.setProperty('--lens-mix', mix().toFixed(3))
-  // The base only wears a mask while the lens is open, so at rest the headline
-  // is plain text with no compositing layer.
+  // Masked only while open, so at rest the headline is plain text.
   const lit = eased.on > 0.002
   if (lit !== open.value) open.value = lit
 }
@@ -246,8 +216,7 @@ const tick = (now: number) => {
   // instrument away.
   eased.on = smooth(eased.on, target.on, target.on === 0 ? 40 : 55, dt)
 
-  // Land it: an exponential never quite arrives, and a lens left 2% open is a
-  // lens that never closed.
+  // Land it: an exponential never quite arrives.
   if (
     Math.abs(target.x - eased.x) < 0.4 &&
     Math.abs(target.y - eased.y) < 0.4 &&
@@ -279,8 +248,7 @@ const onPointerMove = (event: PointerEvent) => {
   const r = host.getBoundingClientRect()
   target.x = event.clientX - r.left
   target.y = event.clientY - r.top
-  // Open where the pointer entered, rather than sliding in from wherever it
-  // was last time.
+  // Open where the pointer entered, not where it left last time.
   if (target.on === 0) {
     eased.x = target.x
     eased.y = target.y
@@ -337,8 +305,8 @@ watch(enabled, (on) => {
     @pointermove="onPointerMove"
     @pointerleave="close"
   >
-    <!-- The only copy of the sentence anything reads. The word spans carry no
-         styling — they exist so the marks can find the type. -->
+    <!-- The only copy anything reads. The word spans carry no styling; they
+         exist so the marks can find the type. -->
     <h1 id="hero-title" class="display statement__text">
       <template v-for="(token, t) in TOKENS" :key="t">
         <span v-if="token.kind === 'hold'" class="statement__hold"
@@ -358,8 +326,7 @@ watch(enabled, (on) => {
       </template>
     </h1>
 
-    <!-- Decorative twins of the sentence above: inert, hidden from assistive
-         technology, painted only inside the lens. -->
+    <!-- Inert twins of the sentence, painted only inside the lens. -->
     <div v-if="enabled" class="statement__scan" aria-hidden="true">
       <!-- The same sentence as outline, registered by construction. -->
       <p class="display statement__text statement__ghost">
@@ -377,8 +344,7 @@ watch(enabled, (on) => {
         :height="size.h"
         fill="none"
       >
-        <!-- Design construction: where the line sits, where each word starts,
-             how wide the space between is. -->
+        <!-- Design construction: baseline, word starts, space widths. -->
         <g class="marks marks--design">
           <template v-for="row in lines" :key="`d${row.line}`">
             <line
@@ -427,8 +393,7 @@ watch(enabled, (on) => {
           </template>
         </g>
 
-        <!-- Implementation: the same words as boxes, with the couple of
-             declarations that would place them. -->
+        <!-- Implementation: the same words as boxes. -->
         <g class="marks marks--code">
           <rect
             v-for="(b, i) in boxes"
@@ -451,8 +416,7 @@ watch(enabled, (on) => {
 <style scoped>
 .statement {
   position: relative;
-  /* Where the lens is and how open it is. Script writes these; the values here
-     are the rest state, so nothing depends on script having run. */
+  /* Script writes these; the values here are the rest state. */
   --lens-x: 50%;
   --lens-y: 50%;
   --lens-on: 0;
@@ -462,8 +426,7 @@ watch(enabled, (on) => {
 
 .statement__text {
   font-size: clamp(2.25rem, 1.05rem + 4.2vw, 5.25rem);
-  /* Optical size wound right up: at this scale Fraunces gets the hairlines and
-     contrast that carry the editorial voice. */
+  /* Optical size wound up: the hairlines and contrast the display voice wants. */
   font-variation-settings:
     'opsz' 144,
     'SOFT' 0,
@@ -484,9 +447,8 @@ watch(enabled, (on) => {
   display: inline;
 }
 
-/* Complementary masks: inside the lens the solid letter is cut away and its
-   outline revealed in exactly the same place, so the letterform reads as
-   continuous across the edge. */
+/* Complementary masks: the solid letter is cut away exactly where its outline
+   is revealed, so the letterform reads as continuous across the edge. */
 .statement[data-open='true'] .statement__text:not(.statement__ghost) {
   -webkit-mask-image: radial-gradient(
     circle var(--lens-r) at var(--lens-x) var(--lens-y),
@@ -542,8 +504,7 @@ watch(enabled, (on) => {
   stroke: var(--c-hero-accent);
 }
 
-/* Crossfade between the two languages: at the design anchor only guides, at
-   the code anchor only boxes, both at once through the words between. */
+/* Crossfade: guides at one anchor, boxes at the other, both in between. */
 .marks--design {
   opacity: clamp(0, calc(1.12 - var(--lens-mix) * 1.5), 1);
 }
@@ -581,8 +542,7 @@ watch(enabled, (on) => {
   text-anchor: middle;
 }
 
-/* Restrained on purpose: the lens is the moment, and a headline that performed
-   on arrival would compete with it. */
+/* Restrained on purpose: the lens is the moment, not the entrance. */
 .statement[data-motion='true'] .statement__text:not(.statement__ghost) {
   animation: statement-resolve 720ms var(--ease-out) both;
 }

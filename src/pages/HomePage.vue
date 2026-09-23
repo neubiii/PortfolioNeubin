@@ -14,8 +14,8 @@ import { profile } from '@/data/profile'
 
 <template>
   <div>
-    <!-- Layering, back to front: Vanta canvas (inert) → veil → layout ruler →
-         content. Only the content layer takes pointer events. -->
+    <!-- Back to front: Vanta canvas → veil → ruler → content. Only the content
+         layer takes pointer events. -->
     <section class="hero" data-hero aria-labelledby="hero-title">
       <VantaBirds class="hero__vanta" />
       <div class="hero__veil" aria-hidden="true" />
@@ -82,12 +82,20 @@ import { profile } from '@/data/profile'
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* Hero + the 4.5rem sticky header fill exactly one viewport. `svh` keeps
-     that true under mobile browser chrome. */
-  min-height: calc(100svh - 4.5rem);
-  padding-block: clamp(4rem, 12vh, 8rem) 0;
+  /* Hero + header fill one viewport. The bar is 4.5rem plus a 1px hairline;
+     `svh` holds under mobile browser chrome. */
+  min-height: calc(100svh - 4.5rem - 1px);
+  padding-block: var(--hero-top) 0;
   background: var(--c-hero-bg);
   overflow: hidden;
+
+  /* The block's vertical rhythm, in one place for the override below. */
+  --hero-top: clamp(4rem, 12vh, 8rem);
+  --hero-inner-top: clamp(2rem, 6vh, 4rem);
+  --hero-inner-bottom: clamp(2rem, 6vh, 4rem);
+  --hero-gap-eyebrow: clamp(1.25rem, 3.5vh, 2rem);
+  --hero-gap-lede: clamp(1.5rem, 4vh, 2.25rem);
+  --hero-gap-cta: clamp(2rem, 5vh, 3.25rem);
 
   /* Re-point the palette for this block; every child reads these tokens. */
   --c-ink: var(--c-hero-ink);
@@ -103,12 +111,24 @@ import { profile } from '@/data/profile'
   color: var(--c-hero-ink);
 }
 
+/* Compact the hero rhythm on short desktop viewports, so the foot stays in
+   view. Each value equals the one above at 900px tall, so there is no step. */
+@media (max-height: 56.25rem) {
+  .hero {
+    --hero-top: max(2rem, 36vh - 216px);
+    --hero-inner-top: max(0.75rem, 19vh - 117px);
+    --hero-inner-bottom: max(1rem, 17vh - 99px);
+    --hero-gap-eyebrow: max(0.875rem, 8vh - 40px);
+    --hero-gap-lede: max(1rem, 8vh - 36px);
+    --hero-gap-cta: max(1.25rem, 10vh - 45px);
+  }
+}
+
 .hero__vanta {
   z-index: 0;
 }
 
-/* Washes toward the hero's own ground so a bird crossing behind the headline
-   never costs contrast. Not a panel: it has no edge. */
+/* Washes toward the hero's ground so a passing bird never costs contrast. */
 .hero__veil {
   position: absolute;
   inset: 0;
@@ -138,7 +158,7 @@ import { profile } from '@/data/profile'
   align-items: flex-start;
   justify-content: center;
   text-align: left;
-  padding-block: clamp(2rem, 6vh, 4rem);
+  padding-block: var(--hero-inner-top) var(--hero-inner-bottom);
 }
 
 .hero__eyebrow {
@@ -146,11 +166,10 @@ import { profile } from '@/data/profile'
   font-size: var(--t-xs);
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  margin-bottom: clamp(1.25rem, 3.5vh, 2rem);
+  margin-bottom: var(--hero-gap-eyebrow);
 }
 
-/* Wide tracking is the point of this line, but at 390px it runs past the
-   gutter — so it eases off rather than being clipped. */
+/* The tracking runs past the gutter at 390px. */
 @media (max-width: 30rem) {
   .hero__eyebrow {
     font-size: 0.6875rem;
@@ -158,15 +177,15 @@ import { profile } from '@/data/profile'
   }
 }
 
-/* No `ch` cap: `ch` would resolve against the body size this wrapper inherits,
-   not the display size the sentence is set in. The type size against the
-   ruler's width sets the line count. */
+/* Capped short of the shell: at full measure the sentence sets as two
+   edge-to-edge lines. Not `ch` — it resolves against the inherited body size,
+   not the display size the sentence is set in. */
 .hero__statement {
-  width: 100%;
+  width: min(100%, 72rem);
 }
 
 .hero__lede {
-  margin-top: clamp(1.5rem, 4vh, 2.25rem);
+  margin-top: var(--hero-gap-lede);
   max-width: 62ch;
   font-size: var(--t-lg);
   line-height: 1.55;
@@ -175,12 +194,10 @@ import { profile } from '@/data/profile'
 }
 
 .hero__cta {
-  margin-top: clamp(2rem, 5vh, 3.25rem);
+  margin-top: var(--hero-gap-cta);
 }
 
-/* The rule is an element rather than a border, so the two controls sit inside
-   the line rather than under it: the hairline runs the measure, breaks for the
-   labels, and closes again. */
+/* An element, not a border, so the controls sit inside the line. */
 .hero__foot {
   position: relative;
   z-index: 3;
@@ -242,8 +259,7 @@ import { profile } from '@/data/profile'
   }
 }
 
-/* Top edge only. Padding both ends made every interior boundary twice the
-   hero → work gap, which is the one that reads correctly. */
+/* Top edge only, so a boundary is one gap rather than two stacked. */
 .section {
   padding-top: var(--section-y);
   padding-bottom: 0;
