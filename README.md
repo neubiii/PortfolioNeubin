@@ -1,4 +1,4 @@
-# Neubin Sebastian — Portfolio
+# Neubin Sebastian - Portfolio
 
 Personal portfolio of **Neubin Sebastian**, a UI/UX designer and front-end developer working across B2B and enterprise products.
 
@@ -6,16 +6,16 @@ This portfolio brings together product design case studies, front-end developmen
 
 ## Live site
 
-[neubinsebastian.com](https://neubinsebastian.com)
+https://neubinsebastian.vercel.app/
 
 
 ## What’s inside
 
 The portfolio is organised into three areas:
 
-- **UI/UX** — product design, user research, interaction design, prototyping, usability testing, and design systems
-- **Development** — front-end and application-development projects with technical deep dives
-- **Writing** — articles and notes around UX, AI UX, and product design
+- **UI/UX** - product design, user research, interaction design, prototyping, usability testing, and design systems
+- **Development** - front-end and application-development projects with technical deep dives
+- **Writing** - articles and notes around UX, AI UX, and product design
 
 The site also includes dedicated case-study routes, responsive layouts, light/dark themes, keyboard support, and reduced-motion behaviour.
 
