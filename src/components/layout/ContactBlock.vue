@@ -47,7 +47,7 @@ const rise = (delay = 0, distance = 16) =>
         </motion.h2>
 
         <motion.p class="contact__lede" v-bind="rise(0.12)">
-          You never know where a connection might lead — maybe to a strong teammate, a thoughtful
+          You never know where a connection might lead: maybe to a strong teammate, a thoughtful
           collaboration, or something genuinely worth building.
         </motion.p>
 
