@@ -75,7 +75,6 @@ import { profile } from '@/data/profile'
 </template>
 
 <style scoped>
-
 .hero {
   position: relative;
   isolation: isolate;

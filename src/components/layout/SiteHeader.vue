@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch, type Component } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import { ArrowUpRight } from 'lucide-vue-next'
+import { ArrowUpRight, Github, Linkedin } from 'lucide-vue-next'
 import { onKeyStroke, useEventListener, useScrollLock, useWindowScroll } from '@vueuse/core'
 import ThemeToggle from './ThemeToggle.vue'
 import { useScrollSpy } from '@/composables/useScrollSpy'
@@ -15,12 +15,8 @@ const route = useRoute()
 const { y } = useWindowScroll()
 const scrolled = computed(() => y.value > 24)
 
-/**
- * Every destination is a section of the home page, so every item is a hash
- * link — including Work, which no longer has a route of its own. Experience
- * appears only once there is experience data; a nav item pointing at an empty
- * section is a dead link.
- */
+/* Every destination is a section of the home page. Experience appears only
+   once there is data for it, so the item is never a dead link. */
 const links = computed(() => [
   { label: 'Work', to: '/#work' },
   { label: 'About', to: '/#about' },
@@ -29,7 +25,9 @@ const links = computed(() => [
   { label: 'Contact', to: '/#contact' },
 ])
 
-const github = profile.links.find((l) => l.label === 'GitHub')
+/* Only profile links with an icon reach the bar; the data stays the source. */
+const socialIcons: Record<string, Component> = { GitHub: Github, LinkedIn: Linkedin }
+const socials = profile.links.filter((l) => l.label in socialIcons)
 
 const open = ref(false)
 const locked = useScrollLock(document.body)
@@ -55,13 +53,8 @@ watch(
 )
 const overHero = computed(() => !open.value && heroHeight.value > 0 && y.value < heroHeight.value - 96)
 
-/**
- * Which item is lit — a question about where the visitor is, not about what the
- * URL says. The hash goes stale the moment anyone scrolls, and rewriting it
- * continuously would fill the back button with their own scrolling, so the
- * scrollspy answers it and the URL is left alone. Off the home page nothing is
- * lit.
- */
+/* Where the visitor is, not what the URL says: the hash goes stale on the
+   first scroll, and rewriting it would fill the back button. */
 const { active } = useScrollSpy(['work', 'about', 'skillset', 'contact'], SPY_LINE)
 
 const isActive = (to: string) => {
@@ -96,18 +89,21 @@ const isActive = (to: string) => {
         </ul>
       </nav>
 
-      <!-- One aligned control group: every child is a 2.75rem-tall inline-flex
-           box on the same axis, with the divider centred between them. -->
       <div class="header__meta">
-        <a
-          v-if="github"
-          :href="github.href"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="link-grow header__github"
-        >
-          GitHub<span class="sr-only"> (opens in a new tab)</span>
-        </a>
+        <div class="header__social">
+          <a
+            v-for="social in socials"
+            :key="social.label"
+            :href="social.href"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="header__social-link"
+            :data-social="social.label"
+            :aria-label="`${social.label} (opens in a new tab)`"
+          >
+            <component :is="socialIcons[social.label]" aria-hidden="true" />
+          </a>
+        </div>
         <span class="header__divider" aria-hidden="true" />
         <ThemeToggle />
         <button
@@ -138,15 +134,20 @@ const isActive = (to: string) => {
               >
             </li>
           </ul>
-          <a
-            v-if="github"
-            :href="github.href"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="meta panel__github"
-          >
-            GitHub <ArrowUpRight />
-          </a>
+          <div class="panel__social">
+            <a
+              v-for="social in socials"
+              :key="social.label"
+              :href="social.href"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="meta panel__social-link"
+            >
+              {{ social.label }}
+              <ArrowUpRight aria-hidden="true" />
+              <span class="sr-only"> (opens in a new tab)</span>
+            </a>
+          </div>
         </nav>
       </div>
     </Transition>
@@ -285,21 +286,66 @@ const isActive = (to: string) => {
   gap: 1rem;
 }
 
-/* Must stay inline-flex when shown: `display: block` here overrides
-   `.link-grow`'s own centring and pushes GitHub off the shared axis. */
-.header__github {
+/* Optical: the targets carry their own padding, so without this the divider
+   would sit twice as far from the icons as it does from the toggle. */
+.header__social {
   display: none;
-  font-family: var(--font-sans);
-  font-size: var(--t-xs);
-  line-height: 1;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--c-muted);
+  align-items: center;
+  gap: 0.125rem;
+  margin-right: -0.375rem;
 }
 
-.header__github:hover,
-.header__github:focus-visible {
+/* A 2.5rem target around a 17px glyph: the hit area grows, the icon does not. */
+.header__social-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  font-size: 1.0625rem;
+  color: var(--c-muted);
+  transition: color var(--dur) var(--ease-out);
+}
+
+.header__social-link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 1.875rem;
+  height: 1.875rem;
+  margin: auto;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.75);
+  pointer-events: none;
+  transition:
+    opacity var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-out);
+}
+
+.header__social-link:hover,
+.header__social-link:focus-visible {
   color: var(--c-ink);
+}
+
+/* A frame that matches each glyph: round for GitHub, square for LinkedIn. */
+.header__social-link[data-social='LinkedIn']::before {
+  border-radius: 0.3rem;
+}
+
+.header__social-link:hover::before,
+.header__social-link:focus-visible::before {
+  opacity: 0.7;
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header__social-link::before {
+    transition: none;
+    transform: none;
+  }
 }
 
 .header__divider {
@@ -312,8 +358,8 @@ const isActive = (to: string) => {
 }
 
 @media (min-width: 42rem) {
-  .header__github {
-    display: inline-flex;
+  .header__social {
+    display: flex;
   }
 
   .header__divider {
@@ -400,12 +446,24 @@ const isActive = (to: string) => {
   color: var(--c-accent);
 }
 
-.panel__github {
+.panel__social {
+  display: flex;
+  gap: 1.75rem;
+  margin-top: 2rem;
+}
+
+.panel__social-link {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  margin-top: 2rem;
+  min-height: 2.75rem;
   color: var(--c-muted);
+  transition: color var(--dur) var(--ease-out);
+}
+
+.panel__social-link:hover,
+.panel__social-link:focus-visible {
+  color: var(--c-accent);
 }
 
 .panel-enter-active,
