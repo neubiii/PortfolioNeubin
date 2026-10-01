@@ -1,7 +1,18 @@
+<script lang="ts">
+/**
+ * Module scope, so it survives a route change but not a document load: the
+ * opening plays on every full load of the home page and does not replay when a
+ * visitor routes back from a project. Nothing is persisted.
+ */
+let introPlayed = false
+</script>
+
 <script setup lang="ts">
+import { ref } from 'vue'
 import { ArrowDown } from 'lucide-vue-next'
 import ArrowLink from '@/components/ui/ArrowLink.vue'
 import GridRules from '@/components/ui/GridRules.vue'
+import HeroIntro from '@/components/ui/HeroIntro.vue'
 import HeroStatement from '@/components/ui/HeroStatement.vue'
 import MotionToggle from '@/components/ui/MotionToggle.vue'
 import SectionHead from '@/components/ui/SectionHead.vue'
@@ -9,27 +20,48 @@ import AboutSection from '@/components/layout/AboutSection.vue'
 import SkillsetSection from '@/components/layout/SkillsetSection.vue'
 import VantaBirds from '@/components/ui/VantaBirds.vue'
 import WorksShowcase from '@/components/project/WorksShowcase.vue'
+import { useMotion } from '@/composables/useMotion'
 import { profile } from '@/data/profile'
+
+const { motionOk } = useMotion()
+
+/* Decided during setup rather than on mount, so the settled hero never flashes
+   ahead of the sequence. */
+const introActive = ref(!introPlayed && motionOk.value)
+introPlayed = true
+
+const heroRevealed = ref(!introActive.value)
+const finishIntro = () => (introActive.value = false)
 </script>
 
 <template>
   <div>
     <!-- Back to front: Vanta canvas → veil → ruler → content. Only the content
          layer takes pointer events. -->
-    <section class="hero" data-hero aria-labelledby="hero-title">
+    <section
+      class="hero"
+      data-hero
+      :data-revealed="String(heroRevealed)"
+      aria-labelledby="hero-title"
+    >
       <VantaBirds class="hero__vanta" />
       <div class="hero__veil" aria-hidden="true" />
       <GridRules class="hero__rules" :columns="4" ticks />
 
+      <!-- Ahead of the hero content in the DOM, so `Skip intro` is the first
+           stop inside the hero for a keyboard visitor. -->
+      <HeroIntro v-if="introActive" @reveal="heroRevealed = true" @done="finishIntro" />
+
       <div class="shell hero__inner">
-        <p class="meta hero__eyebrow">Let's fly higher, together.</p>
+        <p class="meta hero__meta">One match found.</p>
 
         <HeroStatement class="hero__statement" />
 
         <p class="hero__lede">{{ profile.intro }}</p>
 
         <div class="hero__cta">
-          <ArrowLink to="/#work" size="lg">View my work</ArrowLink>
+          <ArrowLink to="/#work" size="lg">View Neubin&rsquo;s work</ArrowLink>
+          <ArrowLink to="/#contact">Contact Neubin</ArrowLink>
         </div>
       </div>
 
@@ -92,7 +124,7 @@ import { profile } from '@/data/profile'
   --hero-top: clamp(4rem, 12vh, 8rem);
   --hero-inner-top: clamp(2rem, 6vh, 4rem);
   --hero-inner-bottom: clamp(2rem, 6vh, 4rem);
-  --hero-gap-eyebrow: clamp(1.25rem, 3.5vh, 2rem);
+  --hero-gap-meta: clamp(1.25rem, 3.5vh, 2rem);
   --hero-gap-lede: clamp(1.5rem, 4vh, 2.25rem);
   --hero-gap-cta: clamp(2rem, 5vh, 3.25rem);
 
@@ -117,14 +149,54 @@ import { profile } from '@/data/profile'
     --hero-top: max(2rem, 36vh - 216px);
     --hero-inner-top: max(0.75rem, 19vh - 117px);
     --hero-inner-bottom: max(1rem, 17vh - 99px);
-    --hero-gap-eyebrow: max(0.875rem, 8vh - 40px);
+    --hero-gap-meta: max(0.875rem, 8vh - 40px);
     --hero-gap-lede: max(1rem, 8vh - 36px);
     --hero-gap-cta: max(1.25rem, 10vh - 45px);
   }
 }
 
+/* On a phone the second action wraps to a row of its own; the lead-in above the
+   question gives back the height that costs. */
+@media (max-width: 30rem) {
+  .hero {
+    --hero-top: clamp(1.5rem, 5vh, 2.75rem);
+  }
+}
+
 .hero__vanta {
   z-index: 0;
+}
+
+/* The hero settles in as the intro fades off it: meta, then headline, then the
+   supporting copy and the actions. A small stagger — a settling, not a cascade.
+   The last group lands at 900ms, the length of the intro's reveal beat. */
+.hero__meta,
+.hero__statement,
+.hero__lede,
+.hero__cta,
+.hero__foot {
+  transition:
+    opacity 720ms var(--ease-out),
+    transform 720ms var(--ease-out);
+}
+
+.hero__statement {
+  transition-delay: 90ms;
+}
+
+.hero__lede,
+.hero__cta,
+.hero__foot {
+  transition-delay: 180ms;
+}
+
+.hero[data-revealed='false'] .hero__meta,
+.hero[data-revealed='false'] .hero__statement,
+.hero[data-revealed='false'] .hero__lede,
+.hero[data-revealed='false'] .hero__cta,
+.hero[data-revealed='false'] .hero__foot {
+  opacity: 0;
+  transform: translateY(8px);
 }
 
 /* Washes toward the hero's ground so a passing bird never costs contrast. */
@@ -160,20 +232,11 @@ import { profile } from '@/data/profile'
   padding-block: var(--hero-inner-top) var(--hero-inner-bottom);
 }
 
-.hero__eyebrow {
+.hero__meta {
   color: var(--c-hero-muted);
-  font-size: var(--t-xs);
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  margin-bottom: var(--hero-gap-eyebrow);
-}
-
-/* The tracking runs past the gutter at 390px. */
-@media (max-width: 30rem) {
-  .hero__eyebrow {
-    font-size: 0.6875rem;
-    letter-spacing: 0.14em;
-  }
+  letter-spacing: 0.01em;
+  opacity: 0.88;
+  margin-bottom: var(--hero-gap-meta);
 }
 
 /* Capped short of the shell: at full measure the sentence sets as two
@@ -192,7 +255,13 @@ import { profile } from '@/data/profile'
   text-wrap: pretty;
 }
 
+/* `flex-end` rather than `baseline`: the two links are set at different sizes,
+   and it is their rules that should line up, not their text boxes. */
 .hero__cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem clamp(1.75rem, 3.5vw, 3rem);
   margin-top: var(--hero-gap-cta);
 }
 
