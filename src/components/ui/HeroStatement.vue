@@ -1,10 +1,14 @@
 <script setup lang="ts">
-
+/**
+ * The hero's semantic heading: one `<h1>` at the display scale, with each
+ * discipline phrase held on a single line.
+ */
 const SEGMENTS: { text: string; hold?: boolean }[] = [
-  { text: 'Neubin Sebastian is an experienced professional in ' },
-  { text: 'UI/UX design', hold: true },
+  { text: 'Neubin Sebastian is a professional ' },
+  { text: 'UI/UX designer', hold: true },
   { text: ' and ' },
-  { text: 'front-end development.', hold: true },
+  { text: 'front-end developer', hold: true },
+  { text: ' with industry experience.' },
 ]
 </script>
 
@@ -31,8 +35,10 @@ const SEGMENTS: { text: string; hold?: boolean }[] = [
   text-wrap: pretty;
 }
 
-/* Neither discipline reads as two half-phrases on separate lines. */
+/* The two disciplines carry the accent, and neither reads as two half-phrases
+   on separate lines. */
 .statement__hold {
+  color: var(--c-accent);
   white-space: nowrap;
 }
 </style>

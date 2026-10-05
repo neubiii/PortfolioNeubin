@@ -53,7 +53,7 @@ const finishIntro = () => (introActive.value = false)
       <HeroIntro v-if="introActive" @reveal="heroRevealed = true" @done="finishIntro" />
 
       <div class="shell hero__inner">
-        <p class="meta hero__meta">One match found.</p>
+        <p class="meta hero__eyebrow">Let’s fly higher, together.</p>
 
         <HeroStatement class="hero__statement" />
 
@@ -124,7 +124,7 @@ const finishIntro = () => (introActive.value = false)
   --hero-top: clamp(4rem, 12vh, 8rem);
   --hero-inner-top: clamp(2rem, 6vh, 4rem);
   --hero-inner-bottom: clamp(2rem, 6vh, 4rem);
-  --hero-gap-meta: clamp(1.25rem, 3.5vh, 2rem);
+  --hero-gap-eyebrow: clamp(1.25rem, 3.5vh, 2rem);
   --hero-gap-lede: clamp(1.5rem, 4vh, 2.25rem);
   --hero-gap-cta: clamp(2rem, 5vh, 3.25rem);
 
@@ -149,7 +149,7 @@ const finishIntro = () => (introActive.value = false)
     --hero-top: max(2rem, 36vh - 216px);
     --hero-inner-top: max(0.75rem, 19vh - 117px);
     --hero-inner-bottom: max(1rem, 17vh - 99px);
-    --hero-gap-meta: max(0.875rem, 8vh - 40px);
+    --hero-gap-eyebrow: max(0.875rem, 8vh - 40px);
     --hero-gap-lede: max(1rem, 8vh - 36px);
     --hero-gap-cta: max(1.25rem, 10vh - 45px);
   }
@@ -159,7 +159,7 @@ const finishIntro = () => (introActive.value = false)
    question gives back the height that costs. */
 @media (max-width: 30rem) {
   .hero {
-    --hero-top: clamp(1.5rem, 5vh, 2.75rem);
+    --hero-top: clamp(1.25rem, 4.5vh, 2.5rem);
   }
 }
 
@@ -170,7 +170,7 @@ const finishIntro = () => (introActive.value = false)
 /* The hero settles in as the intro fades off it: meta, then headline, then the
    supporting copy and the actions. A small stagger — a settling, not a cascade.
    The last group lands at 900ms, the length of the intro's reveal beat. */
-.hero__meta,
+.hero__eyebrow,
 .hero__statement,
 .hero__lede,
 .hero__cta,
@@ -190,7 +190,7 @@ const finishIntro = () => (introActive.value = false)
   transition-delay: 180ms;
 }
 
-.hero[data-revealed='false'] .hero__meta,
+.hero[data-revealed='false'] .hero__eyebrow,
 .hero[data-revealed='false'] .hero__statement,
 .hero[data-revealed='false'] .hero__lede,
 .hero[data-revealed='false'] .hero__cta,
@@ -232,18 +232,20 @@ const finishIntro = () => (introActive.value = false)
   padding-block: var(--hero-inner-top) var(--hero-inner-bottom);
 }
 
-.hero__meta {
+.hero__eyebrow {
   color: var(--c-hero-muted);
-  letter-spacing: 0.01em;
-  opacity: 0.88;
-  margin-bottom: var(--hero-gap-meta);
+  font-size: var(--t-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-bottom: var(--hero-gap-eyebrow);
 }
 
-/* Capped short of the shell: at full measure the sentence sets as two
-   edge-to-edge lines. Not `ch` — it resolves against the inherited body size,
-   not the display size the sentence is set in. */
+/* Capped short of the shell: at full measure the sentence sets edge to edge,
+   and much below this it breaks into four ragged lines on a wide display. Not
+   `ch` — it resolves against the inherited body size, not the display size the
+   sentence is set in. */
 .hero__statement {
-  width: min(100%, 72rem);
+  width: min(100%, 76rem);
 }
 
 .hero__lede {
