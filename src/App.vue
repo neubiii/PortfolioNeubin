@@ -5,6 +5,7 @@ import SiteHeader from '@/components/layout/SiteHeader.vue'
 import SiteFooter from '@/components/layout/SiteFooter.vue'
 import ContactBlock from '@/components/layout/ContactBlock.vue'
 import GrainOverlay from '@/components/ui/GrainOverlay.vue'
+import VasuAssistant from '@/components/assistant/VasuAssistant.vue'
 import { router } from '@/router'
 
 /**
@@ -33,6 +34,7 @@ void router.isReady().then(() => (routed.value = true))
   <template v-if="routed">
     <ContactBlock />
     <SiteFooter />
+    <VasuAssistant />
   </template>
 </template>
 
