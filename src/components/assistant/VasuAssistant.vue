@@ -4,13 +4,21 @@ import { RouterLink } from 'vue-router'
 import { Brain, MessageCircle, Send, X } from 'lucide-vue-next'
 import { onKeyStroke } from '@vueuse/core'
 import { useMotion } from '@/composables/useMotion'
-import { VASU_FALLBACK, VASU_WELCOME, vasuStarters, type VasuAction, type VasuReply } from '@/data/vasu'
+import {
+  VASU_FALLBACK,
+  VASU_WELCOME,
+  matchTopic,
+  vasuFollowUps,
+  vasuStarters,
+  type VasuAction,
+  type VasuTopic,
+} from '@/data/vasu'
 
 /**
  * Vasu — the portfolio's assistant. Mounted once in the app shell, so the
  * conversation survives routing and closing the panel keeps it.
  *
- * Phase 1 answers come from `data/vasu.ts`; nothing here talks to a network.
+ * Answers come from `data/vasuKnowledge.ts`; nothing here talks to a network.
  */
 
 /** Stands in for the round trip a real answer will take. */
@@ -21,6 +29,10 @@ type Message = {
   from: 'visitor' | 'vasu'
   text: string
   actions?: VasuAction[]
+  /** Which topic answered this, so it is not offered again. */
+  topicId?: string
+  /** What to offer next, resolved when the answer is pushed. */
+  followUps?: VasuTopic[]
   /** Marks the honest "I don't know" so the starters come back. */
   unanswered?: boolean
 }
@@ -39,9 +51,23 @@ const field = useTemplateRef<HTMLInputElement>('field')
 const list = useTemplateRef<HTMLElement>('list')
 
 const last = computed(() => messages.value[messages.value.length - 1])
-const showStarters = computed(
-  () => !thinking.value && (messages.value.length === 0 || Boolean(last.value?.unanswered)),
-)
+
+const answered = computed(() => new Set(messages.value.map((message) => message.topicId)))
+
+/**
+ * The four starters to begin with, and again whenever Vasu has to say it does
+ * not know — there in full, since that is the point of offering them.
+ * Otherwise the two or three the last answer suggests, minus anything already
+ * answered, so the conversation moves on rather than circling.
+ */
+const suggestions = computed<VasuTopic[]>(() => {
+  if (thinking.value) return []
+  if (!last.value || last.value.unanswered) return vasuStarters
+
+  const followUps = last.value.followUps ?? []
+  const fresh = followUps.filter((topic) => !answered.value.has(topic.id))
+  return fresh.length ? fresh : followUps
+})
 const canSend = computed(() => draft.value.trim().length > 0 && !thinking.value)
 
 let timer = 0
@@ -55,16 +81,7 @@ const toLatest = () =>
     if (list.value) list.value.scrollTop = list.value.scrollHeight
   })
 
-/**
- * Phase 1 stand-in for a model: the first starter whose keyword appears in the
- * question wins. Deliberately throwaway — delete it with the mock answers.
- */
-const matchReply = (text: string): VasuReply | undefined => {
-  const question = text.toLowerCase()
-  return vasuStarters.find((s) => s.keywords.some((k) => question.includes(k)))?.reply
-}
-
-const ask = (question: string, reply = matchReply(question)) => {
+const ask = (question: string, topic = matchTopic(question)) => {
   if (thinking.value) return
   push({ from: 'visitor', text: question })
   thinking.value = true
@@ -73,8 +90,15 @@ const ask = (question: string, reply = matchReply(question)) => {
 
   timer = window.setTimeout(() => {
     thinking.value = false
-    const text = reply?.text ?? VASU_FALLBACK
-    push({ from: 'vasu', text, actions: reply?.actions, unanswered: !reply })
+    const text = topic?.answer ?? VASU_FALLBACK
+    push({
+      from: 'vasu',
+      text,
+      actions: topic?.actions,
+      topicId: topic?.id,
+      followUps: topic && vasuFollowUps(topic),
+      unanswered: !topic,
+    })
     status.value = text
     void toLatest()
   }, THINK_MS)
@@ -110,6 +134,9 @@ onKeyStroke('Escape', () => {
 onBeforeUnmount(() => clearTimeout(timer))
 
 const isExternal = (action: VasuAction) => Boolean(action.href && !action.href.startsWith('mailto:'))
+
+/** Longer answers are written in two or three paragraphs; keep them as such. */
+const paragraphs = (text: string) => text.split('\n\n')
 </script>
 
 <template>
@@ -152,7 +179,13 @@ const isExternal = (action: VasuAction) => Boolean(action.href && !action.href.s
         <ol v-if="messages.length" class="vasu__messages">
           <li v-for="message in messages" :key="message.id" :data-from="message.from">
             <p v-if="message.from === 'vasu'" class="vasu__tag">Vasu</p>
-            <p :class="message.from === 'vasu' ? 'vasu__said' : 'vasu__asked'">{{ message.text }}</p>
+
+            <template v-if="message.from === 'vasu'">
+              <p v-for="(para, i) in paragraphs(message.text)" :key="i" class="vasu__said">
+                {{ para }}
+              </p>
+            </template>
+            <p v-else class="vasu__asked">{{ message.text }}</p>
 
             <p v-if="message.actions" class="vasu__actions">
               <template v-for="action in message.actions" :key="action.label">
@@ -177,15 +210,15 @@ const isExternal = (action: VasuAction) => Boolean(action.href && !action.href.s
           <Brain class="vasu__brain" aria-hidden="true" />Thinking&hellip;
         </p>
 
-        <div v-if="showStarters" class="vasu__starters">
+        <div v-if="suggestions.length" class="vasu__starters">
           <button
-            v-for="starter in vasuStarters"
-            :key="starter.id"
+            v-for="topic in suggestions"
+            :key="topic.id"
             type="button"
             class="vasu__starter"
-            @click="ask(starter.label, starter.reply)"
+            @click="ask(topic.title, topic)"
           >
-            {{ starter.label }}
+            {{ topic.title }}
           </button>
         </div>
       </div>
@@ -349,6 +382,11 @@ const isExternal = (action: VasuAction) => Boolean(action.href && !action.href.s
   line-height: 1.6;
   color: var(--c-ink);
   overflow-wrap: anywhere;
+}
+
+/* An answer set in two or three paragraphs, not one block. */
+.vasu__messages .vasu__said + .vasu__said {
+  margin-top: 0.55rem;
 }
 
 .vasu__asked {
