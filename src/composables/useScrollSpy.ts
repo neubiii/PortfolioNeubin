@@ -4,19 +4,14 @@ import { useRoute } from 'vue-router'
 /**
  * Which section the visitor is currently reading.
  *
- * Not intersection ratios: these sections differ in height by a factor of
- * four, so a tall one keeps a larger ratio than a short one filling the screen,
- * and two ratios crossing near a boundary flip back and forth on every pixel of
- * scroll. Instead this asks which section sits under a fixed line just below
- * the sticky header — exactly one can, and the answer changes once per
- * boundary. IntersectionObserver still does the watching, through a
- * zero-height root-margin band pinned at that line.
+ * Not intersection ratios — these sections differ in height by a factor of
+ * four, so two ratios crossing near a boundary flip on every pixel of scroll.
+ * This asks which section sits under a fixed line below the sticky header:
+ * exactly one can, and the answer changes once per boundary. The observer
+ * watches through a zero-height root-margin band pinned at that line.
  *
- * The hero is deliberately not a section: while it is in view the answer is
- * `null` and no nav item is marked.
- *
- * `ids` accepts an array (the home page's fixed sections) or a ref/getter (a
- * case study's contents rail); a reactive list re-observes when it changes.
+ * The hero is not a section, so while it is in view the answer is `null`.
+ * `ids` takes an array or a ref/getter; a reactive list re-observes.
  */
 
 /** How far the current section must retreat past the line before an earlier one
@@ -44,10 +39,8 @@ export function useScrollSpy(ids: MaybeRefOrGetter<string[]>, headerOffset = 96)
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => Boolean(el))
 
-    // The header mounts in the app shell, before the lazily-imported route has
-    // rendered any sections — and on a route change the outgoing view has to
-    // finish transitioning first. Look again next frame until they exist; the
-    // frame budget is a safety valve, not a timer.
+    // The header mounts before the lazy route has rendered any sections. Look
+    // again next frame; the budget is a safety valve, not a timer.
     if (!targets.length) {
       active.value = null
       if (attempt < 90) frame = requestAnimationFrame(() => connect(attempt + 1))
@@ -62,9 +55,8 @@ export function useScrollSpy(ids: MaybeRefOrGetter<string[]>, headerOffset = 96)
         if (box.top <= line && box.bottom > line) index = i
       }
 
-      // The last section is shorter than the viewport, so its top never reaches
-      // the line and it could never be current. At the foot of the document the
-      // furthest section that has started is the one being read.
+      // The last section never reaches the line, so at the foot of the page
+      // the furthest section that has started is the one being read.
       const atBottom =
         window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2
       if (atBottom) {
@@ -76,9 +68,8 @@ export function useScrollSpy(ids: MaybeRefOrGetter<string[]>, headerOffset = 96)
         }
       }
 
-      // Forward switches immediately; going back needs the current section to
-      // have retreated clear of the line, or a hand resting on a boundary
-      // toggles the highlight on every twitch.
+      // Going back needs the current section clear of the line, or a hand
+      // resting on a boundary toggles the highlight on every twitch.
       const current = active.value ? targets.findIndex((el) => el.id === active.value) : -1
       if (index >= 0 && current >= 0 && index < current) {
         const box = targets[current].getBoundingClientRect()
@@ -99,11 +90,8 @@ export function useScrollSpy(ids: MaybeRefOrGetter<string[]>, headerOffset = 96)
 
   const onResize = () => connect()
 
-  /**
-   * The last section is shorter than the viewport, so reaching the foot of the
-   * page crosses no boundary and the observer never fires. Watch only for the
-   * page arriving at or leaving its own bottom.
-   */
+  /** Reaching the foot of the page crosses no boundary, so the observer never
+   *  fires there. Watch only for arriving at or leaving the bottom. */
   const onScroll = () => {
     const atBottom =
       window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2
@@ -112,8 +100,8 @@ export function useScrollSpy(ids: MaybeRefOrGetter<string[]>, headerOffset = 96)
     runPick?.()
   }
 
-  /** Sections can arrive late within a route — an image finishing, a font
-   *  swapping — so the observed set is re-checked when the page height settles. */
+  /** Sections can arrive late — an image, a font swap — so the observed set is
+   *  re-checked when the page height settles. */
   let sizer: ResizeObserver | null = null
 
   onMounted(() => {

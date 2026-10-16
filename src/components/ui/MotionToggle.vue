@@ -3,18 +3,23 @@ import { Pause, Play } from 'lucide-vue-next'
 import { useMotion } from '@/composables/useMotion'
 
 /**
- * Pause / resume the hero's flock.
+ * Pause / resume the hero's flock, and nothing else on the page.
  *
- * The button names the action it will perform, which is the standard
- * media-control pattern and needs no `aria-pressed`: the accessible name
- * changes with the state. Rendered only where WebGL exists, so it never offers
- * to resume something that could not run.
+ * The button names the action rather than the state, so it needs no
+ * `aria-pressed`. Rendered only where WebGL exists.
  */
 const { active, supported, toggle, label } = useMotion()
 </script>
 
 <template>
-  <button v-if="supported" type="button" class="motion" @click="toggle">
+  <!-- The visible label opens the accessible name, so speech input matches. -->
+  <button
+    v-if="supported"
+    type="button"
+    class="motion"
+    :aria-label="`${label} animation`"
+    @click="toggle"
+  >
     <span class="motion__glyph">
       <Pause v-if="active" fill="currentColor" stroke="none" />
       <Play v-else fill="currentColor" stroke="none" />

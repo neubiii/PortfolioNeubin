@@ -25,8 +25,7 @@ import { profile } from '@/data/profile'
 
 const { motionOk } = useMotion()
 
-/* Decided during setup rather than on mount, so the settled hero never flashes
-   ahead of the sequence. */
+/* Decided during setup, so the settled hero never flashes ahead of it. */
 const introActive = ref(!introPlayed && motionOk.value)
 introPlayed = true
 
@@ -60,8 +59,8 @@ const finishIntro = () => (introActive.value = false)
         <p class="hero__lede">{{ profile.intro }}</p>
 
         <div class="hero__cta">
-          <ArrowLink to="/#work" size="lg">View Neubin&rsquo;s work</ArrowLink>
-          <ArrowLink to="/#contact">Contact Neubin</ArrowLink>
+          <ArrowLink to="/#work" size="lg">View my work</ArrowLink>
+          <ArrowLink to="/#contact">Contact me</ArrowLink>
         </div>
       </div>
 
@@ -155,8 +154,7 @@ const finishIntro = () => (introActive.value = false)
   }
 }
 
-/* On a phone the second action wraps to a row of its own; the lead-in above the
-   question gives back the height that costs. */
+/* On a phone the second action wraps; the lead-in gives that height back. */
 @media (max-width: 30rem) {
   .hero {
     --hero-top: clamp(1.25rem, 4.5vh, 2.5rem);
@@ -167,9 +165,8 @@ const finishIntro = () => (introActive.value = false)
   z-index: 0;
 }
 
-/* The hero settles in as the intro fades off it: meta, then headline, then the
-   supporting copy and the actions. A small stagger — a settling, not a cascade.
-   The last group lands at 900ms, the length of the intro's reveal beat. */
+/* The hero settles as the intro fades off it: meta, headline, then the copy
+   and actions. The last group lands at 900ms, the intro's reveal beat. */
 .hero__eyebrow,
 .hero__statement,
 .hero__lede,
@@ -241,9 +238,8 @@ const finishIntro = () => (introActive.value = false)
 }
 
 /* Capped short of the shell: at full measure the sentence sets edge to edge,
-   and much below this it breaks into four ragged lines on a wide display. Not
-   `ch` — it resolves against the inherited body size, not the display size the
-   sentence is set in. */
+   much below this it breaks into four ragged lines. Not `ch` — that resolves
+   against the body size, not the display size this is set in. */
 .hero__statement {
   width: min(100%, 76rem);
 }

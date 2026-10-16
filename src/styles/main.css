@@ -24,8 +24,7 @@
 
   --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
   --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
-  /* Code only — the hero's construction fragments. A system stack rather than
-     a third downloaded family. */
+  /* Code only. A system stack rather than a third downloaded family. */
   --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
 
   --text-xs: var(--t-xs);
@@ -190,8 +189,7 @@
     line-height: 1.4;
   }
 
-  /* The same voice one step up, for readable metadata: counts, notes, dates.
-     Named for its role, not a typeface — it is set in the sans like `.label`. */
+  /* The same voice one step up: counts, notes, dates. Also set in the sans. */
   .meta {
     font-family: var(--font-sans);
     font-size: var(--t-sm);
@@ -207,8 +205,7 @@
   }
 
   /* The category ruler: text controls on a hairline, the active one carrying a
-     2px accent rule that sits on that same line. The work index and the skillset
-     lens are the same control, so they are the same CSS. */
+     2px accent rule on that line. Shared by the work index and the skillset. */
   .ruler {
     display: flex;
     gap: clamp(1.25rem, 3vw, 2.5rem);
@@ -252,10 +249,8 @@
 
   /* ---- Icons ------------------------------------------------------------ */
 
-  /* One library (lucide-vue-next), one weight. 1.5 matches the hairline rules
-     the rest of the site is drawn with; Lucide's own default of 2 reads heavy
-     against this type. Size follows the text unless a wrapper sets its own,
-     and the colour is always inherited. */
+  /* One weight for every icon: 1.5 matches the site's hairline rules, where
+     Lucide's default of 2 reads heavy. Size and colour follow the text. */
   .lucide {
     width: 1em;
     height: 1em;
@@ -264,8 +259,7 @@
 
   /* ---- Interaction ------------------------------------------------------ */
 
-  /* Underline that grows from the leading edge. Used on every inline text link
-     so link affordance never depends on colour alone. */
+  /* On every inline link, so affordance never depends on colour alone. */
   .link-underline {
     background-image: linear-gradient(currentColor, currentColor);
     background-repeat: no-repeat;
@@ -286,9 +280,8 @@
     background-size: 0% 1px;
   }
 
-  /* For nav items, which start bare. A pseudo-element rather than a background,
-     so the link can carry a 44px hit area (WCAG 2.5.8) while the rule still
-     sits tight under the text rather than 44px below it. */
+  /* A pseudo-element, not a background, so a nav link can carry a 44px hit
+     area (WCAG 2.5.8) with the rule still tight under the text. */
   .link-grow {
     position: relative;
     display: inline-flex;

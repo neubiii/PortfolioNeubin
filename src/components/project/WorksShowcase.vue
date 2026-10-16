@@ -7,28 +7,11 @@ import WritingPreview from '@/components/project/WritingPreview.vue'
 import { categories, presentationLabel, projectsIn, type CategoryId } from '@/data/projects'
 import { writing } from '@/data/writing'
 
-/**
- * The one place work is browsed. Categories filter a single list rather than
- * splitting into three components, so an entry appears under every discipline
- * it claims and adding work is a data change.
- *
- * Above 75rem the composition is three columns — half the index, the preview,
- * the other half — so the last project sits at the same eye level as the first.
- * Below that the preview column is dropped and each row carries what the
- * preview would have shown, since touch has no hover to discover it with.
- *
- * Writing shares the whole composition; only two things differ: a row is an
- * external link rather than a route, and the centre panel is typographic
- * because a post has no screenshot.
- */
+
 const active = ref<CategoryId>('ux')
 const tabs = ref<(HTMLButtonElement | null)[]>([])
 
-/**
- * Numbering is per category, not global: the first project in this tab is 01
- * whichever tab it is. A stored index could not do that, since the same project
- * holds a different position in each list it appears in.
- */
+
 const ordinal = (i: number) => String(i + 1).padStart(2, '0')
 
 const isWriting = computed(() => active.value === 'writing')
@@ -55,15 +38,7 @@ const split = <T,>(rows: T[]) => [rows.slice(0, half.value), rows.slice(half.val
 const groups = computed(() => split(projectRows.value))
 const writingGroups = computed(() => split(writingRows.value))
 
-/**
- * Which row the preview is showing — a project slug or a writing id.
- *
- * `picked` is what the pointer or focus last chose; `current` resolves that to
- * a row that always exists, falling back to the first in the category. So a
- * category opens with its first row already active rather than with none, and
- * leaving the list returns to it without a second piece of state to keep in
- * step. One row is current at any moment, and it is the row the preview shows.
- */
+
 const picked = ref<string | null>(null)
 
 const keys = computed(() =>

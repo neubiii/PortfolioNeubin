@@ -4,7 +4,7 @@
  * discipline phrase held on a single line.
  */
 const SEGMENTS: { text: string; hold?: boolean }[] = [
-  { text: 'Neubin Sebastian is a professional ' },
+  { text: 'I’m Neubin Sebastian, a ' },
   { text: 'UI/UX designer', hold: true },
   { text: ' and ' },
   { text: 'front-end developer', hold: true },

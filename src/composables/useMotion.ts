@@ -1,12 +1,19 @@
 import { computed, ref, watch } from 'vue'
 
 /**
- * Whether the hero's decorative motion should run.
+ * Two separate questions, deliberately not one.
  *
- * Three states, not a boolean, so the OS preference and an explicit choice can
- * coexist: 'system' follows `prefers-reduced-motion`, 'on' overrides it, 'off'
- * pauses. Held at module level and mirrored to sessionStorage, so the choice
- * survives navigating into a project and back.
+ * `motionOk` is the accessibility answer — does this visitor want decorative
+ * motion at all — and every section's entrance animation reads it. `active`
+ * is the hero background: that question plus WebGL plus the hero's play/pause
+ * control, which writes to `background` below and to nothing else. Keeping the
+ * control out of `motionOk` is what stops it stripping entrance animations off
+ * sections mid-session, leaving unrevealed content stuck at `opacity: 0`.
+ *
+ * Three states rather than a boolean, so the OS preference and an explicit
+ * choice can coexist: 'system' follows `prefers-reduced-motion`, 'on'
+ * overrides it, 'off' pauses. Module level and mirrored to sessionStorage, so
+ * the choice survives navigating into a project and back.
  */
 export type MotionPreference = 'system' | 'on' | 'off'
 
@@ -21,11 +28,12 @@ const readStored = (): MotionPreference => {
   }
 }
 
-const preference = ref<MotionPreference>(
+/** The hero background only. Nothing else reads it. */
+const background = ref<MotionPreference>(
   typeof window === 'undefined' ? 'system' : readStored(),
 )
 
-watch(preference, (value) => {
+watch(background, (value) => {
   try {
     if (value === 'system') sessionStorage.removeItem(KEY)
     else sessionStorage.setItem(KEY, value)
@@ -55,29 +63,29 @@ if (typeof window !== 'undefined') {
   }
 }
 
-/**
- * Motion the visitor is happy with. Reduced motion is authoritative on load,
- * since `preference` starts at 'system' — motion never starts and then stops.
- */
-const motionOk = computed(
-  () => preference.value === 'on' || (preference.value === 'system' && !reducedMotion.value),
-)
+/** Sections across the site. The OS setting alone, so it never flips
+ *  mid-session and takes an entrance animation away from unrevealed content. */
+const motionOk = computed(() => !reducedMotion.value)
 
-/** The same question plus WebGL — the hero's flock, and nothing else. */
-const active = computed(() => supported.value && motionOk.value)
+/** The hero's flock: motion, WebGL, and the visitor's own play/pause. */
+const active = computed(
+  () =>
+    supported.value &&
+    (background.value === 'on' || (background.value === 'system' && !reducedMotion.value)),
+)
 
 export function useMotion() {
   const toggle = () => {
-    preference.value = active.value ? 'off' : 'on'
+    background.value = active.value ? 'off' : 'on'
   }
 
-  /* Name the action, not the state: under an un-overridden reduced-motion
-     setting the button offers to enable motion, not to resume it. */
+  /* Name the action and what it acts on. Under an un-overridden
+     reduced-motion setting it offers to start, not to resume. */
   const label = computed(() => {
-    if (active.value) return 'Pause motion'
-    if (preference.value === 'system' && reducedMotion.value) return 'Enable motion'
-    return 'Resume motion'
+    if (active.value) return 'Pause background'
+    if (background.value === 'system' && reducedMotion.value) return 'Play background'
+    return 'Resume background'
   })
 
-  return { preference, reducedMotion, motionOk, supported, active, toggle, label }
+  return { background, reducedMotion, motionOk, supported, active, toggle, label }
 }

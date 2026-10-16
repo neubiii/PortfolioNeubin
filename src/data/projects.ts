@@ -3,32 +3,27 @@ import type { Discipline, Project } from '@/types'
 /**
  * PROJECT CONTENT
  *
- * Every headline, statistic, quote and paragraph below is transcribed from the
- * case-study pages in the Figma file `xbNlhyfWuoGdGYpjusY0eD`:
+ * Provenance, so nothing here drifts from its source.
+ *
+ * The UX entries are transcribed from the case-study pages in the Figma file
+ * `xbNlhyfWuoGdGYpjusY0eD`:
  *
  *   CasestudyMeetingroom        → meet-in-room
  *   CasestudyExpensereporting   → ai-expense-agent
  *   CasestudyBusstop            → busstop
- *   Designwork-Webdesign        → evergrove   (gallery - no documented process)
- *   Designwork-landingpage      → rate-conversion (gallery)
+ *   Designwork-Webdesign        → evergrove        (gallery)
+ *   Designwork-landingpage      → rate-conversion  (gallery)
  *
- * Three of those pages carry real prototype wiring, and their `links` point at
- * the flow's own starting frame. EverGrove and the landing page have none, so
- * they carry no link.
- *
- * The development entries are transcribed the same way, from the repositories
- * rather than from Figma: source files, Docker and CI configuration, and
- * `git log`. Ports, rule IDs, thresholds and library names are quoted from the
- * code.
+ * `links` point at a flow's own starting frame where one exists; the two
+ * galleries have none. The development entries are transcribed the same way
+ * from the repositories — source files, Docker and CI configuration, `git
+ * log` — with ports, rule IDs and thresholds quoted from the code.
  *
  * `ai-expense-agent` and `expense-ai` are the same product told twice on
- * purpose - the designed concept and the thing that was built. They are
- * separate entries because they answer different questions.
+ * purpose: the designed concept and the thing that was built.
  *
- * Nothing here is invented. Where the source is silent - a role title, a
- * prototype link - the field is absent rather than filled in.
- *
- * `Designwork-Newsletter` is an empty page in Figma and has no entry.
+ * Nothing here is invented. Where the source is silent — a role title, a
+ * prototype link — the field is absent rather than filled in.
  */
 export const projects: Project[] = [
   // ───────────────────────────────────────────────────────────────────────────
