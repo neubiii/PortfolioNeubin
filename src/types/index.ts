@@ -119,9 +119,8 @@ export type CaseSection =
   | ListSection
 
 /**
- * A piece of writing published elsewhere. Deliberately not a `Project`: there
- * is no page to route to, so modelling it as one would mean empty project
- * pages. Its only destination is the original post.
+ * A piece of writing published elsewhere. Not a `Project`: there is no page to
+ * route to — its only destination is the original post.
  */
 export interface WritingEntry {
   /** Selection key for the preview. Not a route — writing has none. */
@@ -179,9 +178,7 @@ export type SkillDomain = 'ux' | 'development'
 
 /**
  * `skill` is a capability, language, framework or practice — something done.
- * `tool` is a named application that is operated. The line matters because the
- * two are worth presenting differently, and it is drawn here rather than being
- * inferred from a name later.
+ * `tool` is a named application that is operated.
  */
 export type SkillKind = 'skill' | 'tool'
 

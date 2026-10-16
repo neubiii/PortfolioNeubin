@@ -3,10 +3,9 @@ import { computed, onBeforeUnmount, ref } from 'vue'
 import { Brain } from 'lucide-vue-next'
 
 /**
- * The hero's opening: a recruiter's requirement is typed out, considered,
- * answered, and then gives way to the hero itself. This layer only covers the
- * hero — it never replaces it, so Vanta and the headline are already live
- * behind the ground it paints.
+ * The hero's opening: a requirement typed out, considered, answered, then
+ * given way to the hero. A layer over the hero, never a replacement for it —
+ * Vanta and the headline are already live behind the ground it paints.
  */
 const emit = defineEmits<{ reveal: []; done: [] }>()
 
@@ -154,9 +153,8 @@ onBeforeUnmount(stop)
   pointer-events: none;
 }
 
-/* Centred and held to a readable measure — the requirement is the whole screen
-   for these few seconds, and the hero's left-aligned composition arrives with
-   the hero. */
+/* Centred and held to a readable measure; the hero's left-aligned
+   composition arrives with the hero. */
 .intro__inner {
   width: min(90vw, 46rem);
   text-align: center;

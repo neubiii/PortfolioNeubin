@@ -71,9 +71,8 @@ const rise = (delay = 0, distance = 16) =>
         </motion.div>
       </div>
 
-      <!-- The plate is a deliberate window, not a pretence of transparency:
-           the artwork's flat ground was recoloured once, in the file, to the
-           blush this panel is painted in. -->
+      <!-- The artwork's flat ground was recoloured in the file to the blush
+           this panel is painted in. -->
       <motion.div class="contact__art" v-bind="rise(0.24, 28)" aria-hidden="true">
         <img class="contact__gif" :src="illustration" alt="" width="500" height="320" />
       </motion.div>
@@ -137,8 +136,7 @@ const rise = (delay = 0, distance = 16) =>
   display: inline-block;
   max-width: 100%;
   padding-block: 0.35rem;
-  /* Sans: an address is read character by character, which is where the
-     serif's punctuation and figures cost the most. The heading stays display. */
+  /* Sans: an address is read character by character. */
   font-family: var(--font-sans);
   font-size: clamp(1.25rem, 1.1rem + 0.62vw, 1.625rem);
   font-weight: 500;
@@ -189,8 +187,7 @@ const rise = (delay = 0, distance = 16) =>
   /* The blush the artwork's own ground was recoloured to, so the drawing has no
      edge of its own inside the panel. */
   background: #ecd9d4;
-  /* An arch, open at the foot: three sides drawn, the fourth is the section's
-     own floor — a window cut into the block rather than a card laid on it. */
+  /* An arch open at the foot: the fourth side is the section's own floor. */
   border-radius: clamp(1.75rem, 4vw, 3rem) clamp(1.75rem, 4vw, 3rem) 0 0;
   overflow: hidden;
   position: relative;
@@ -217,8 +214,7 @@ const rise = (delay = 0, distance = 16) =>
   aspect-ratio: 500 / 320;
 }
 
-/* Phone and small tablet: the details read first, the drawing sits under them
-   and still stands on the section's floor. */
+/* Phone: the details read first, the drawing sits under them. */
 @media (max-width: 61.999rem) {
   .contact__art {
     width: min(100%, 26rem);

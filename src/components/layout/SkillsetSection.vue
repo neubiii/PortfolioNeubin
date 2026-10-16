@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useInView } from 'motion-v'
+import { Eye, EyeOff } from 'lucide-vue-next'
 import { useMotion } from '@/composables/useMotion'
 import { LEVELS, LEVEL_LABEL, byLevel, ofKind } from '@/data/skills'
 import type { SkillDomain, SkillItem } from '@/types'
@@ -8,18 +9,10 @@ import type { SkillDomain, SkillItem } from '@/types'
 /**
  * Skillset, set as a type field rather than a list.
  *
- * One inventory, two lenses. Nothing is filtered out when the lens changes —
- * every item keeps its place and only its emphasis moves, because the argument
- * is that this is a single toolkit seen from two sides.
- *
- * The scatter is deterministic: each item's indent, trailing space and drift
- * come from three fixed patterns indexed by its position, and position depends
- * on index alone, never on the lens, so switching cannot move anything.
- *
- * Overlap is impossible rather than avoided — the items are inline-blocks in
- * normal text flow and the drift is applied with `vertical-align`, which the
- * line box accounts for, so the browser reserves the space each item needs at
- * every width, including the caption strip beneath it.
+ * Changing the lens only changes emphasis: placement comes from the item's
+ * index alone, so nothing moves. Items are inline-blocks in normal text flow
+ * and the drift is `vertical-align`, which the line box accounts for, so they
+ * cannot overlap at any width.
  */
 const lens = ref<SkillDomain>('ux')
 
@@ -29,12 +22,25 @@ const lenses: { id: SkillDomain; label: string }[] = [
 ]
 
 /**
- * Strongest first, then woven within each band.
- *
- * Sorting by level alone put all ten advanced UI/UX skills ahead of the five
- * advanced development ones, so a lens could open on a wall of ghost type.
- * Dealing the two domains alternately, with shared items every third slot,
- * means neither lens gets a long dim run. Deterministic and lens-independent.
+ * Skills and Tools share the field; only one is mounted at a time. The two
+ * choices are independent — changing discipline keeps the open collection.
+ */
+type Collection = 'practice' | 'tooling'
+
+const collection = ref<Collection>('practice')
+
+const collections: { id: Collection; label: string }[] = [
+  { id: 'practice', label: 'Skills' },
+  { id: 'tooling', label: 'Tools' },
+]
+
+/** Off: a level is read on hover or focus. On: every level is shown at once. */
+const showLevels = ref(false)
+
+/**
+ * Strongest first, then the two domains dealt alternately within each band
+ * (shared items every third slot) so neither lens opens on a long dim run.
+ * Deterministic and lens-independent.
  */
 const weave = (items: SkillItem[]): SkillItem[] => {
   const out: SkillItem[] = []
@@ -73,22 +79,13 @@ const tooling = weave(byLevel(ofKind('tool')))
 
 const total = practice.length + tooling.length
 
-/* Indent, trailing space and drift, in em of the item's own size. Co-prime
-   lengths keep the field from falling into a pattern the eye can catch. */
+/* Indent, trailing space and drift, in em. Co-prime lengths keep the field
+   from falling into a visible pattern. */
 const LEAD = [0, 1.5, 0.3, 2.4, 0.7, 0, 1.1, 3, 0.5, 1.8, 0.2, 2.7, 0.9, 0.4]
 const TRAIL = [1.5, 2.3, 1.1, 1.9, 2.7, 1.3, 2.1, 1.6, 2.5, 1.2, 1.8]
 const DRIFT = [0, -0.26, 0.16, -0.1, 0.32, -0.18, 0.07, 0.24, -0.32]
-/* Nothing sizes the words: one size and one weight at every width. Scale would
-   be a second, silent claim about proficiency — decodable off the page, and it
-   would push the weakest items to where they are hardest to read. Level is
-   stated by the caption and nowhere else. */
-
-/**
- * Entrance vectors, one per slot, cycled by position. Thirteen of them, sharing
- * no factor with any of the three placement patterns, so direction never lines
- * up with indent or drift into a visible stripe. All 10–16px: enough to read as
- * arrival, not as travel.
- */
+/** Entrance vectors. Thirteen, sharing no factor with the placement patterns,
+ *  so direction never lines up with indent or drift into a stripe. */
 const ENTER: [number, number][] = [
   [-14, 0],
   [0, 12],
@@ -105,8 +102,7 @@ const ENTER: [number, number][] = [
   [-8, -11],
 ]
 
-/** Eight words settle together, then the next eight — the whole field has
- *  assembled inside a second. */
+/* Eight words per beat: the field assembles inside a second. */
 const BATCH = 8
 const STEP = 70
 
@@ -119,35 +115,46 @@ const place = (i: number) => ({
   '--delay': `${Math.floor(i / BATCH) * STEP}ms`,
 })
 
+const items = computed(() => (collection.value === 'practice' ? practice : tooling))
+
 /** In the current lens, or practised on both sides of the work. */
 const lit = (item: SkillItem) => item.domains.includes(lens.value)
 
 const countIn = (domain: SkillDomain) =>
   [...practice, ...tooling].filter((item) => item.domains.includes(domain)).length
 
-const setLens = (id: SkillDomain) => {
-  lens.value = id
+/** Nothing captioned survives a switch: the word it belonged to may be gone. */
+const clearCue = () => {
   grazed.value = null
   held.value = null
 }
 
-/** Announced, not just shown: the lens is a real change of state. */
+const setLens = (id: SkillDomain) => {
+  lens.value = id
+  clearCue()
+}
+
+const setCollection = (id: Collection) => {
+  collection.value = id
+  clearCue()
+}
+
+/** Announced, not just shown: both levels are real changes of state. */
 const status = computed(() => {
-  const label = lenses.find((l) => l.id === lens.value)?.label
-  return `${label} emphasised. ${countIn(lens.value)} of ${total} entries in this discipline.`
+  const discipline = lenses.find((l) => l.id === lens.value)?.label
+  const showing = collections.find((c) => c.id === collection.value)?.label
+  return `${showing}, ${discipline} emphasised. ${countIn(lens.value)} of ${total} entries in this discipline.`
 })
 
 /* ── The annotation ──────────────────────────────────────────────────────
-   The level is captioned under its own word rather than floated over the page.
-   It can neither push the field around nor land on another word, and both are
-   structural: every item permanently reserves a strip of padding beneath
-   itself, so revealing the caption changes no geometry. */
+   Each item reserves a strip of padding beneath itself for its level, so
+   revealing the caption changes no geometry. */
 
 /**
- * Pointer and focus are tracked apart so a mouse resting in the field cannot
- * wipe out what a keyboard just selected — scrolling to a focused item slides
- * content under a stationary cursor, firing `pointerleave` after the focus
- * handler. The last device used decides which wins.
+ * Pointer and focus are tracked apart: scrolling to a focused item slides
+ * content under a stationary cursor and fires `pointerleave` after the focus
+ * handler, which would otherwise wipe out the keyboard's selection. The last
+ * device used wins.
  */
 const grazed = ref<SkillItem | null>(null)
 const held = ref<SkillItem | null>(null)
@@ -157,11 +164,8 @@ const cue = computed(() =>
   via.value === 'key' ? (held.value ?? grazed.value) : (grazed.value ?? held.value),
 )
 
-/**
- * A caption near the right edge would run off the measure, so it hangs from the
- * word's right edge instead. Measured, not guessed: the caption is always in
- * the DOM, so its width is known before it is shown.
- */
+/** A caption near the right edge would run off the measure, so it hangs from
+ *  the word's right edge instead. Measured while it is still transparent. */
 const aim = (el: EventTarget | null) => {
   const item = el as HTMLElement | null
   const caption = item?.querySelector<HTMLElement>('.item__cue')
@@ -171,19 +175,16 @@ const aim = (el: EventTarget | null) => {
     item.offsetLeft + caption.offsetWidth > field.clientWidth ? 'right' : 'left'
 }
 
-/** A pointer only wakes items in the current lens; brushing past a recessed one
- *  on the way somewhere else should not caption it. */
+/** A pointer only wakes items in the current lens. */
 const enter = (item: SkillItem, event: PointerEvent) => {
   via.value = 'pointer'
-  /* Aimed either way: a recessed item is not captioned by a pointer, but a tap
-     or keystroke a moment later must find the width measured here. */
+  /* Aimed either way: a tap or keystroke a moment later needs this width. */
   aim(event.currentTarget)
   if (!lit(item)) return
   grazed.value = item
 }
 
-/** Focus and tap are deliberate, so they caption anything — a recessed item
- *  still has to be readable to someone who asked for it by name. */
+/** Focus and tap are deliberate, so they caption a recessed item too. */
 const hold = (item: SkillItem, event: Event) => {
   held.value = item
   aim(event.currentTarget)
@@ -194,14 +195,13 @@ const tap = (item: SkillItem, event: MouseEvent) => {
   hold(item, event)
 }
 
-/* A roving tabindex, one stop per field. Sixty-four tab stops in one section
-   would be worse than no keyboard support, so the field behaves as one
-   composite control: tab to it, arrow through it. Every item also carries its
-   level in text, so nothing has to be navigated to be read. */
-const rove = ref<Record<string, number>>({ practice: 0, tooling: 0 })
-const fields = ref<Record<string, HTMLElement | null>>({ practice: null, tooling: null })
+/* A roving tabindex: the field is one composite control — tab to it, arrow
+   through it — rather than one stop per word. Every item carries its level in
+   text, so nothing has to be navigated to be read. */
+const rove = ref<Record<Collection, number>>({ practice: 0, tooling: 0 })
+const field = ref<HTMLElement | null>(null)
 
-const step = (region: string, list: SkillItem[], event: KeyboardEvent) => {
+const step = (region: Collection, list: SkillItem[], event: KeyboardEvent) => {
   const delta: Record<string, number> = {
     ArrowRight: 1,
     ArrowDown: 1,
@@ -218,30 +218,25 @@ const step = (region: string, list: SkillItem[], event: KeyboardEvent) => {
   via.value = 'key'
   rove.value[region] = Math.max(0, Math.min(list.length - 1, next))
   nextTick(() => {
-    fields.value[region]?.querySelectorAll<HTMLElement>('.item')[rove.value[region]]?.focus()
+    field.value?.querySelectorAll<HTMLElement>('.item')[rove.value[region]]?.focus()
   })
 }
 
-/* Each field assembles on its own arrival rather than both waiting on the
-   section. The hidden state lives in CSS from the first paint — the class only
-   removes it — so there is always a frame to transition from.
-
-   `active` from useMotion is not the gate here: it also asks about WebGL, which
-   is the hero's question. */
+/* The hidden state lives in CSS from the first paint; the attribute only
+   removes it, so there is always a frame to transition from. `motionOk`, not
+   `active`: the latter also asks about WebGL, which is the hero's question. */
 const { motionOk } = useMotion()
 
-const practiceInView = useInView(
-  computed(() => fields.value.practice),
-  { amount: 0.05, margin: '0px 0px -12% 0px' },
-)
-const toolingInView = useInView(
-  computed(() => fields.value.tooling),
-  { amount: 0.05, margin: '0px 0px -12% 0px' },
-)
+const inView = useInView(field, { amount: 0.05, margin: '0px 0px -12% 0px' })
 
-/* Under reduced motion the caption still reveals — it is information, not
-   decoration. Only the arrival is dropped. */
-const settled = (inView: boolean) => (motionOk.value ? inView : true)
+/* Latched: the arrival plays once, so switching collection only crossfades. */
+const arrived = ref(false)
+watch(inView, (visible) => {
+  if (visible) arrived.value = true
+})
+
+/* Reduced motion drops the arrival; the caption still reveals. */
+const settled = computed(() => !motionOk.value || arrived.value)
 </script>
 
 <template>
@@ -251,7 +246,9 @@ const settled = (inView: boolean) => (motionOk.value ? inView : true)
     </div>
 
     <p class="skillset__lede">
-      Two sides of the same toolkit. Pick a discipline to see what I use most.
+      I work across the path from understanding a product problem to shipping the
+      interface. These are the skills and tools I use for research, UX, component
+      design, frontend development and testing.
     </p>
 
     <div class="ruler skillset__lenses" role="group" aria-label="Emphasise a discipline">
@@ -269,87 +266,88 @@ const settled = (inView: boolean) => (motionOk.value ? inView : true)
       </button>
     </div>
 
+    <!-- Second level, quieter than the first. -->
+    <div class="skillset__switch">
+      <div class="swap" role="group" aria-label="Show skills or tools">
+        <button
+          v-for="option in collections"
+          :key="option.id"
+          type="button"
+          class="meta swap__item"
+          :data-active="collection === option.id"
+          :aria-pressed="collection === option.id"
+          @click="setCollection(option.id)"
+        >
+          {{ option.label }}
+        </button>
+      </div>
+
+      <button
+        type="button"
+        class="meta swap__levels"
+        :aria-pressed="showLevels"
+        @click="showLevels = !showLevels"
+      >
+        <component :is="showLevels ? EyeOff : Eye" class="swap__eye" aria-hidden="true" />
+        {{ showLevels ? 'Hide' : 'Show' }} proficiency
+      </button>
+    </div>
+
     <p class="sr-only" role="status">{{ status }}</p>
 
     <div class="skillset__body">
-      <section class="region region--practice" aria-labelledby="skillset-practice">
-        <h3 id="skillset-practice" class="label region__marker">Skills</h3>
+      <Transition name="swap">
         <ul
-          :ref="(el) => (fields.practice = el as HTMLElement)"
-          class="field field--practice"
-          :data-in="settled(practiceInView)"
-          @keydown="step('practice', practice, $event)"
+          :key="collection"
+          ref="field"
+          class="field"
+          :aria-label="collection === 'practice' ? 'Skills' : 'Tools'"
+          :data-in="settled"
+          :data-levels="showLevels"
+          @keydown="step(collection, items, $event)"
         >
           <li
-            v-for="(item, i) in practice"
+            v-for="(item, i) in items"
             :key="item.id"
             class="item"
             :data-level="item.level"
             :data-lit="lit(item)"
             :data-cue="cue?.id === item.id"
             :style="place(i)"
-            :tabindex="rove.practice === i ? 0 : -1"
+            :tabindex="rove[collection] === i ? 0 : -1"
             @pointerenter="enter(item, $event)"
             @pointerleave="grazed = null"
-            @focus="((rove.practice = i), hold(item, $event))"
+            @focus="((rove[collection] = i), hold(item, $event))"
             @blur="held = null"
             @click="tap(item, $event)"
           >
             <span class="item__word">{{ item.name }}</span>
             <span class="sr-only">, {{ LEVEL_LABEL[item.level] }}</span>
-            <span class="meta item__cue" aria-hidden="true">{{ LEVEL_LABEL[item.level] }}</span>
+            <!-- Shown because this item was asked for, or because every level
+                 is on — and the switch speaks only for the discipline in focus.
+                 `aria-hidden`: the level is already in text above. -->
+            <span
+              v-if="!showLevels || lit(item)"
+              class="meta item__cue"
+              aria-hidden="true"
+              >{{ LEVEL_LABEL[item.level] }}</span
+            >
           </li>
         </ul>
-      </section>
-
-      <!-- Set beside its marker rather than under it, and a notch smaller, so
-           the two regions never read as one long run of type. -->
-      <section class="region region--tooling" aria-labelledby="skillset-tooling">
-        <h3 id="skillset-tooling" class="label region__marker">Tools</h3>
-        <ul
-          :ref="(el) => (fields.tooling = el as HTMLElement)"
-          class="field field--tooling"
-          :data-in="settled(toolingInView)"
-          @keydown="step('tooling', tooling, $event)"
-        >
-          <li
-            v-for="(item, i) in tooling"
-            :key="item.id"
-            class="item"
-            :data-level="item.level"
-            :data-lit="lit(item)"
-            :data-cue="cue?.id === item.id"
-            :style="place(i)"
-            :tabindex="rove.tooling === i ? 0 : -1"
-            @pointerenter="enter(item, $event)"
-            @pointerleave="grazed = null"
-            @focus="((rove.tooling = i), hold(item, $event))"
-            @blur="held = null"
-            @click="tap(item, $event)"
-          >
-            <span class="item__word">{{ item.name }}</span>
-            <span class="sr-only">, {{ LEVEL_LABEL[item.level] }}</span>
-            <span class="meta item__cue" aria-hidden="true">{{ LEVEL_LABEL[item.level] }}</span>
-          </li>
-        </ul>
-      </section>
+      </Transition>
     </div>
   </section>
 </template>
 
 <style scoped>
 .skillset {
-  /* Scales the whole scatter in one place: full strength on a desktop, eased
-     off as the measure narrows, off on a phone. */
+  /* Scales the whole scatter: full on desktop, off on a phone. */
   --scatter: 1;
-  /* The strip every item reserves beneath itself for its caption. In rem, so it
-     does not shrink with the smallest words. */
-  --cue-room: 1.6rem;
-  /* The largest value in DRIFT, as a plain number: the caption geometry has to
-     know it to cancel the drift out. */
+  /* The strip each item reserves for its caption. */
+  --cue-room: 1.35rem;
+  /* The largest DRIFT value; the caption geometry cancels the drift out. */
   --drift-max: 0.32em;
-  /* Entrance offsets are horizontal as well as vertical; clip rather than
-     hidden, so nothing here becomes a scroll container. */
+  /* Entrance offsets are horizontal too. `clip`, so this never scrolls. */
   overflow-x: clip;
 }
 
@@ -365,14 +363,14 @@ const settled = (inView: boolean) => (motionOk.value ? inView : true)
 
 .skillset__lede {
   margin-top: clamp(1.1rem, 2vw, 1.6rem);
-  max-width: 52ch;
+  max-width: 58ch;
   color: var(--c-muted);
   font-size: var(--t-lg);
   line-height: 1.5;
 }
 
 .skillset__lenses {
-  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+  margin-top: clamp(1.1rem, 2vw, 1.6rem);
 }
 
 .lens__count {
@@ -381,49 +379,78 @@ const settled = (inView: boolean) => (motionOk.value ? inView : true)
 }
 
 .skillset__body {
-  display: grid;
-  gap: clamp(2.5rem, 5vw, 4.5rem);
-  margin-top: clamp(2rem, 3.5vw, 3rem);
+  position: relative;
+  margin-top: clamp(1.1rem, 2vw, 1.6rem);
 }
 
-.region__marker {
+/* Collection on the left, level switch to the right. */
+.skillset__switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  margin-top: clamp(0.9rem, 1.6vw, 1.25rem);
+}
+
+.swap {
+  display: flex;
+  gap: clamp(1rem, 2vw, 1.75rem);
+}
+
+.swap__item,
+.swap__levels {
+  /* Padding, not min-height: a line of type with a 44px target. */
+  padding-block: 0.85rem;
   color: var(--c-muted);
+  transition: color var(--dur) var(--ease-out);
 }
 
-.region--practice .region__marker {
-  margin-bottom: clamp(1.25rem, 2.5vw, 2rem);
+/* The icon carries the state, the label the action. */
+.swap__levels {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
 }
 
-/* Beside the field, in the same 9rem marker column the section heads use. */
-@media (min-width: 48rem) {
-  .region--tooling {
-    display: grid;
-    grid-template-columns: 9rem minmax(0, 1fr);
-    column-gap: 2rem;
-    align-items: start;
-  }
-
-  .region--tooling .region__marker {
-    padding-top: 0.35rem;
-  }
+.swap__eye {
+  width: 0.9375rem;
+  height: 0.9375rem;
+  flex: none;
 }
 
-.region--tooling .region__marker {
-  margin-bottom: 1rem;
+.swap__levels[aria-pressed='true'] {
+  color: var(--c-ink);
+}
+
+.swap__levels[aria-pressed='true'] .swap__eye {
+  color: var(--c-accent);
+}
+
+.swap__item:hover,
+.swap__levels:hover,
+.swap__item:focus-visible,
+.swap__levels:focus-visible {
+  color: var(--c-ink);
+}
+
+.swap__item[data-active='true'] {
+  color: var(--c-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--c-accent);
+  text-underline-offset: 0.45em;
+  text-decoration-thickness: 2px;
 }
 
 .field {
-  /* Text flow, not placement: every item is an inline-block, which is why
-     nothing can land on top of anything else. */
+  /* Text flow, not placement, so nothing can overlap. */
   position: relative;
   margin: 0;
   padding: 0;
   list-style: none;
   line-height: 1;
   text-wrap: pretty;
-  /* One face. Technical names are dense and often punctuated — `Node.js /
-     Express` — and the display serif made them work to read at these sizes.
-     Hierarchy moves to weight and a narrow size range instead. */
+  /* Sans, not the display serif: technical names are dense and punctuated. */
   font-family: var(--font-sans);
   letter-spacing: -0.005em;
 }
@@ -434,24 +461,18 @@ const settled = (inView: boolean) => (motionOk.value ? inView : true)
   display: inline-block;
   margin-inline: calc(var(--lead) * var(--scatter)) calc(var(--trail) * var(--scatter));
   margin-block: 0.4rem 0;
-  /* The reserved caption strip, part of the item's own box, so the line box
-     grows to hold it and the next line can never rise into a caption.
-
-     The item's own drift is added back here and taken off again on the caption,
-     landing every caption the same distance below the baseline however far its
-     word has drifted. */
+  /* The caption strip, part of the item's own box so the next line cannot
+     rise into it. The drift is added back here and taken off on the caption,
+     landing every caption the same distance below the baseline. */
   padding-bottom: calc(var(--cue-room) + var(--d) + var(--drift-max) * var(--scatter));
-  /* Not `translate`: `vertical-align` is part of layout, so the line box grows
-     to hold the drift instead of the item wandering into the line above. */
+  /* Not `translate`: `vertical-align` is layout, so the line box holds it. */
   vertical-align: var(--d);
   color: var(--c-ink);
   cursor: default;
-  /* One size and one weight for every entry, skills and tools alike. The two
-     regions are already told apart by their markers and their place. */
+  /* One size and weight throughout; the control above names the collection. */
   font-size: clamp(0.96875rem, 0.9225rem + 0.19vw, 1.09375rem);
   font-weight: 500;
-  /* Entrance only. The hover response lives on the word inside, so the two
-     never contend for the same transform. */
+  /* Entrance only; the hover response lives on the word inside. */
   transition:
     opacity 520ms var(--ease-out) var(--delay, 0ms),
     transform 560ms var(--ease-out) var(--delay, 0ms);
@@ -470,15 +491,13 @@ const settled = (inView: boolean) => (motionOk.value ? inView : true)
     transform var(--dur) var(--ease-out);
 }
 
-/* Always in the DOM — that is how its width is known before it is shown, and
-   how the reveal costs no layout. `aria-hidden`, because the item already
-   states its level in text. */
+/* Rendered transparent rather than absent, so its width is known before it is
+   shown and revealing it costs no layout. */
 .item__cue {
   position: absolute;
   left: 0;
   bottom: calc(var(--drift-max) * var(--scatter));
-  /* Drawn into the reserved strip, clear of the descenders of anything that has
-     drifted down beside it. */
+  /* Drawn into the reserved strip, clear of neighbouring descenders. */
   height: 0.9rem;
   line-height: 0.9rem;
   font-size: 0.6875rem;
@@ -486,9 +505,7 @@ const settled = (inView: boolean) => (motionOk.value ? inView : true)
   text-transform: uppercase;
   white-space: nowrap;
   color: var(--c-accent);
-/* Paper behind it: a long caption reaches past its own word into the reserved
-   strip beside it, which is empty — the ground makes that visible rather than
-   assumed. */
+/* Paper behind it: a long caption reaches into the empty strip beside it. */
   background: var(--c-paper);
   padding-right: 0.35em;
   pointer-events: none;
@@ -506,9 +523,41 @@ const settled = (inView: boolean) => (motionOk.value ? inView : true)
   padding-left: 0.35em;
 }
 
-.item[data-cue='true'] .item__cue {
+/* Asked for, or all of them at once — the same caption either way. */
+.item[data-cue='true'] .item__cue,
+.field[data-levels='true'] .item[data-lit='true'] .item__cue {
   opacity: 1;
   transform: none;
+}
+
+/* Hung captions collide once they are all up, so here the caption takes its
+   own place in the item's box and sets the item's width. Same type, colour and
+   distance under the word; the strip it hung in is given back, so the line
+   height does not move. */
+.field[data-levels='true'] .item {
+  padding-bottom: calc(var(--d) + var(--drift-max) * var(--scatter));
+}
+
+.field[data-levels='true'] .item[data-lit='true'] .item__cue {
+  position: static;
+  display: block;
+  margin-top: 0.42rem;
+  padding: 0;
+  background: none;
+}
+
+/* A recessed item keeps the caption's space: an inline-block takes its
+   baseline from its last line, so without this the captioned words ride up and
+   the line goes ragged. Empty, so there is nothing to announce. */
+.field[data-levels='true'] .item[data-lit='false']::after {
+  /* A space, not nothing: an empty block draws no line box. */
+  content: '\00a0';
+  display: block;
+  margin-top: 0.42rem;
+  height: 0.9rem;
+  line-height: 0.9rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.09em;
 }
 
 /* The word's own response is small, because the caption is the information. */
@@ -522,15 +571,13 @@ const settled = (inView: boolean) => (motionOk.value ? inView : true)
   z-index: 1;
 }
 
-/* Nothing is removed, nothing moves. An item outside the lens drops back far
-   enough to read as ground rather than figure, but stays a readable word — not
-   a disabled control. Items practised on both sides never drop back. */
+/* An item outside the lens recedes but stays readable — not a disabled
+   control. Items practised on both sides never recede. */
 .item[data-lit='false'] .item__word {
   opacity: 0.36;
 }
 
-/* Dark: the same nominal recede reads fainter against a near-black ground, so
-   it is carried a little higher. */
+/* The same recede reads fainter on a near-black ground. */
 :root[data-theme='dark'] .item[data-lit='false'] .item__word {
   opacity: 0.4;
 }
@@ -541,8 +588,7 @@ const settled = (inView: boolean) => (motionOk.value ? inView : true)
   }
 }
 
-/* Deliberate: focus and tap reach a recessed item, because someone asked for
-   it by name. */
+/* Focus and tap reach a recessed item. */
 .item[data-lit='false'][data-cue='true'] .item__word,
 .item[data-lit='false']:focus .item__word {
   opacity: 1;
@@ -556,8 +602,7 @@ const settled = (inView: boolean) => (motionOk.value ? inView : true)
   }
 }
 
-/* `:focus`, not `:focus-visible` — a tap has to leave the state up long enough
-   to read, and on a phone that is the whole interaction. */
+/* `:focus`, not `:focus-visible`: a tap has to leave the state up to read. */
 .item:focus {
   outline: none;
 }
@@ -569,8 +614,25 @@ const settled = (inView: boolean) => (motionOk.value ? inView : true)
 
 /* ── Entrance ──────────────────────────────────────────────────────────── */
 
-/* The start state, in CSS from the first paint. Eight words share a delay, so
-   the field assembles in six beats rather than sixty-four. */
+/* ── Switching collection ──────────────────────────────────────────────── */
+
+/* Opacity only, and short: the field is being replaced, not animated. */
+.swap-enter-active,
+.swap-leave-active {
+  transition: opacity 140ms var(--ease-out);
+}
+
+.swap-enter-from,
+.swap-leave-to {
+  opacity: 0;
+}
+
+.swap-leave-active {
+  position: absolute;
+  inset: 0 0 auto;
+}
+
+/* The start state, in CSS from the first paint. */
 .field[data-in='false'] .item {
   opacity: 0;
   transform: translate(var(--dx), var(--dy));
@@ -585,16 +647,14 @@ const settled = (inView: boolean) => (motionOk.value ? inView : true)
   }
 }
 
-/* Tablet: more structure — the tools drop under their marker and the drift
-   comes most of the way out. */
+/* Tablet: most of the drift comes out. */
 @media (max-width: 64rem) {
   .skillset {
     --scatter: 0.45;
   }
 }
 
-/* Phone: readability wins. No scatter at all, no drift, and the field becomes
-   an evenly spaced wrap that still keeps size as hierarchy. */
+/* Phone: no scatter, no drift — an evenly spaced wrap. */
 @media (max-width: 44rem) {
   .skillset {
     --scatter: 0;
@@ -608,9 +668,8 @@ const settled = (inView: boolean) => (motionOk.value ? inView : true)
 
 /* ── Reduced motion ────────────────────────────────────────────────────── */
 
-/* The site preference is honoured in script — the field is rendered settled
-   rather than animated in. This is the OS setting saying the same thing, and it
-   leaves the caption working: it is information, not decoration. */
+/* The script already renders the field settled; this is the OS setting saying
+   the same thing. The caption keeps working — it is information. */
 @media (prefers-reduced-motion: reduce) {
   .field[data-in='false'] .item {
     opacity: 1;
@@ -620,7 +679,8 @@ const settled = (inView: boolean) => (motionOk.value ? inView : true)
   .item,
   .item__word,
   .item__cue,
-  .lens {
+  .swap-enter-active,
+  .swap-leave-active {
     transition: none;
   }
 }

@@ -63,9 +63,8 @@ const from = (dir: From, delay = 0) =>
       }
     : {}
 
-/* Tied to the counts block's own in-view state, so the numbers are on screen
-   while they move. It goes false only once the block is fully out of the
-   trigger zone, which is why scrolling inside the section does not restart it. */
+/* Tied to the counts block's in-view state, so the numbers are on screen while
+   they move, and scrolling inside the section does not restart them. */
 const tallies = ref(stats.map(() => 0))
 const counted = ref(false)
 
@@ -200,10 +199,6 @@ const loves = [
           </article>
         </motion.div>
 
-        <!-- <motion.h3 class="display-soft loves__head" v-bind="from('bottom')">
-          Things I love most…
-        </motion.h3> -->
-
         <motion.ul class="loves" v-bind="from('bottom', 0.1)">
           <li
             v-for="love in loves"
@@ -239,12 +234,10 @@ const loves = [
 
 <style scoped>
 /* ── Local palette ───────────────────────────────────────────────────────
-   One anchor and two accents rather than a family of purples. Every pairing is
-   fixed ink on a fixed ground, so the colour-blocked panels need no dark-theme
+   Fixed ink on fixed grounds, so the colour-blocked panels need no dark-theme
    variant; only the accents that land on the page ground follow the theme. */
-/* The counts block enters 24px to the right, which on a narrow screen is 24px
-   of horizontal scroll until it arrives. `clip`, not `hidden`: it creates no
-   scroll container. */
+/* The counts block enters 24px to the right — 24px of horizontal scroll on a
+   narrow screen until it arrives. `clip`, so this never becomes scrollable. */
 .about {
   overflow-x: clip;
 
@@ -274,9 +267,8 @@ const loves = [
   --a-accent-ink: #e88ab0;
 }
 
-/* The Work section's ruler row rather than the marker-and-title block the later
-   sections use: this section's title is the statement inside the composition,
-   so the opener only names the section. */
+/* A ruler row, not the marker-and-title block: the title is the statement
+   inside the composition, so the opener only names the section. */
 .about__head {
   display: flex;
   align-items: baseline;
@@ -292,8 +284,7 @@ const loves = [
   margin: 0;
 }
 
-/* One grid, four rows. The identity panel spans all of them, which makes the
-   two halves a single composition rather than a sidebar beside a stack. */
+/* One grid, four rows; the identity panel spans all of them. */
 .bento {
   display: grid;
   gap: clamp(0.75rem, 1.1vw, 1rem);
@@ -338,15 +329,13 @@ const loves = [
   }
 }
 
-/* Tablet: the identity panel goes wide across the top, the rest keeps its bento
-   logic underneath rather than collapsing into one column. */
+/* Tablet: the identity panel goes wide, the rest keeps its bento logic. */
 @media (min-width: 44rem) and (max-width: 63.99rem) {
   .bento {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
-  /* Spans the title, the story and the counts, so the panel is tall enough for
-     the portrait to still be a portrait rather than an avatar. */
+  /* Tall enough for the portrait to still read as a portrait. */
   .id {
     grid-column: 1 / 3;
     grid-row: 1 / 4;
@@ -438,8 +427,7 @@ const loves = [
   padding-inline: 0.15rem;
 }
 
-/* A ruled row, the way the rest of the site sets its links, in this panel's
-   palette. */
+/* A ruled row, in this panel's palette. */
 .id__link {
   display: flex;
   align-items: center;
@@ -519,8 +507,7 @@ const loves = [
   text-wrap: pretty;
 }
 
-/* A ruled row rather than a banner: the same device the card already uses for
-   the two cities. */
+/* A ruled row, the same device the card uses for the two cities. */
 .story__open {
   display: flex;
   align-items: center;
@@ -614,8 +601,7 @@ const loves = [
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-/* Picture edge to edge, caption sitting on it — no strip underneath, so the
-   card is one image rather than an image plus a bar. */
+/* Picture edge to edge with the caption on it, so the card is one image. */
 .love {
   position: relative;
   transition:
@@ -646,8 +632,7 @@ const loves = [
   transition: transform var(--dur-slow) var(--ease-out);
 }
 
-/* The picture's lower third is darkened so the caption has something settled to
-   sit on. Not on the music card: its ground is pale by design. */
+/* The lower third is darkened for the caption. Not on the music card. */
 .love[data-love='mountains'] .love__media::after,
 .love[data-love='snow'] .love__media::after {
   content: '';
@@ -674,8 +659,7 @@ const loves = [
   transition: transform var(--dur-slow) var(--ease-out);
 }
 
-/* A translucent block laid on the picture, low and inset — the image carries
-   on behind it. */
+/* A translucent block laid low on the picture. */
 .love__label {
   position: absolute;
   right: 0.65rem;
@@ -729,8 +713,7 @@ const loves = [
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* Wider crops so three full-width cards stay a band rather than a column of
-     squares. */
+  /* Wider crops, so three full-width cards stay a band. */
   .love__media {
     aspect-ratio: 16 / 9;
   }

@@ -4,12 +4,9 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 const HEADER_OFFSET = 104
 
 /**
- * Wait for a hash target to exist before scrolling to it.
- *
- * The routed view animates with `<Transition mode="out-in">`, so on a
- * cross-route hash navigation (`/work/<slug>` → `/#work`) the new page has not
- * mounted yet when `scrollBehavior` runs. This resolves on the frame the
- * element actually appears — the frame budget is a safety valve, not a delay.
+ * Wait for a hash target to exist before scrolling to it: `<Transition
+ * mode="out-in">` means that on a cross-route hash navigation the new page has
+ * not mounted when `scrollBehavior` runs. The frame budget is a safety valve.
  */
 const waitForTarget = (hash: string): Promise<Element | null> =>
   new Promise((resolve) => {
@@ -25,8 +22,7 @@ const waitForTarget = (hash: string): Promise<Element | null> =>
 
 const routes: RouteRecordRaw[] = [
   { path: '/', name: 'home', component: () => import('@/pages/HomePage.vue') },
-  // Work now lives on the home page. Kept as a redirect so older links and
-  // bookmarks land on the showcase instead of the 404.
+  // Work lives on the home page; older links still land on the showcase.
   { path: '/work', redirect: () => ({ path: '/', hash: '#work' }) },
   {
     path: '/work/:slug',

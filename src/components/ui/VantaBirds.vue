@@ -4,32 +4,22 @@ import { useTheme } from '@/composables/useTheme'
 import { useMotion } from '@/composables/useMotion'
 
 /**
- * Vanta BIRDS as the hero's atmosphere.
+ * Vanta BIRDS as the hero's atmosphere. Two Vanta quirks shape this file.
  *
- * Two Vanta quirks shape this file; both are worked around deliberately.
+ * 1. Sizing. Vanta measures its container once, clamped to minWidth/minHeight,
+ *    and BIRDS stubs out `onResize()`, so nothing corrects it — a routed hero
+ *    still mid-transition measures ~0 and gets clamped to 200x200. A
+ *    ResizeObserver drives the lifecycle instead: construct on the first
+ *    non-zero measurement, `resize()` on every change after.
  *
- * 1. Sizing. Vanta measures its container once in `setSize()`, clamped to
- *    `minWidth`/`minHeight`, and BIRDS overrides `onResize()` with an empty
- *    method — so nothing ever corrects it. On a return visit the dynamic
- *    imports resolve from cache while the routed hero is still mid-transition
- *    and measures ~0, which the clamp turns into 200x200: a correctly sized
- *    canvas with a camera framed for a tiny box. A ResizeObserver drives the
- *    lifecycle instead, constructing on the first non-zero measurement and
- *    calling `resize()` on every change, so mount, route return, window resize
- *    and late font reflow all take one path.
+ * 2. Texture width. BIRDS seeds its simulation size at 32 and only writes the
+ *    real one in the geometry builder, which `onInit()` runs after the compute
+ *    renderer — so the first build simulates into 32x32 while the geometry
+ *    addresses `2 ** quantity`. `build()` checks the allocated texture and
+ *    rebuilds once if they disagree, and QUANTITY stays an integer (see below).
  *
- * 2. Texture width. BIRDS keeps its simulation size in a module-level `WIDTH`,
- *    seeded at 32 and written only inside the geometry builder — which
- *    `onInit()` runs *after* the GPU compute renderer. So the first build in a
- *    page simulates into 32x32 while its geometry addresses `2 ** quantity`.
- *    Two things fix it: `QUANTITY` must be an integer (a fractional one puts
- *    every reference UV between texel centres, and a cancelled bilinear blend
- *    makes the vertex shader's orientation basis NaN — the collapsed,
- *    'one-winged' triangles), and `build()` verifies the allocated texture
- *    against `2 ** QUANTITY`, rebuilding once if they disagree.
- *
- * `three` and `vanta` are dynamic imports, so ~600 kB of WebGL never enters the
- * initial bundle and never loads at all under reduced motion.
+ * `three` and `vanta` are dynamic imports, so ~600 kB of WebGL never enters
+ * the initial bundle and never loads at all under reduced motion.
  */
 const el = ref<HTMLElement | null>(null)
 const instance = shallowRef<VantaEffect | null>(null)
@@ -104,9 +94,11 @@ const palette = () => {
 }
 
 /**
- * Flock size as Vanta's exponent: it simulates a `2 ** QUANTITY` square of
- * boids, so 4 ** QUANTITY birds — 64 on desktop, 16 on a phone. Integers only;
- * see the WIDTH note above.
+ * Flock size as Vanta's exponent: a `2 ** QUANTITY` square of boids, so
+ * 4 ** QUANTITY birds — 64 on desktop, 16 on a phone. Integers only: a
+ * fractional one puts every reference UV between texel centres, and the
+ * cancelled bilinear blend makes the vertex shader's orientation basis NaN
+ * (collapsed, one-winged triangles).
  */
 const QUANTITY = { wide: 3, small: 2 }
 
@@ -139,8 +131,7 @@ const build = async (correcting = false): Promise<void> => {
       el: el.value,
       THREE,
 
-      // A drifting predator rather than a snapping one. Touch and gyro stay off
-      // so the flock never fights a phone's scroll.
+      // Touch and gyro off, so the flock never fights a phone's scroll.
       mouseControls: true,
       mouseEase: true,
       touchControls: false,
@@ -157,9 +148,8 @@ const build = async (correcting = false): Promise<void> => {
       color2: c2,
       colorMode: 'lerpGradient',
 
-      // Vanta scales the wings by `wingSpan * birdSize`, so its defaults gave a
-      // half-span wider than the body. Pulled back so a bird reads as a bird,
-      // and a wing turned edge-on vanishes quietly instead of flashing.
+      // Wings scale by `wingSpan * birdSize`; the defaults are wider than the
+      // body.
       birdSize: small ? 0.9 : 1.05,
       wingSpan: small ? 20.0 : 24.0,
       speedLimit: 2.4,
@@ -171,9 +161,8 @@ const build = async (correcting = false): Promise<void> => {
 
     running.value = true
 
-    // Did Vanta simulate into the texture its geometry addresses? On the first
-    // build in a page it will not have (see the WIDTH note above). Rebuild once
-    // through this same path; by then the geometry step has written WIDTH.
+    // Did Vanta simulate into the texture its geometry addresses? Not on the
+    // first build in a page; by the rebuild the geometry step has written it.
     const built = computeWidth(instance.value)
     if (!correcting && built !== undefined && built !== expectedWidth(quantity)) {
       teardown()
@@ -196,8 +185,8 @@ const teardown = () => {
   running.value = false
 }
 
-/** Stop drawing without discarding the flock, so resuming picks the birds up
- *  where they were instead of scattering a fresh set into frame. */
+/** Stop drawing without discarding the flock, so a resume picks the birds up
+ *  where they were. */
 const pause = () => {
   const vanta = instance.value
   if (!vanta) return
@@ -215,8 +204,7 @@ const resume = () => {
   const vanta = instance.value
   if (!vanta) return
   if (typeof vanta.animationLoop === 'function') {
-    // Drop the stale frame timestamp so the first tick after a pause is an
-    // ordinary delta rather than a jump.
+    // Drop the stale timestamp, or the first tick after a pause jumps.
     vanta.prevNow = 0
     vanta.animationLoop()
     running.value = true
@@ -227,8 +215,8 @@ onMounted(() => {
   if (typeof window === 'undefined' || !el.value) return
   if (!canRunWebGL()) return
 
-  // The observer always runs, so the hero's geometry is known the moment the
-  // visitor asks for motion; `active` decides whether anything is built.
+  // Always observing, so the geometry is known the moment motion is asked
+  // for; `active` decides whether anything is built.
   observer = new ResizeObserver(() => {
     const host = el.value
     if (!host || disposed) return
@@ -256,9 +244,8 @@ onMounted(() => {
   observer.observe(el.value)
 })
 
-/** A paused flock stays in memory and simply stops being drawn; a resume that
- *  finds nothing built (paused before first paint, or reduced motion
- *  overridden) builds it now. */
+/** A paused flock stays in memory; a resume that finds nothing built — paused
+ *  before first paint, or reduced motion overridden — builds it now. */
 watch(active, (on) => {
   if (disposed) return
   if (on) {
@@ -304,8 +291,7 @@ defineExpose({ running })
 .vanta {
   position: absolute;
   inset: 0;
-  /* Scenery: never takes a pointer event. Vanta binds its own mouse listener
-     to `window`, so this costs no interaction. */
+  /* Scenery. Vanta binds its own listener to `window`, so this costs nothing. */
   pointer-events: none;
   background: transparent;
   opacity: 0;

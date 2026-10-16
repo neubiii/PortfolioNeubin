@@ -1,8 +1,6 @@
 /**
  * Resolves an image key — `meet-in-room/user-flow` — to its bundled URL, so
  * the file extension is not baked into the project data.
- *
- * See ASSETS.md for the Figma node behind each key.
  */
 const files = import.meta.glob('../assets/**/*.{png,jpg,jpeg,webp,gif,svg}', {
   eager: true,
@@ -28,8 +26,7 @@ for (const [path, url] of Object.entries(files)) {
 export function asset(key: string): string {
   const found = byKey.get(key)
   if (!found) {
-    // A missing image should be obvious while wiring content, not a silently
-    // broken <img>.
+    // Obvious while wiring content, rather than a silently broken <img>.
     if (import.meta.env.DEV) console.warn(`[assets] no file found for "${key}"`)
     return ''
   }

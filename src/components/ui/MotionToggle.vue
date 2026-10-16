@@ -5,10 +5,8 @@ import { useMotion } from '@/composables/useMotion'
 /**
  * Pause / resume the hero's flock, and nothing else on the page.
  *
- * The button names the action it will perform, which is the standard
- * media-control pattern and needs no `aria-pressed`: the accessible name
- * changes with the state. Rendered only where WebGL exists, so it never offers
- * to resume something that could not run.
+ * The button names the action rather than the state, so it needs no
+ * `aria-pressed`. Rendered only where WebGL exists.
  */
 const { active, supported, toggle, label } = useMotion()
 </script>

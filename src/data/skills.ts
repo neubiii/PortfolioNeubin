@@ -1,23 +1,13 @@
 import type { SkillItem, SkillKind, SkillLevel } from '@/types'
 
 /**
- * SKILLSET
+ * The single source of truth for the Skillset section: no component names a
+ * skill, a tool, a level or a domain.
  *
- * The single source of truth for everything the Skillset section shows. No
- * component names a skill, a tool, a level or a domain — they all read from
- * here, so promoting something is a one-word edit on one line:
- *
- *   level: 'above-average'  →  level: 'advanced'
- *
- * Two rules hold this file together.
- *
- * One entry per thing. Where a subject was supplied under both a skills
- * heading and a tools heading — Git, Docker, GitHub Actions — it appears once,
- * as the tool it is. Nothing is listed twice under a different hat.
- *
- * Domains are a list, not a choice. A practice that genuinely lives on both
- * sides of the work carries `['ux', 'development']` rather than being split
- * into two rows that then drift apart.
+ * Two rules. One entry per thing — anything that could be filed as both a
+ * skill and a tool (Git, Docker, GitHub Actions) appears once, as the tool it
+ * is. And domains are a list, so a practice living on both sides of the work
+ * carries both rather than being split into rows that drift apart.
  */
 
 /** Strongest first. The display order of the whole section comes from this. */
@@ -46,18 +36,15 @@ export const skills: SkillItem[] = [
   { id: 'design-thinking', name: 'Design Thinking', kind: 'skill', domains: ['ux'], level: 'advanced' },
   { id: 'storytelling', name: 'Storytelling', kind: 'skill', domains: ['ux'], level: 'advanced' },
   { id: 'ai-ux-patterns', name: 'AI UX Patterns', kind: 'skill', domains: ['ux'], level: 'advanced' },
-  // Cross-domain: the same habit of working with AI shows up in the build.
   { id: 'ai-assisted-workflows', name: 'AI-assisted Design Workflows', kind: 'skill', domains: ['ux', 'development'], level: 'advanced' },
   { id: 'web-mobile-app-design', name: 'Web & Mobile App Design', kind: 'skill', domains: ['ux'], level: 'advanced' },
 
   { id: 'user-research', name: 'User Research', kind: 'skill', domains: ['ux'], level: 'above-average' },
   { id: 'information-architecture', name: 'Information Architecture', kind: 'skill', domains: ['ux'], level: 'above-average' },
-  // Cross-domain: drawn as a system, then shipped as tokens and components.
   { id: 'design-systems', name: 'Design Systems', kind: 'skill', domains: ['ux', 'development'], level: 'above-average' },
   { id: 'human-ai-interaction', name: 'Human–AI Interaction Design', kind: 'skill', domains: ['ux'], level: 'above-average' },
   { id: 'information-design', name: 'Information Design', kind: 'skill', domains: ['ux'], level: 'above-average' },
   { id: 'visual-design', name: 'Visual Design', kind: 'skill', domains: ['ux'], level: 'above-average' },
-  // Cross-domain: a design decision and an implementation one in equal measure.
   { id: 'accessibility', name: 'Accessibility', kind: 'skill', domains: ['ux', 'development'], level: 'above-average' },
   { id: 'learning-experience-design', name: 'Learning Experience Design', kind: 'skill', domains: ['ux'], level: 'above-average' },
 
@@ -68,7 +55,6 @@ export const skills: SkillItem[] = [
   { id: 'html', name: 'HTML', kind: 'skill', domains: ['development'], level: 'advanced' },
   { id: 'css', name: 'CSS', kind: 'skill', domains: ['development'], level: 'advanced' },
   { id: 'javascript', name: 'JavaScript', kind: 'skill', domains: ['development'], level: 'advanced' },
-  // Cross-domain: the layout decision and the media query are the same call.
   { id: 'responsive-development', name: 'Responsive Development', kind: 'skill', domains: ['development', 'ux'], level: 'advanced' },
 
   { id: 'typescript', name: 'TypeScript', kind: 'skill', domains: ['development'], level: 'above-average' },
@@ -98,7 +84,6 @@ export const skills: SkillItem[] = [
   { id: 'figma', name: 'Figma', kind: 'tool', domains: ['ux'], level: 'advanced' },
   { id: 'figjam', name: 'FigJam', kind: 'tool', domains: ['ux'], level: 'advanced' },
 
-  // Cross-domain: it exists to carry a design across into code.
   { id: 'figma-make', name: 'Figma Make', kind: 'tool', domains: ['ux', 'development'], level: 'advanced' },
   { id: 'canva', name: 'Canva', kind: 'tool', domains: ['ux'], level: 'above-average' },
   { id: 'tsc-cms', name: 'TSC CMS', kind: 'tool', domains: ['ux'], level: 'above-average' },
@@ -117,19 +102,15 @@ export const skills: SkillItem[] = [
   { id: 'claude-code', name: 'Claude Code', kind: 'tool', domains: ['development'], level: 'above-average' },
   { id: 'codex', name: 'Codex', kind: 'tool', domains: ['development'], level: 'above-average' },
   { id: 'github', name: 'GitHub', kind: 'tool', domains: ['development'], level: 'above-average' },
-  // Also supplied as the skill "Git / Version Control", at the same level.
   { id: 'git', name: 'Git', kind: 'tool', domains: ['development'], level: 'above-average' },
   { id: 'vite', name: 'Vite', kind: 'tool', domains: ['development'], level: 'above-average' },
 
-  // Also supplied as a development skill, at the same level.
   { id: 'docker', name: 'Docker', kind: 'tool', domains: ['development'], level: 'working-knowledge' },
-  // Also supplied as the skill "CI / GitHub Actions", at the same level.
   { id: 'github-actions', name: 'GitHub Actions', kind: 'tool', domains: ['development'], level: 'working-knowledge' },
 ]
 
-/* ── Selectors ─────────────────────────────────────────────────────────────
-   Small, so a component asks for what it needs rather than filtering an array
-   inline and quietly encoding its own idea of the taxonomy. */
+/* ── Selectors ───────────────────────────────────────────────────────────
+   So a component asks for what it needs rather than filtering inline. */
 
 const rank = (item: SkillItem) => LEVELS.indexOf(item.level)
 

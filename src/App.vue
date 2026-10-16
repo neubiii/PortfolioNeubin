@@ -9,10 +9,8 @@ import { router } from '@/router'
 
 /**
  * Contact and the footer live in the shell rather than in each route, so on a
- * cold load they were the only thing in the document while the lazily-imported
- * route was still in flight — a screenful of Contact before the page arrived.
- * `isReady()` resolves once that chunk has loaded, so they are simply not
- * rendered until the page they close exists.
+ * cold load they would be the only thing in the document while the lazy route
+ * chunk is in flight. `isReady()` resolves once it has loaded.
  */
 const routed = ref(false)
 void router.isReady().then(() => (routed.value = true))
@@ -37,9 +35,8 @@ void router.isReady().then(() => (routed.value = true))
 </template>
 
 <style scoped>
-/* Sections pay their spacing on the top edge, so the last one on a page has
-   no closing space of its own — and Contact, the coloured band below, would
-   meet it directly. */
+/* Sections pay their spacing on the top edge, so the last one needs a closing
+   space before Contact's coloured band. */
 #main {
   outline: none;
   padding-bottom: var(--section-y);

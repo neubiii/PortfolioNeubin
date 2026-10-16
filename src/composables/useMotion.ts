@@ -3,21 +3,17 @@ import { computed, ref, watch } from 'vue'
 /**
  * Two separate questions, deliberately not one.
  *
- * `motionOk` is the accessibility answer: does this visitor want decorative
- * motion at all? Only the OS setting decides it, and every section's entrance
- * animation reads it.
- *
- * `active` is the hero background: the same question plus WebGL, plus the
- * visitor's own use of the hero's play/pause control. That control writes to
- * `background` below and to nothing else — it is a control for the flock, not
- * a site-wide switch. Wiring it into `motionOk` used to strip the entrance
- * animations off sections mid-session, which left anything not yet revealed
- * stuck at the `opacity: 0` its animation had already applied.
+ * `motionOk` is the accessibility answer — does this visitor want decorative
+ * motion at all — and every section's entrance animation reads it. `active`
+ * is the hero background: that question plus WebGL plus the hero's play/pause
+ * control, which writes to `background` below and to nothing else. Keeping the
+ * control out of `motionOk` is what stops it stripping entrance animations off
+ * sections mid-session, leaving unrevealed content stuck at `opacity: 0`.
  *
  * Three states rather than a boolean, so the OS preference and an explicit
  * choice can coexist: 'system' follows `prefers-reduced-motion`, 'on'
- * overrides it, 'off' pauses. Held at module level and mirrored to
- * sessionStorage, so the choice survives navigating into a project and back.
+ * overrides it, 'off' pauses. Module level and mirrored to sessionStorage, so
+ * the choice survives navigating into a project and back.
  */
 export type MotionPreference = 'system' | 'on' | 'off'
 
@@ -67,11 +63,8 @@ if (typeof window !== 'undefined') {
   }
 }
 
-/**
- * Decorative motion the visitor is happy with, for sections across the site.
- * The OS setting alone, so this never flips mid-session and never takes an
- * entrance animation away from content that has not been revealed yet.
- */
+/** Sections across the site. The OS setting alone, so it never flips
+ *  mid-session and takes an entrance animation away from unrevealed content. */
 const motionOk = computed(() => !reducedMotion.value)
 
 /** The hero's flock: motion, WebGL, and the visitor's own play/pause. */
@@ -86,9 +79,8 @@ export function useMotion() {
     background.value = active.value ? 'off' : 'on'
   }
 
-  /* Name the action and name what it acts on: the control pauses the hero's
-     animated background, not the page. Under an un-overridden reduced-motion
-     setting it offers to start that background rather than to resume it. */
+  /* Name the action and what it acts on. Under an un-overridden
+     reduced-motion setting it offers to start, not to resume. */
   const label = computed(() => {
     if (active.value) return 'Pause background'
     if (background.value === 'system' && reducedMotion.value) return 'Play background'
