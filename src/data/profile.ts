@@ -8,7 +8,7 @@ export const profile = {
   email: 'neubinsebastian0@gmail.com',
 
   intro:
-    'He works mainly across B2B and enterprise products - complex workflows, data-rich interfaces and AI-assisted experiences and he is comfortable switching mindsets between designer and developer when the problem needs both.',
+    'My experience spans UI/UX work at SAP and front-end development at Accenture. I work across B2B and enterprise products, turning complex workflows into clear interfaces and moving between design and implementation when the problem needs both.',
 
   links: [
     { label: 'GitHub', href: 'https://github.com/neubiii', external: true },

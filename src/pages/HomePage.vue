@@ -60,8 +60,8 @@ const finishIntro = () => (introActive.value = false)
         <p class="hero__lede">{{ profile.intro }}</p>
 
         <div class="hero__cta">
-          <ArrowLink to="/#work" size="lg">View Neubin&rsquo;s work</ArrowLink>
-          <ArrowLink to="/#contact">Contact Neubin</ArrowLink>
+          <ArrowLink to="/#work" size="lg">View my work</ArrowLink>
+          <ArrowLink to="/#contact">Contact me</ArrowLink>
         </div>
       </div>
 

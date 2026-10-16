@@ -8,7 +8,7 @@ import { profile } from '@/data/profile'
 
 
 const media = {
-  portrait: asset('about/portrait-cut'),
+  portrait: asset('profile/neubin-portrait'),
   mountains: asset('about/mountains'),
   snow: asset('about/snow'),
   music: asset('about/music-mask'),
@@ -139,19 +139,17 @@ const loves = [
         </motion.p>
 
         <motion.article class="panel id" v-bind="from('left')">
-          <!-- An arched window cut into the panel. The cut-out stands on its
-               floor, so the flat bottom edge of the source reads as the frame's
-               own baseline. -->
+          <!-- The photograph itself, standing on the floor of the panel. -->
           <div class="id__stage">
-            <div class="id__frame">
-              <img
-                class="id__portrait"
-                :src="media.portrait"
-                alt="Neubin Sebastian"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
+            <img
+              class="id__portrait"
+              :src="media.portrait"
+              alt="Portrait of Neubin Sebastian"
+              width="896"
+              height="1200"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
 
           <div class="id__foot">
@@ -251,8 +249,6 @@ const loves = [
   overflow-x: clip;
 
   --a-navy: #1b2247;
-  --a-navy-lit: #262e5c;
-  --a-navy-edge: rgb(198 206 240 / 0.2);
 
   --a-burgundy: #6d1235;
   --a-lilac: #ded3f2;
@@ -373,8 +369,7 @@ const loves = [
   }
 }
 
-/* Square, so the one curve left in the section — the arched window — reads as
-   a deliberate shape rather than the largest of several radii. */
+/* Square throughout: no panel, photograph or tile carries a radius. */
 .panel {
   position: relative;
   border-radius: 0;
@@ -397,42 +392,21 @@ const loves = [
   min-height: 12rem;
 }
 
-/* A single arch — the top corners are one elliptical sweep, the bottom two the
-   panel's own radius — recessed a shade so it reads as cut into the panel. */
-.id__frame {
-  position: relative;
-  /* The window has its own proportion rather than the photograph's. */
-  height: min(100%, 29rem);
-  aspect-ratio: 41 / 52;
-  width: auto;
-  max-width: 100%;
-  overflow: hidden;
-  background: var(--a-navy-lit);
-  border: 1px solid var(--a-navy-edge);
-  border-radius: 50% 50% 0 0 / 42% 42% 0 0;
+/* The photograph at its own 3:4, square-cornered like every other panel. It
+   only takes `cover` when a short panel caps its height, and the framing is
+   held a little above centre so the head stays in the crop when it does. */
+.id__portrait {
+  display: block;
+  width: 100%;
+  max-width: 24rem;
+  max-height: min(100%, 29rem);
+  aspect-ratio: 896 / 1200;
+  object-fit: cover;
+  object-position: center 28%;
   transition: transform var(--dur-slow) var(--ease-out);
 }
 
-/* Placed inside the window rather than filling it, and standing on its floor.
-   The source is cropped tight to the subject, so `bottom: 0` puts the body on
-   the frame's baseline and `translateX(-50%)` centres the person rather than a
-   transparent box. Height is set and width follows, so the side margins stay
-   put. */
-.id__portrait {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  z-index: 1;
-  display: block;
-  height: 82%;
-  width: auto;
-  max-width: 84%;
-  object-fit: contain;
-  object-position: bottom center;
-  transform: translateX(-50%);
-}
-
-.id:hover .id__frame {
+.id:hover .id__portrait {
   transform: translateY(-0.4rem);
 }
 
@@ -774,7 +748,7 @@ const loves = [
     transition: none;
   }
 
-  .id__frame,
+  .id__portrait,
   .love,
   .love__img,
   .love__art,
@@ -789,7 +763,7 @@ const loves = [
 
   .love:hover .love__img,
   .love:hover .love__art,
-  .id:hover .id__frame {
+  .id:hover .id__portrait {
     transform: none;
   }
 }
