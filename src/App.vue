@@ -7,6 +7,7 @@ import ContactBlock from '@/components/layout/ContactBlock.vue'
 import GrainOverlay from '@/components/ui/GrainOverlay.vue'
 import VasuAssistant from '@/components/assistant/VasuAssistant.vue'
 import { router } from '@/router'
+import { Analytics } from '@vercel/analytics/vue'
 
 /**
  * Contact and the footer live in the shell rather than in each route, so on a
@@ -34,6 +35,7 @@ void router.isReady().then(() => (routed.value = true))
     <SiteFooter />
     <VasuAssistant />
   </template>
+  <Analytics />
 </template>
 
 <style scoped>
