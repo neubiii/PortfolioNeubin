@@ -6,6 +6,7 @@ import SiteFooter from '@/components/layout/SiteFooter.vue'
 import ContactBlock from '@/components/layout/ContactBlock.vue'
 import GrainOverlay from '@/components/ui/GrainOverlay.vue'
 import { router } from '@/router'
+import { Analytics } from '@vercel/analytics/vue'
 
 /**
  * Contact and the footer live in the shell rather than in each route, so on a
@@ -32,6 +33,7 @@ void router.isReady().then(() => (routed.value = true))
     <ContactBlock />
     <SiteFooter />
   </template>
+  <Analytics />
 </template>
 
 <style scoped>
