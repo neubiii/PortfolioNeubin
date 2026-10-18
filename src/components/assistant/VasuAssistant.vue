@@ -5,7 +5,7 @@ import { Brain, MessageCircle, Send, X } from 'lucide-vue-next'
 import { onKeyStroke } from '@vueuse/core'
 import { useMotion } from '@/composables/useMotion'
 import {
-  VASU_FALLBACK,
+  VASU_OFFLINE,
   VASU_WELCOME,
   matchTopic,
   vasuFollowUps,
@@ -18,11 +18,18 @@ import {
  * Vasu — the portfolio's assistant. Mounted once in the app shell, so the
  * conversation survives routing and closing the panel keeps it.
  *
- * Answers come from `data/vasuKnowledge.ts`; nothing here talks to a network.
+ * Questions go to `/api/chat`, which answers from `data/vasuKnowledge.ts`.
+ * When that call fails — rate limit, outage, no network, or the dev server,
+ * which serves no functions — the same knowledge answers locally instead, so
+ * the panel is never dead. Links and follow-ups are always ours, never the
+ * model's.
  */
 
-/** Stands in for the round trip a real answer will take. */
-const THINK_MS = 560
+/** Long enough for a cold function, short enough not to feel stuck. */
+const REPLY_TIMEOUT_MS = 9000
+
+/** Recent turns sent for context. Enough to resolve "and his UX work?". */
+const HISTORY = 8
 
 type Message = {
   id: number
@@ -70,7 +77,7 @@ const suggestions = computed<VasuTopic[]>(() => {
 })
 const canSend = computed(() => draft.value.trim().length > 0 && !thinking.value)
 
-let timer = 0
+let inflight: AbortController | null = null
 let seq = 0
 
 const push = (message: Omit<Message, 'id'>) => messages.value.push({ id: ++seq, ...message })
@@ -81,34 +88,68 @@ const toLatest = () =>
     if (list.value) list.value.scrollTop = list.value.scrollHeight
   })
 
-const ask = (question: string, topic = matchTopic(question)) => {
+/**
+ * One request, no retry. Any failure — non-200, timeout, offline — comes back
+ * as an empty string, and the caller answers from the local knowledge instead.
+ */
+const askServer = async (turns: { role: 'user' | 'assistant'; content: string }[]) => {
+  const controller = new AbortController()
+  inflight = controller
+  const timer = window.setTimeout(() => controller.abort(), REPLY_TIMEOUT_MS)
+
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ messages: turns }),
+      signal: controller.signal,
+    })
+    if (!response.ok) return ''
+
+    const data: unknown = await response.json()
+    const answer = (data as { answer?: unknown })?.answer
+    return typeof answer === 'string' ? answer.trim() : ''
+  } catch {
+    return ''
+  } finally {
+    window.clearTimeout(timer)
+    if (inflight === controller) inflight = null
+  }
+}
+
+const ask = async (question: string, topic = matchTopic(question)) => {
   if (thinking.value) return
   push({ from: 'visitor', text: question })
   thinking.value = true
   status.value = 'Thinking'
   void toLatest()
 
-  timer = window.setTimeout(() => {
-    thinking.value = false
-    const text = topic?.answer ?? VASU_FALLBACK
-    push({
-      from: 'vasu',
-      text,
-      actions: topic?.actions,
-      topicId: topic?.id,
-      followUps: topic && vasuFollowUps(topic),
-      unanswered: !topic,
-    })
-    status.value = text
-    void toLatest()
-  }, THINK_MS)
+  const turns = messages.value.slice(-HISTORY).map((message) => ({
+    role: message.from === 'vasu' ? ('assistant' as const) : ('user' as const),
+    content: message.text,
+  }))
+
+  const answer = await askServer(turns)
+
+  thinking.value = false
+  const text = answer || topic?.answer || VASU_OFFLINE
+  push({
+    from: 'vasu',
+    text,
+    actions: topic?.actions,
+    topicId: topic?.id,
+    followUps: topic && vasuFollowUps(topic),
+    unanswered: !topic,
+  })
+  status.value = text
+  void toLatest()
 }
 
 const send = () => {
   const question = draft.value.trim()
   if (!question || thinking.value) return
   draft.value = ''
-  ask(question)
+  void ask(question)
 }
 
 const show = async () => {
@@ -131,7 +172,7 @@ onKeyStroke('Escape', () => {
   if (open.value) void hide()
 })
 
-onBeforeUnmount(() => clearTimeout(timer))
+onBeforeUnmount(() => inflight?.abort())
 
 const isExternal = (action: VasuAction) => Boolean(action.href && !action.href.startsWith('mailto:'))
 
@@ -216,6 +257,7 @@ const paragraphs = (text: string) => text.split('\n\n')
             :key="topic.id"
             type="button"
             class="vasu__starter"
+            :disabled="thinking"
             @click="ask(topic.title, topic)"
           >
             {{ topic.title }}
@@ -235,6 +277,7 @@ const paragraphs = (text: string) => text.split('\n\n')
           class="vasu__input"
           placeholder="Ask Vasu about Neubin&hellip;"
           autocomplete="off"
+          maxlength="500"
         />
         <button type="submit" class="vasu__send" :disabled="!canSend" aria-label="Send">
           <Send aria-hidden="true" />
