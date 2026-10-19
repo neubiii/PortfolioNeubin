@@ -69,7 +69,7 @@ export const vasuTopics: VasuTopic[] = [
     aliases: ['accenture', 'myconcerto', 'bengaluru', 'bangalore'],
     answer:
       'Accenture is where his implementation foundation comes from: two and a half years in Bengaluru as a frontend developer on MyConcerto, turning dense business-development content into client-facing web experiences. He built 100+ responsive templates with Figma, HTML, CSS, JavaScript and React, worked with UX, backend and QA on delivery and bug fixing, ran knowledge-transfer sessions for new joiners, and presented finished work in client demos. That is where he learned to read a design and build it accurately, at volume and on a delivery schedule.',
-    followUps: ['frontend', 'sap', 'projects'],
+    followUps: ['frontend', 'design-dev', 'sap'],
   },
   {
     id: 'ai',
@@ -181,6 +181,7 @@ export const vasuTopics: VasuTopic[] = [
       'node',
       'stack',
       'tech stack',
+      'code',
       'coding',
       'implement',
     ],
