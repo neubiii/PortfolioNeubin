@@ -42,17 +42,7 @@ const normalise = (text: string) =>
 const hits = (question: string, topic: VasuTopic) =>
   topic.aliases.filter((alias) => question.includes(` ${alias}`)).length
 
-/**
- * Which topics this question is worth. The latest question decides; the two
- * before it only break ties, which is enough to carry "and his UX work?"
- * without any parsing. A thin match is rounded out with the topic's own
- * curated follow-ups, and a question that matches nothing — Kubernetes,
- * Angular, salary — gets the fallback rather than a manufactured match, so
- * the model can say plainly that the detail is not in the portfolio.
- *
- * Deterministic throughout: the sort is stable, so equal scores keep
- * `vasuTopics` order, which is already specific-first.
- */
+
 const selectTopics = (turns: Turn[]): VasuTopic[] => {
   const asked = turns.filter((turn) => turn.role === 'user')
   const latest = normalise(asked[asked.length - 1]?.content ?? '')
@@ -151,7 +141,7 @@ const readTurns = (body: unknown): Turn[] | null => {
   return turns.length ? turns : null
 }
 
-export default async function handler(request: Request): Promise<Response> {
+async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') return failed(405)
 
   const key = process.env.GROQ_API_KEY
@@ -216,3 +206,6 @@ export default async function handler(request: Request): Promise<Response> {
     clearTimeout(timer)
   }
 }
+
+
+export default { fetch: handler }
