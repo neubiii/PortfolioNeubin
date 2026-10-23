@@ -208,4 +208,7 @@ async function handler(request: Request): Promise<Response> {
 }
 
 
-export default { fetch: handler }
+
+export async function POST(request: Request): Promise<Response> {
+  return handler(request)
+}

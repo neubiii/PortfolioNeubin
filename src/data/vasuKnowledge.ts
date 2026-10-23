@@ -1,28 +1,6 @@
 import { findProject } from './projects'
 import { profile } from './profile'
 
-/**
- * WHAT VASU KNOWS
- *
- * One topic per question a recruiter actually asks. Every claim below is
- * traceable to Neubin's CV, the project data in `projects.ts`, the skill list
- * or `profile`. Nothing is inferred beyond what those state.
- *
- * Two lines are worth holding on to while editing:
- *
- *   SAP and Accenture are employment. The AI Expense Agent is his master's
- *   project. Those facts never swap places.
- *
- *   React is where the professional frontend years are. Vue and TypeScript are
- *   current work. Saying it the other way round would overclaim.
- *
- * Primitives — email, links, project titles and routes — are read from the
- * existing data rather than retyped. The prose is curated; the facts are not
- * duplicated.
- *
- * Phase 3 note: this array is the whole context. Serialising `title` + `answer`
- * is all a model would need.
- */
 
 export type VasuAction = {
   label: string
@@ -49,11 +27,7 @@ const work = (slug: string): VasuAction => ({
   to: `/work/${slug}`,
 })
 
-/**
- * Order is the matcher: the first topic with a matching alias answers. Specific
- * employers and named subjects come first, broad topics last, so `background`
- * never outranks `accenture`.
- */
+
 export const vasuTopics: VasuTopic[] = [
   {
     id: 'sap',

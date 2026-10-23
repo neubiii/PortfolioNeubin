@@ -14,16 +14,6 @@ import {
   type VasuTopic,
 } from '@/data/vasu'
 
-/**
- * Vasu — the portfolio's assistant. Mounted once in the app shell, so the
- * conversation survives routing and closing the panel keeps it.
- *
- * Questions go to `/api/chat`, which answers from `data/vasuKnowledge.ts`.
- * When that call fails — rate limit, outage, no network, or the dev server,
- * which serves no functions — the same knowledge answers locally instead, so
- * the panel is never dead. Links and follow-ups are always ours, never the
- * model's.
- */
 
 /** Long enough for a cold function, short enough not to feel stuck. */
 const REPLY_TIMEOUT_MS = 9000
