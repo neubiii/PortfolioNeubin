@@ -1,5 +1,5 @@
-import { findProject } from './projects'
-import { profile } from './profile'
+import { findProject } from './projects.js'
+import { profile } from './profile.js'
 
 
 export type VasuAction = {

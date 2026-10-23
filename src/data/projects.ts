@@ -1,4 +1,4 @@
-import type { Discipline, Project } from '@/types'
+import type { Discipline, Project } from '../types/index.js'
 
 /**
  * PROJECT CONTENT

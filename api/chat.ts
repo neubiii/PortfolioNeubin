@@ -1,4 +1,7 @@
-import { vasuTopics, type VasuTopic } from '../src/data/vasuKnowledge'
+/// <reference types="node" />
+
+import { env } from 'node:process'
+import { vasuTopics, type VasuTopic } from '../src/data/vasuKnowledge.js'
 
 
 
@@ -144,7 +147,7 @@ const readTurns = (body: unknown): Turn[] | null => {
 async function handler(request: Request): Promise<Response> {
   if (request.method !== 'POST') return failed(405)
 
-  const key = process.env.GROQ_API_KEY
+  const key = env.GROQ_API_KEY
   if (!key) {
     console.error('[vasu] GROQ_API_KEY is not set')
     return failed(503)
@@ -161,7 +164,7 @@ async function handler(request: Request): Promise<Response> {
   const topics = selectTopics(turns)
   const system = `${RULES}\n${knowledge(topics)}`
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (env.NODE_ENV !== 'production') {
     // Ids and sizes only — never the key, the prompt or the conversation.
     console.log(
       `[vasu] ${topics.length} topics (${topics.map((t) => t.id).join(', ')}), ` +
