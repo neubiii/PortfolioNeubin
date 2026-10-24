@@ -5,16 +5,17 @@ import { vasuTopics, type VasuTopic } from './vasuKnowledge'
 export type { VasuAction, VasuTopic } from './vasuKnowledge'
 
 export const VASU_WELCOME = [
-  'Hey, I’m Vasu. I know a suspicious amount about Neubin’s work.',
-  'Ask me about his experience, projects, skills, or how to reach him.',
+  'Welcome to Neubin’s portfolio.',
+  'I’m Vasu, your guide to Neubin’s work.',
+  'Ask me about his experience, projects, skills, or how he works.',
 ]
 
 
 export const VASU_OFFLINE =
   'I’m having trouble answering that one right now. You can still ask me about Neubin’s experience, projects, skills or contact details.'
 
-/** The first impression. Four, deliberately — recruiter questions, not trivia. */
-const STARTER_IDS = ['overview', 'team-value', 'sap', 'design-dev']
+/** Two, deliberately: suggestions beside the input, not a menu to pick from. */
+const STARTER_IDS = ['overview', 'team-value']
 
 const byId = new Map(vasuTopics.map((topic) => [topic.id, topic]))
 
