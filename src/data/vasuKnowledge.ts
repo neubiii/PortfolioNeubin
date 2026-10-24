@@ -15,6 +15,20 @@ export type VasuTopic = {
   title: string
   /** Lower-case words and phrases that route a typed question here. */
   aliases: string[]
+  /**
+   * The subset of `aliases` too common to route on by itself. A question is a
+   * recruiter's sentence, not a keyword, and these words turn up in questions
+   * this topic cannot answer: 'team' in "has he managed an engineering team",
+   * 'developer' in "is he a full-stack developer". They still count toward the
+   * match; they just cannot carry it alone. Sparse by design — add a word here
+   * only once it is seen misrouting, and leave the field off entirely for a
+   * topic whose aliases are all distinctive.
+   *
+   * Read by the browser's offline matcher. The server selector scores `aliases`
+   * and ignores this, because it has the model and the whole prompt to keep it
+   * honest; offline there is nothing but this file.
+   */
+  generic?: string[]
   answer: string
   actions?: VasuAction[]
   /** Ids of two or three topics worth asking next. */
@@ -74,6 +88,7 @@ export const vasuTopics: VasuTopic[] = [
       'how does he work',
       'collaborat',
       'communicat',
+      'product manager',
       'process',
       'iterat',
       'workshop',
@@ -101,6 +116,7 @@ export const vasuTopics: VasuTopic[] = [
       'useful to',
       'strengths for',
     ],
+    generic: ['team', 'fit'],
     answer:
       'His biggest strength is that design and implementation are the same job to him. At SAP he turned business requirements into flows, wireframes and prototypes, interviewed 20+ global managers and tested with real participants; at Accenture he shipped 100+ responsive templates alongside UX, backend and QA. That means he is useful in a design review and in a frontend stand-up, and a decision made in one survives into the other.\n\nHe also builds things to be reused: a 20+ component design system at SAP, and his own typed Vue component library now. If your product has complex workflows or data-heavy screens, that is familiar ground — both of his roles were enterprise B2B.',
     followUps: ['design-dev', 'frontend', 'projects'],
@@ -159,6 +175,7 @@ export const vasuTopics: VasuTopic[] = [
       'coding',
       'implement',
     ],
+    generic: ['developer', 'development', 'engineer', 'stack'],
     answer:
       'His professional foundation is the classic one: HTML, CSS, JavaScript and React, two and a half years of it at Accenture across 100+ responsive templates. That is real production mileage.\n\nHe has kept building on it — TypeScript, Vue 3, component-driven work with Vite, Storybook and Vitest. neubii UI, his own typed Vue 3 component library with design tokens and automated tests, is the clearest example, and this portfolio is Vue 3 and TypeScript written from scratch. His UX experience gives that frontend work stronger product and usability context: he knows what an interface has to do for the person using it, not only how to assemble it.',
     actions: [{ label: 'See the full skillset', to: '/#skillset' }],
@@ -187,6 +204,7 @@ export const vasuTopics: VasuTopic[] = [
       'designer',
       'case study',
     ],
+    generic: ['design', 'designer'],
     answer:
       'His UX side is formally trained and professionally practised: a master’s in Applied Computer Science specialising in UX design and usability engineering, plus the showroom design work at SAP. In practice that is user interviews, personas and journey maps, user flows, wireframes, high-fidelity Figma prototypes, design systems, moderated usability testing and design thinking facilitation.\n\nMeet-in-Room is the clearest single example — an eight-week case study that runs interviews through personas, information architecture, prototype, two rounds of usability testing and an A/B test on the booking entry point.',
     actions: [work('meet-in-room'), work('ai-expense-agent')],
@@ -206,6 +224,7 @@ export const vasuTopics: VasuTopic[] = [
       'expertise',
       'good at',
     ],
+    generic: ['skill', 'tool'],
     answer:
       'Strongest in the frontend core — HTML, CSS and JavaScript — with React from professional work, and Vue 3 with TypeScript from his current projects. Around that: Tailwind, Vite, Node and Express, REST APIs, Git and GitHub Actions, and testing with Jest, Vitest and Cypress.\n\nOn the design side it is Figma, backed by design systems, prototyping and usability testing as the actual practice. He also works with AI coding tools — Claude Code, Codex, Figma AI — as part of his normal workflow.',
     actions: [{ label: 'See the full skillset', to: '/#skillset' }],
