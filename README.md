@@ -31,8 +31,30 @@ The site also includes dedicated case-study routes, responsive layouts, light/da
 - Three.js
 - Lucide Icons
 
+## Vasu, the portfolio assistant
+
+`api/chat.ts` is a single Vercel function. It answers from the portfolio facts in
+`src/data/vasuKnowledge.ts` — the one source of truth — via Groq's
+OpenAI-compatible endpoint. It needs one environment variable:
+
+    GROQ_API_KEY=...
+
+Copy `.env.example` to `.env.local` for local work, and set the same variable in
+the Vercel project settings for deployments. It is read server-side only and is
+never exposed to the browser.
+
+`npm run dev` serves the site but not the function, so Vasu falls back to its
+local grounded answers there. To run the function locally:
+
+    npx vercel dev
+
+which picks `GROQ_API_KEY` up from `.env.local`. If Groq is unreachable, rate
+limited or unconfigured, the assistant keeps answering from the same knowledge
+in the browser.
+
 ## Project structure
 
+api/               # Vercel server functions
 src/
 ├── assets/        # Portfolio imagery and project assets
 ├── components/    # Layout, UI and project components

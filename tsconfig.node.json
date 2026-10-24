@@ -1,10 +1,17 @@
 {
   "extends": "@tsconfig/node22/tsconfig.json",
-  "include": ["vite.config.ts"],
+  "include": ["vite.config.ts", "api/**/*.ts"],
   "compilerOptions": {
     "noEmit": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "types": ["node"]
+    "types": ["node"],
+
+    /* The function imports the knowledge from `src/`, which uses the `@` alias
+       for its types. Same mapping as `tsconfig.json`, so both see one module. */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   }
 }
